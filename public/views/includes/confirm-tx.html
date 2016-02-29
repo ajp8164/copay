@@ -7,7 +7,7 @@
   </div>
   <div class="p10" ng-style="{'background':skin.view.viewBackground}">
     <div class="size-36" ng-style="{'color':skin.view.viewPrimaryTextColor}">{{tx.amountStr}}</div>
-    <div class="size-14 text-light" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="tx.alternativeAmountStr">{{tx.alternativeAmountStr}}</div>
+    <div class="size-12 label gray radius" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="tx.alternativeAmountStr">{{tx.alternativeAmountStr}}</div>
     <i class="db fi-arrow-down size-24 m10v" ng-style="{'color':skin.view.viewPrimaryTextColor}"></i>
     <div class="payment-proposal-to" ng-click="copyToClipboard(tx.toAddress)">
       <i class="fi-bitcoin left m10l" ng-style="{'color':skin.view.viewPrimaryTextColor}"></i>
@@ -16,8 +16,15 @@
         Multiple recipients
       </span>
     </div>
-    <div class="text-bold m10t size-12" ng-style="{'color':skin.view.viewSecondaryTextColor}">
-      <span translate>Fee</span>: {{tx.feeStr}}
+    <div class="text-bold m10t size-12" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-init="confirm.processFee(tx.amount, tx.fee)">
+      <div ng-show="!showPercentage" ng-click="showPercentage = true">
+        <span translate>Fee</span>: {{tx.feeStr}}
+        <span class="label gray radius">{{confirm.feeAlternativeStr}}</span>
+      </div>
+      <div ng-show="showPercentage" ng-click="showPercentage = false" translate>
+        {{confirm.feeLevel|translate}} &middot; 
+        {{confirm.feeRateStr}} of the transaction
+      </div>
     </div>
     <div class="row m20t">
       <div class="large-6 medium-6 small-6 columns">
