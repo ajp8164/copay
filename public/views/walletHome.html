@@ -270,7 +270,6 @@
                   </div>
             </div>
           </div>
-
           <ion-infinite-scroll distance="1" on-infinite="home.showMore()" ng-if="home.historyShowMore()">
           </ion-infinite-scroll>
         </ion-list>
@@ -390,7 +389,7 @@
           </a>
           <div ng-show="!home.paymentExpired && home._paypro">
             <span translate>Payment expires</span>
-            <time> {{home.timeToExpire * 1000 | amTimeAgo}}</time>
+            <time>{{home.remainingTimeStr}}</time>
           </div>
         </h4>
         <div class="camera-icon" ng-style="{'color':skin.view.cameraButtonColor, 'background':skin.view.cameraButtonBackground, 'box-shadow':skin.view.cameraButtonShadow}" ng-show="index.isComplete">
