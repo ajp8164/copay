@@ -59,7 +59,7 @@
           <button class="button outline round dark-gray expand"
             ng-style="{'background':theme.view.secondaryButtonBackground, 'border':theme.view.secondaryButtonBorder, 'color':theme.view.secondaryButtonTextColor}"
             ng-click="reject(tx);"
-            ng-disabled="loading || (paymentExpired && usePaypro)">
+            ng-disabled="loading || paymentExpired">
             <i class="fi-x"></i>
             <span translate>Reject</span>
           </button>
@@ -170,7 +170,7 @@
         <li class="line-b p10" ng-if="!paymentExpired">
           <span class="text-gray" ng-style="{'color':skin.view.viewPrimaryTextColor}" translate>Expires</span>
           <span class="right" ng-style="{'color':skin.view.viewSecondaryTextColor}">
-            <time>{{expires * 1000 | amTimeAgo }}</time>
+            <time>{{expires}}</time>
           </span>
         </li>
         <li class="line-b p10"

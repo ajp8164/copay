@@ -34,23 +34,26 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
       }, function(err, paypro) {
         if (err) return;
         self.tx.paypro = paypro;
-        $scope.paymentExpired = self.tx.paypro.expires <= now;
-        if (!$scope.paymentExpired)
-          paymentTimeControl(self.tx.paypro.expires);
-        $scope.$apply();
+        paymentTimeControl(self.tx.paypro.expires);
       });
     }
   };
 
-  function paymentTimeControl(timeToExpire) {
-    $scope.expires = timeToExpire;
-    var countDown = $interval(function() {
-      if ($scope.expires <= now) {
-        $scope.paymentExpired = true;
-        $interval.cancel(countDown);
-      }
-      $scope.expires--;
+  function paymentTimeControl(expirationTime) {
+    $scope.paymentExpired = false;
+    var countDown;
+    setExpirationTime();
+    countDown = $interval(function() {
+      setExpirationTime();
     }, 1000);
+
+    function setExpirationTime() {
+      if (moment().isAfter(expirationTime * 1000)) {
+        $scope.paymentExpired = true;
+        if (countDown) $interval.cancel(countDown);
+      }
+      $scope.expires = moment(expirationTime * 1000).fromNow();
+    };
   };
   
   lodash.each(['TxProposalRejectedBy', 'TxProposalAcceptedBy', 'transactionProposalRemoved', 'TxProposalRemoved', 'NewOutgoingTx', 'UpdateTx'], function(eventName) {
