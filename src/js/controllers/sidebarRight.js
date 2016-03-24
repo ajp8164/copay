@@ -1,20 +1,16 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('sidebarRightController', function($rootScope, $scope, $state, $log, $timeout, lodash, go, themeService, profileService, configService, dragularService) {
+angular.module('copayApp.controllers').controller('sidebarRightController', function($rootScope, $scope, $log, themeService, dragulaService) {
 
   var self = this;
-  var config = configService.getSync();
-  this.appletGalleryLayout = config.view.appletGalleryLayout;
-  this.applets = themeService.getAppletSkins();
+  this.applets = [];
 
-  this.init = function() {
-    this.dragularOptions = {
-      classes: {
-        mirror: 'custom-green-mirror'
-      },
-      nameSpace: 'common' // just connecting left and right container
-    };
-  }
+  $rootScope.$on('Local/ThemeUpdated', function(event) {
+    self.applets = themeService.getAppletSkins();
+  });
 
-  this.init();
+  $scope.$on('applet-bag.drop-model', function (e, el) {
+    $log.debug('drop event');
+  });
+
 });

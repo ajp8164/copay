@@ -139,14 +139,14 @@ module.exports = function(grunt) {
         src: [
           'bower_components/jquery/dist/jquery.js',
           'bower_components/roundSlider/dist/roundslider.min.js',
-          'bower_components/dragular/dist/dragular.min.js'
+          'bower_components/angular-dragula/dist/angular-dragula.min.js'
         ],
         dest: 'public/lib/ui-components.js'
       },
       ui_components_css: {
         src: [
           'bower_components/roundSlider/dist/roundslider.min.css',
-          'bower_components/dragular/dist/dragular.min.css'
+          'bower_components/angular-dragula/dist/dragula.min.css'
         ],
         dest: 'public/css/ui-components.css',
       },
