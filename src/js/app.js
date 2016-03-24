@@ -19,7 +19,8 @@ var modules = [
   'copayApp.controllers',
   'copayApp.directives',
   'copayApp.api',
-  'copayApp.plugins'
+  'copayApp.plugins',
+  'dragularModule'
 ];
 
 var copayApp = window.copayApp = angular.module('copayApp', modules);

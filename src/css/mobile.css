@@ -318,17 +318,17 @@ a.missing-copayers {
   padding: 0.2rem 0.2rem;
 }
 
-.sidebar-bg {
+.sidebar-left-bg {
   width: 100%;
   height: 100%;
 }
 
-.sidebar {
+.sidebar-left {
   background: #000;
 
   height: 100%;
 }
-.sidebar .icon {
+.sidebar-left .icon {
   width:  39px;
   text-align: center;
   margin-right: 13px;
@@ -337,7 +337,7 @@ a.missing-copayers {
   display: block;
 }
 
-.sidebar li {
+.sidebar-left li {
   overflow: hidden;
   border-bottom-style: solid;
   border-bottom-width: 1px;
@@ -348,12 +348,12 @@ a.missing-copayers {
   color: #A5B2BF;
 }
 
-.sidebar li.nav-item.selected {
+.sidebar-left li.nav-item.selected {
   background-image: -webkit-linear-gradient(left, rgba(255,255,255,.5), rgba(255,255,255,0));
   background-image: linear-gradient(to right, rgba(255,255,255,.5), rgba(255,255,255,0));
 }
 
-.sidebar .avatar-wallet, .payment-uri .avatar-wallet, .modal-content .avatar-wallet {
+.sidebar-left .avatar-wallet, .payment-uri .avatar-wallet, .modal-content .avatar-wallet {
   background-color: #2C3E50;
   color: #fff;
   font-size: 1.4rem;
@@ -367,23 +367,23 @@ a.missing-copayers {
   padding-top: 5px;
 }
 
-.sidebar ion-content {
+.sidebar-left ion-content {
   top: 99px;
   border-top: 1px solid #233e81;
 }
 
-.sidebar header {
+.sidebar-left header {
   text-align: center;
   padding: 1.7rem 1.7rem 1.0rem 1.7rem;
 }
 
-.sidebar header h1 {
+.sidebar-left header h1 {
   color: #fff;
   margin: 0;
   padding: 5px;
 }
 
-.sidebar ul {
+.sidebar-left ul {
   margin: 0 0 30px 0;
 }
 .modal-content ul li a {

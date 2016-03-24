@@ -1,20 +1,19 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('sidebarRightController', function($rootScope, $scope, $state, $log, $timeout, lodash, go, themeService, profileService, configService) {
+angular.module('copayApp.controllers').controller('sidebarRightController', function($rootScope, $scope, $state, $log, $timeout, lodash, go, themeService, profileService, configService, dragularService) {
 
   var self = this;
   var config = configService.getSync();
-  var filterBarInstance;
   this.appletGalleryLayout = config.view.appletGalleryLayout;
   this.applets = themeService.getAppletSkins();
 
-  var nextLayout = {};
-  nextLayout['grid'] = 'list';
-  nextLayout['list'] = 'list-detail';
-  nextLayout['list-detail'] = 'grid';
-
   this.init = function() {
-    $('.gridly').gridly();
+    this.dragularOptions = {
+      classes: {
+        mirror: 'custom-green-mirror'
+      },
+      nameSpace: 'common' // just connecting left and right container
+    };
   }
 
   this.init();

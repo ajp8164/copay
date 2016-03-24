@@ -1,70 +1,92 @@
-<nav class="sidebar" ng-controller="sidebarRightController as sidebar">
-<!--
-  <div class="sidebar-bg" ng-style="{'background':theme.view.sidebarRBackground}">
--->
+<nav class="sidebar-left" ng-controller="sidebarRightController as sidebar">
+  <div class="sidebar-left-bg" ng-style="{'background':theme.view.sidebarLBackground}">
 
-    <style>
-      .brick.small {
-        width: 140px;
-        height: 140px;
-      }
+    <ion-content overflow-scroll="true"
+      ng-style="{'border-top-color':theme.view.sidebarLHeaderBottomBorderColor}">
 
-      .brick.large {
-        width: 300px;
-        height: 300px;
-      }
-    </style>
+  <style>
+    .applet-launch-container:nth-child(odd) {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    .applet-launch-container:nth-child(even) {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .applet-launch-container pre {
+      border: 0;
+      background-color: transparent;
+    }
+    .applet-launch-container .ex-moved {
+      background-color: #e74c3c;
+    }
+    .applet-launch-container div, .gu-mirror {
+      margin: 0px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.2);
+      -webkit-transition: opacity 0.4s ease-in-out;
+      transition: opacity 0.4s ease-in-out;
+      cursor: move;
+      cursor: grab;
+      cursor: -webkit-grab;
+      float: left;
+    }
+    .applet-launch-container.width25.gu-over-active.gu-over-accept {
+      background-color: green !important;
+    }
+    .applet-launch-container.width25.gu-over-active.gu-over-decline {
+      background-color: red !important;
+    }
+    .custom-green-mirror {
+      background-color: #56AB1C;
+      margin: 10px;
+      padding: 10px;
+      cursor: move;
+      cursor: grab;
+      cursor: -webkit-grab;
+      opacity: 0.8;
+      position: fixed !important;
+      margin: 0 !important;
+      z-index: 9999 !important;
+    }
 
-    <div class="gridly" style="width:200px; height:500px">
-      <div class="brick small" style="background: red"></div>
-      <div class="brick small" style="background: green"></div>
-      <div class="brick large" style="background: blue"></div>
-      <div class="brick small" style="background: yellow"></div>
-      <div class="brick small" style="background: white"></div>
-      <div class="brick large" style="background: aqua"></div>
+    .applet-icon {
+      vertical-align: top;
+      display: inline-block;
+      text-align: center;
+      width: 100px;
+    }
+    .applet-icon .name {
+      font-size: 14px;
+      margin-top: 3px;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div class="applet-launch-container" dragular="sidebar.dragularOptions">
+    <div class="applet-icon">
+      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
+      <span class="name">Bitrefill</span>
     </div>
-
-    <!-- Grid layout -->
-    <div class="row" style="padding-left: 1px;" ng-show="sidebar.appletGalleryLayout == 'grid'">
-      <div class="columns large-2 medium-3 small-4 end" style="padding: 1px 1px 1px 0;" ng-repeat="a in sidebar.applets">
-        <img menu-close ng-src="{{a.header.galleryImage}}" ng-click="applet.open(a.header.name)"/>
-        <div class="gallery-grid-text">
-          <div ng-if="theme.header.preferences.showAppletGalleryGridLabel">{{a.header.name}}</div>
-          <div ng-if="!theme.header.preferences.showAppletGalleryGridLabel">&nbsp;</div>
-        </div>
-      </div>
+    <div class="applet-icon">
+      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
+      <span class="name">American Red Cross</span>
     </div>
-<!--
-
-    <!-- List layout --
-    <div ng-show="sidebar.appletGalleryLayout == 'list'">
-      <ul class="no-bullet m0">
-        <li class="p0i oa" ng-repeat="a in sidebar.applets">
-
-          <div menu-close class="gallery-list-container" ng-click="applet.open(a.header.name)">
-            <img class="gallery-list-image" ng-src="{{a.header.galleryImage}}"/>
-            <div class="gallery-list-text-lg">{{a.header.name}}</div>
-            <div class="gallery-list-text-sm">{{a.header.description}}</div>
-          </div>
-
-        </li>
-      </ul>
+    <div class="applet-icon">
+      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
+      <span class="name">BitPay Visa</span>
     </div>
-
-    <!-- List detail layout --
-    <div ng-show="sidebar.appletGalleryLayout == 'list-detail'">
-      <ul class="no-bullet m0">
-        <li class="p0i oa" ng-repeat="a in sidebar.applets">
-
-          <div menu-close class="gallery-listd-container" ng-click="applet.open(a.header.name)">
-            <img class="gallery-listd-image" ng-src="{{a.header.galleryImage}}"/>
-            <div class="gallery-listd-text-lg">{{a.header.name}}</div>
-            <div class="gallery-listd-text-sm">{{a.header.description}}</div>
-          </div>
-
-        </li>
-      </ul>
+    <div class="applet-icon">
+      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
+      <span class="name">Other 1</span>
     </div>
--->
-  </div> <!-- sidebar-bg -->
+    <div class="applet-icon">
+      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
+      <span class="name">Other 2</span>
+    </div>
+  </div>
+
+  </ion-content>
+  </div> <!-- sidebar-right-bg -->
 </nav>
