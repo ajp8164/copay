@@ -86,10 +86,14 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   };
 
   root._get_local = function(endpoint) {
-    $log.debug('GET ' + themeCatalogService.getApplicationDirectory() + endpoint);
+    var url = themeCatalogService.getApplicationDirectory() + endpoint;
+    if (lodash.isEmpty(themeCatalogService.getApplicationDirectory())) {
+      url = url.substring(1);
+    }
+    $log.debug('GET ' + url);
     return {
       method: 'GET',
-      url: themeCatalogService.getApplicationDirectory() + endpoint,
+      url: url,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
