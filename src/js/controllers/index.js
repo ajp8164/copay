@@ -11,6 +11,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   features += (brand.features.theme.skinGallery.enabled ? 'Skin Gallery,' : '');
   features += (brand.features.theme.applets.enabled ? 'Applets,' : '');
   features += (brand.features.theme.socialLike.enabled ? 'Like Themes & Skins,' : '');
+  features += (brand.features.pushNotification.enabled ? 'Push Notification,' : '');
   $log.debug('Application branding: ' + brand.shortName);
   $log.debug('Enabled features: ' + features.substring(0, features.length-1));
 
@@ -20,7 +21,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   ret.isSafari = isMobile.Safari();
   ret.useViewManagedStatusBar = isMobile.iOS() && isCordova;
   ret.isWindowsPhoneApp = isMobile.Windows() && isCordova;
-  ret.usePushNotifications = ret.isCordova && !isMobile.Windows();
+  ret.usePushNotifications = ret.isCordova && !isMobile.Windows() && brand.features.pushNotification.enabled;
   ret.onGoingProcess = {};
   ret.prevState = 'walletHome';
   ret.physicalScreenWidth = ((window.innerWidth > 0) ? window.innerWidth : screen.width);

@@ -27,6 +27,9 @@
     "</ul>"
   ],
   "features": {
+    "pushNotification": {
+      "enabled": true
+    },
     "glidera": {
       "enabled": true,
       "auth": {
