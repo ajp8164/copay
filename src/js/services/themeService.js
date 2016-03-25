@@ -300,7 +300,6 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
         });
 
       } else {
-
         $rootScope.$emit('Local/ThemeUpdated');
         callback();
       }
@@ -468,7 +467,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
     }
   };
 
-  root._migrateThemePreferences = function() {
+  root._migrateThemePreferences = function(callback) {
     var config = configService.getSync();
 
     // (v1.5.mtb only) Check and migrate from themeId and skin id's to names.
@@ -504,11 +503,14 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
           return;
         }
         $log.debug('Theme preferences migrated successfully');
+        callback();
       });
+    } else {
+      callback();
     }
   };
 
-  root._migrateViewPreferences = function() {
+  root._migrateViewPreferences = function(callback) {
     var config = configService.getSync();
     var opts = {
       view: {}
@@ -521,6 +523,8 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
         $rootScope.$emit('Local/DeviceError', err);
         return;
       }
+      $log.debug('Theme view preferences migrated successfully');
+      callback();
     });
   };
 
@@ -554,41 +558,46 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
           return;
         }
 
-        root._migrateThemePreferences();
-        root._migrateViewPreferences();
-        
-        if (themeCatalogService.isCatalogEmpty()) {
+        // Cannot continue initialization until preferences migration is completed.
+        root._migrateThemePreferences(function() {
 
-          // Application configuration does not specify a theme.
-          // Read the brand theme definition, publish, and build the catalog for the first time.
-          root._bootstrapTheme(brand.features.theme.definition, function() {
-            root._migrateLegacyColorsToSkins();
-            root.initialized = true;
-            callback();
-            $log.debug('Theme service initialized');
+          root._migrateViewPreferences(function() {
+
+            if (themeCatalogService.isCatalogEmpty()) {
+
+              // Application configuration does not specify a theme.
+              // Read the brand theme definition, publish, and build the catalog for the first time.
+              root._bootstrapTheme(brand.features.theme.definition, function() {
+                root._migrateLegacyColorsToSkins();
+                root.initialized = true;
+                callback();
+                $log.debug('Theme service initialized');
+              });
+
+            } else {
+
+              // Check that the catalog schema is compatible with this application.
+              // 
+              if (!themeCatalogService.isCatalogCompatible()) {
+
+                root._upgradeCatalog(function() {
+                  root.initialized = true;
+                  callback();
+                  $log.debug('Theme service initialized');
+                });
+
+              } else {
+
+                root.initialized = true;
+                root._publishCatalog(function() {
+                  callback();
+                  $log.debug('Theme service initialized');
+                });
+              }
+            }
+
           });
-
-        } else {
-
-          // Check that the catalog schema is compatible with this application.
-          // 
-          if (!themeCatalogService.isCatalogCompatible()) {
-
-            root._upgradeCatalog(function() {
-              root.initialized = true;
-              callback();
-              $log.debug('Theme service initialized');
-            });
-
-          } else {
-
-            root.initialized = true;
-            root._publishCatalog(function() {
-              callback();
-              $log.debug('Theme service initialized');
-            });
-          }
-        }
+        });
       });
     });
   };
