@@ -13,12 +13,13 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
   $scope.canSign = fc.canSign() || fc.isPrivKeyExternal();
   $scope.loading = null;
   $scope.isShared = fc.credentials.n > 1;
+  $scope.tx = self.tx;
 
   // ToDo: use tx.customData instead of tx.message
-  if ($scope.tx.message === 'Glidera transaction' && $scope.isGlidera) {
-    $scope.tx.isGlidera = true;
-    if ($scope.tx.canBeRemoved) {
-      $scope.tx.canBeRemoved = (Date.now() / 1000 - ($scope.tx.ts || $scope.tx.createdOn)) > GLIDERA_LOCK_TIME;
+  if (self.tx.message === 'Glidera transaction' && self.isGlidera) {
+    self.tx.isGlidera = true;
+    if (self.tx.canBeRemoved) {
+      self.tx.canBeRemoved = (Date.now() / 1000 - (self.tx.ts || self.tx.createdOn)) > GLIDERA_LOCK_TIME;
     }
   }
 
@@ -27,15 +28,15 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
   };
 
   function checkPaypro() {
-    if (tx.payProUrl && !isChromeApp) {
+    if (self.tx.payProUrl && !isChromeApp) {
       fc.fetchPayPro({
-        payProUrl: tx.payProUrl,
+        payProUrl: self.tx.payProUrl,
       }, function(err, paypro) {
         if (err) return;
-        tx.paypro = paypro;
-        $scope.paymentExpired = tx.paypro.expires <= now;
+        self.tx.paypro = paypro;
+        $scope.paymentExpired = self.tx.paypro.expires <= now;
         if (!$scope.paymentExpired)
-          paymentTimeControl(tx.paypro.expires);
+          paymentTimeControl(self.tx.paypro.expires);
         $scope.$apply();
       });
     }
@@ -54,14 +55,14 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
   
   lodash.each(['TxProposalRejectedBy', 'TxProposalAcceptedBy', 'transactionProposalRemoved', 'TxProposalRemoved', 'NewOutgoingTx', 'UpdateTx'], function(eventName) {
     $rootScope.$on(eventName, function() {
-      fc.getTx($scope.tx.id, function(err, tx) {
+      fc.getTx(self.tx.id, function(err, tx) {
         if (err) {
 
           if (err.message && err.message == 'TX_NOT_FOUND' &&
             (eventName == 'transactionProposalRemoved' || eventName == 'TxProposalRemoved')) {
-            $scope.tx.removed = true;
-            $scope.tx.canBeRemoved = false;
-            $scope.tx.pendingForUs = false;
+            self.tx.removed = true;
+            self.tx.canBeRemoved = false;
+            self.tx.pendingForUs = false;
             $scope.$apply();
             return;
           }
@@ -71,9 +72,9 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
         var action = lodash.find(tx.actions, {
           copayerId: fc.credentials.copayerId
         });
-        $scope.tx = txFormatService.processTx(tx);
+        self.tx = txFormatService.processTx(tx);
         if (!action && tx.status == 'pending')
-          $scope.tx.pendingForUs = true;
+          self.tx.pendingForUs = true;
         $scope.updateCopayerList();
         $scope.$apply();
       });
@@ -81,8 +82,8 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
   });
 
   $scope.updateCopayerList = function() {
-    lodash.map($scope.copayers, function(cp) {
-      lodash.each($scope.tx.actions, function(ac) {
+    lodash.map(self.copayers, function(cp) {
+      lodash.each(self.tx.actions, function(ac) {
         if (cp.id == ac.copayerId) {
           cp.action = ac.type;
         }

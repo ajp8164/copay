@@ -1,4 +1,4 @@
-<ion-modal-view ng-controller="txpDetailsController" on-swipe-right="cancel()">
+<ion-modal-view ng-controller="txpDetailsController as txpDetails" on-swipe-right="cancel()">
   <nav class="tab-bar"
     ng-class="{'status-bar-space': index.useViewManagedStatusBar}" ng-style="{'background':skin.view.navBarBackground, 'border-bottom':skin.view.navBarBorderBottom}">
 
@@ -60,7 +60,6 @@
             ng-style="{'background':theme.view.secondaryButtonBackground, 'border':theme.view.secondaryButtonBorder, 'color':theme.view.secondaryButtonTextColor}"
             ng-click="reject(tx);"
             ng-disabled="loading || (paymentExpired && usePaypro)">
->
             <i class="fi-x"></i>
             <span translate>Reject</span>
           </button>
@@ -190,8 +189,8 @@
         <span translate>Participants</span>
       </h4>
       <ul class="no-bullet size-14 m0">
-        <li class="line-b p10 text-gray" ng-style="{'color':skin.view.viewPrimaryTextColor}" ng-repeat="ac in tx.actions"
-          ng-style="{'background':skin.view.viewListItemBackground, 'border-bottom-color':skin.view.viewListItemSeparatorColor}">
+        <li class="line-b p10 text-gray" ng-repeat="ac in tx.actions"
+          ng-style="{'color':skin.view.viewPrimaryTextColor, 'background':skin.view.viewListItemBackground, 'border-bottom-color':skin.view.viewListItemSeparatorColor}">
           <i class="icon-contact size-24"></i>
           <span class="right" ng-style="{'color':skin.view.viewSecondaryTextColor}">
             <i ng-if="ac.type == 'reject'" class="fi-x icon-sign x db"></i>

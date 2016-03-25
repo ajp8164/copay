@@ -215,10 +215,10 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   // isGlidera flag is a security measure so glidera status is not
   // only determined by the tx.message
   this.openTxpModal = function(tx, copayers, isGlidera) {
-    $scope.tx = tx;
-    $scope.copayers = copayers;
-    $scope.isGlidera = isGlidera;
-    $scope.currentSpendUnconfirmed = configWallet.spendUnconfirmed;
+    self.tx = tx;
+    self.copayers = copayers;
+    self.isGlidera = isGlidera;
+    self.currentSpendUnconfirmed = configWallet.spendUnconfirmed;
     $scope.self = self;
 
     $ionicModal.fromTemplateUrl('views/modals/txp-details.html', {

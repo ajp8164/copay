@@ -128,8 +128,15 @@
         </div>
 
       </div> <!-- pr -->
-
+<!--
       <div class="pr" style="height:100%">
+-->
+
+<ion-content delegate-handle="txHistory" 
+  overflow-scroll="true" style="position: absolute; top: 130px; bottom: 60px;">
+  <ion-list>
+
+
 
         <div style="position: absolute; width: 100%; height: 100%" ng-style="{'color':skin.view.homeBottomTextColor}">
 
@@ -217,10 +224,11 @@
      
              </div>
             </div>
-
+<!--
             <ion-content delegate-handle="txHistory" 
-              overflow-scroll="true" style="top: 42px; margin-bottom: 149px;">
+              overflow-scroll="true" style="position: initial; top: 42px; margin-bottom: 149px;">
               <ion-list>
+-->
                 <div ng-repeat="btx in home.txHistorySearchResults() track by btx.txid"
                   ng-click="home.openTxModal(btx)"
                   class="row collapse last-transactions-content" ng-style="{'background':skin.view.homeListItemBackground, 'border-bottom':skin.view.homeListItemBorderBottom}">
@@ -269,15 +277,26 @@
                     <i class="icon-arrow-right3 size-18"></i>
                   </div>
                 </div>
-
+<!--
                 <ion-infinite-scroll distance="2" on-infinite="home.showMore()" ng-if="home.historyShowMore()">
                 </ion-infinite-scroll>
               </ion-list>
             </ion-content>
+-->
 
           </div>
         </div>
-      </div> <!-- pr -->
+
+
+    <ion-infinite-scroll distance="1" on-infinite="home.showMore()" ng-if="home.historyShowMore()">
+    </ion-infinite-scroll>
+  </ion-list>
+</ion-content>
+
+
+<!--
+      </div> <!-- pr --
+-->
       <div class="extra-margin-bottom"></div>
 
     </ion-content> <!-- END WalletHome -->
