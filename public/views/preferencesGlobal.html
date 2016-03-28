@@ -84,35 +84,37 @@
       </li>
     </ul>
   </div>
-  <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
-  <ul class="no-bullet m0 ">
-    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
-      <span class="right">
-        <label class="toggle">
-           <input type="checkbox" id="glidera-visible" name="glideraVisible" ng-model="glideraVisible">
-           <div class="track">
-             <div class="handle"></div>
-           </div>
-        </label>
-      </span>
-      <div ng-style="{'color':theme.view.viewPrimaryTextColor}">Show Glidera Service</div>
-    </li>
- 
-    <!-- Disabled for testnet 
-    <li ng-show="glideraVisible"
-      ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
-      <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Glidera Sandbox</span>
-      <span class="right">
-        <label class="toggle">
-           <input type="checkbox" id="glidera-testnet" name="glideraTestnet" ng-model="glideraTestnet">
-           <div class="track">
-             <div class="handle"></div>
-           </div>
-        </label>
-      </span>      
-    </li>
-    -->
-  </ul>
+  <div ng-if="index.brand.features.glidera.enabled">
+    <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
+    <ul class="no-bullet m0 ">
+      <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+        <span class="right">
+          <label class="toggle">
+             <input type="checkbox" id="glidera-visible" name="glideraVisible" ng-model="glideraVisible">
+             <div class="track">
+               <div class="handle"></div>
+             </div>
+          </label>
+        </span>
+        <div ng-style="{'color':theme.view.viewPrimaryTextColor}">Show Glidera Service</div>
+      </li>
+   
+      <!-- Disabled for testnet 
+      <li ng-show="glideraVisible"
+        ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+        <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Glidera Sandbox</span>
+        <span class="right">
+          <label class="toggle">
+             <input type="checkbox" id="glidera-testnet" name="glideraTestnet" ng-model="glideraTestnet">
+             <div class="track">
+               <div class="handle"></div>
+             </div>
+          </label>
+        </span>      
+      </li>
+      -->
+    </ul>
+  </div>
   <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
   <ul class="no-bullet m0">
     <li ng-click="$root.go('about')"

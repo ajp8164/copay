@@ -6,14 +6,22 @@
 
     <div class="applet-icon" ng-repeat="a in sidebar.applets">
       <!-- wallet icon -->
-      <div ng-if="a.header.id == 'wallet-applet'" class="wallet-image"
+      <div ng-if="a.header.id == 'wallet-applet'"
+        class="wallet-image"
         ng-style="{'color':a.view.avatarColor, 'background':a.view.avatarBackground, 'border':a.view.avatarBorder}"
-        menu-close ng-click="applet.open(a)">
+        menu-toggle="right" ng-click="applet.open(a)">
         <i class="icon-wallet size-20"></i>
       </div>
 
+      <!-- builtin capability icon -->
+      <div ng-if="a.header.id == 'builtin-applet'"
+        class="builtin-image" ng-style="{'background':a.view.iconBackground}"
+        menu-toggle="right" ng-click="applet.open(a)">
+      </div>
+
       <!-- applet icon -->
-      <img ng-if="a.header.id != 'wallet-applet'" class="applet-image" ng-src="{{a.view.launchIconImgSrc}}"
+      <img ng-if="a.header.id != 'wallet-applet' && a.header.id != 'builtin-applet'"
+        class="applet-image" ng-src="{{a.view.launchIconImgSrc}}"
         ng-click="applet.open(a)">
 
       <!-- applet name -->

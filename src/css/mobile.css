@@ -458,6 +458,13 @@ a.missing-copayers {
   font-weight: 700;
 }
 
+.applet-icon .builtin-image {
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  border-radius: 10px;
+}
+
 .applet-icon .applet-image {
   width: 60px;
   height: 60px;
