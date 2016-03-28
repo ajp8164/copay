@@ -46,9 +46,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	root._userPropertyKeys = [];
   };
 
-  function showApplet() {
+  function showApplet(applet) {
 		root.appletModal.show();
-  	$log.debug('Opened applet \'' + name + '\'');
+  	$log.debug('Opened applet \'' + applet.header.name + '\'');
   };
 
   function hideApplet() {
@@ -121,12 +121,12 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function getBuiltinApplets() {
   	var builtinApplets = [];
   	// Glidera
-  	builtinApplets.push(createBuiltinAppletSchema({
+  	builtinApplets.push(new Applet(createBuiltinAppletSchema({
   		id: APPLET_BUILTIN_IDENTIFIER,
   		name: 'Glidera',
   		uri: 'glidera',
   		iconBackground: 'url(img/glidera-icon.png) center / 100% no-repeat #FFFFFF',
-  	}));
+  	})));
   	return builtinApplets;
   };
 
@@ -161,7 +161,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
 			// Present the modal, allow some time to render before presentation.
 			$timeout(function() {
-				showApplet()
+				showApplet(applet)
 	    }, 50);
     });
   };

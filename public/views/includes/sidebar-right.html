@@ -1,10 +1,12 @@
-<div ng-controller="sidebarRightController as sidebar"
+<ion-content scroll="true" ng-controller="sidebarRightController as sidebar"
   class="sidebar-right"
   ng-style="{'background':theme.view.sidebarRBackground}">
 
   <div class="applet-launch-container" dragula="'applet-bag'" dragula-model="sidebar.applets">
 
-    <div class="applet-icon" ng-repeat="a in sidebar.applets">
+    <!-- Using collection-repeat here due to an issue with ngRepeat and ngAnimate -->
+    <!-- See https://github.com/angular/angular.js/issues/3613 -->
+    <div class="applet-icon" collection-repeat="a in sidebar.applets" item-width="80px" item-height="84px">
       <!-- wallet icon -->
       <div ng-if="a.header.id == 'wallet-applet'"
         class="wallet-image"
@@ -29,4 +31,4 @@
     </div>
   </div>
 
-</div>
+</ion-content>
