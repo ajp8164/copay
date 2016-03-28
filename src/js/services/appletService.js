@@ -125,7 +125,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   		id: APPLET_BUILTIN_IDENTIFIER,
   		name: 'Glidera',
   		uri: 'glidera',
-  		iconBackground: 'url(img/glidera-logo.png) center / 90% no-repeat #FFFFFF',
+  		iconBackground: 'url(img/glidera-icon.png) center / 100% no-repeat #FFFFFF',
   	}));
   	return builtinApplets;
   };
