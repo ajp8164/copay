@@ -6,10 +6,11 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 	// Root scope provides access to applet services and properties.
 	// Suitable for call from views.
 	// 
-	// applet.open - Open an applet by name.
-	//   <div ng-click="applet.open('my-applet')"></div>
+	// appletService.open - Open an applet.
+	//   <div ng-click="applet.open(applet)"></div>
+	//   <div ng-click="applet.open('my-applet')"></div>  [ *** deprecated *** ]
 	//   
-	// applet.close - Close an open applet
+	// appletService.close - Close an open applet
 	//   <div ng-click="applet.close()"></div>
 	//   
 	// applet.path - Return the qualified path to the specified resource.
@@ -41,8 +42,8 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 
 	// Open the specified applet on the current wallet.
 	// 
-	root.openApplet = function(name) {
-		appletService.doOpenApplet(name);
+	root.openApplet = function(applet) {
+		appletService.doOpenApplet(applet);
   };
 
 	// Close the current applet and return to the prior skin.

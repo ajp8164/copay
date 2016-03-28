@@ -1,6 +1,8 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, themeService, FocusedWallet) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, lodash, Applet, Skin, profileService, configService, themeService, FocusedWallet) {
+
+	const APPLET_WALLET_IDENTIFIER = 'wallet-applet';
 
 	var root = {};
 	root._userPropertyKeys = [];
@@ -25,8 +27,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function publishAppletFunctions() {
 		$rootScope.applet = {
 			close: function() { return root.doCloseApplet(); },
-			open: function(name) { return root.doOpenApplet(name); },
-			path: function(uri) { return root.appletPath(uri); },
+			open: function(applet) { return root.doOpenApplet(applet); },
+			path: function(uri) { return root.appletPath(uri); }
 		};
   };
 
@@ -57,30 +59,45 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	$log.debug('Closed applet');
   };
 
-	root.init = function(callback) {
-		// Publish applet functions to $rootScope.
-		// 
-		publishAppletFunctions();
-		callback();
-		$log.debug('Applet service initialized');
+	function isAppletWallet(applet) {
+		return applet.header.id == APPLET_WALLET_IDENTIFIER;
 	};
 
-	root.getApplet = function() {
-	  return themeService.getCurrentSkin().getApplet();
-	};
-
-	root.appletPath = function(uri) {
-		var path = '';
-		var applet = root.getApplet();
-		if (applet) {
-	  	path = root.getApplet().path(uri);
+  // Creates an applet schema from wallet credentials.
+  function createWalletAppletSchema(credential) {
+  	var walletSkin = themeService.getPublishedSkinForWalletId(credential.walletId);
+  	return {
+	    "header": {
+	      "id": APPLET_WALLET_IDENTIFIER,
+	      "name": credential.walletName
+	    },
+	    "model": {
+	      "m": credential.m,
+	      "n": credential.n,
+	      "walletId": credential.walletId
+	    },
+	    "view": {
+        "avatarColor": walletSkin.view.avatarColor,
+        "avatarBackground": walletSkin.view.avatarBackground,
+        "avatarBorder": walletSkin.view.avatarBorderSmall
+	    },
+	    "services" : []
 	  }
-	  return path;
-	};
+  };
 
-  root.doOpenApplet = function(name) {
+  function getWalletsAsApplets() {
+    var config = configService.getSync();
+		config.aliasFor = config.aliasFor || {};
+		var credentials = lodash.filter(profileService.profile.credentials, 'walletName');
+    var walletApplets = lodash.map(credentials, function(c) {
+    	return new Applet(createWalletAppletSchema(c), null);
+    });
+    return lodash.sortBy(walletApplets, 'header.name');
+  };
+
+  function openApplet(applet) {
   	// Apply the skin containing the applet.
-    themeService.setAppletByNameForWallet(name, FocusedWallet.getWalletId(), function() {
+    themeService.setAppletByNameForWallet(applet.header.name, FocusedWallet.getWalletId(), function() {
 	  	initAppletEnvironment();
 
 	  	// Create the applet modal.
@@ -112,6 +129,48 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 				showApplet()
 	    }, 50);
     });
+  };
+
+  function openWallet(walletId) {
+    profileService.setAndStoreFocus(walletId, function() {});
+  };
+
+	root.init = function(callback) {
+		// Publish applet functions to $rootScope.
+		// 
+		publishAppletFunctions();
+		callback();
+		$log.debug('Applet service initialized');
+	};
+
+  // Return the collection of applets.
+  root.getApplets = function() {
+		var walletApplets = getWalletsAsApplets();
+    var applets = lodash.map(themeService.getAppletSkins(), function(skin) {
+      return new Skin(skin).getApplet();
+    });
+    return walletApplets.concat(applets);
+  };
+
+	root.getApplet = function() {
+	  return themeService.getCurrentSkin().getApplet();
+	};
+
+	root.appletPath = function(uri) {
+		var path = '';
+		var applet = root.getApplet();
+		if (applet) {
+	  	path = root.getApplet().path(uri);
+	  }
+	  return path;
+	};
+
+  root.doOpenApplet = function(applet) {
+  	if (isAppletWallet(applet)) {
+  		openWallet(applet.model.walletId);
+  	} else {
+  		openApplet(applet);
+  	}
   };
 
   root.doCloseApplet = function() {

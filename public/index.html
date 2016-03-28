@@ -47,7 +47,7 @@
       </ion-pane>
 
       <!-- Right menu -->
-      <ion-side-menu side="right" width="{{index.physicalScreenWidth - 50}}" ng-if="index.brand.features.theme.applets.enabled">
+      <ion-side-menu side="right" width="{{index.physicalScreenWidth}}" ng-if="index.brand.features.theme.applets.enabled">
         <div ng-include="'views/includes/sidebar-right.html'" ng-if="index.hasProfile" style="height: 100%;"></div>
       </ion-side-menu>
     </ion-side-menus>

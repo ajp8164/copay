@@ -791,7 +791,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
     });
   };
 
-  // getAppletSkins() - return only the collection of applet skins.
+  // getAppletSkins() - return only the collection of skins that are applets.
   // 
   root.getAppletSkins = function() {
     return lodash.filter(root.getPublishedSkins(), function(skin) {

@@ -41,6 +41,6 @@ angular.module('copayApp.model').factory('Applet', function ($log, lodash, Plugi
     var serviceClass = PluginRegistry.getServiceProviderClass(this.services[serviceIndex].providerId);
     return eval('new ' + serviceClass + '(this.services[serviceIndex])');
   };
-
+  
   return Applet;
 });

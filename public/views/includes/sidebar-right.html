@@ -1,97 +1,25 @@
-<div overflow-scroll="true"
+<div ng-controller="sidebarRightController as sidebar"
   class="sidebar-right"
-  ng-style="{'background':theme.view.sidebarRBackground}"
-  ng-controller="sidebarRightController as sidebar">
+  ng-style="{'background':theme.view.sidebarRBackground}">
 
-  <style>
-    .applet-launch-container:nth-child(odd) {
-      background-color: rgba(0, 0, 0, 0.2);
-    }
-    .applet-launch-container:nth-child(even) {
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-    .applet-launch-container pre {
-      border: 0;
-      background-color: transparent;
-    }
-    .applet-launch-container .ex-moved {
-      background-color: #e74c3c;
-    }
-    .applet-launch-container div, .gu-mirror {
-      margin: 0px;
-      padding: 10px;
-      -webkit-transition: opacity 0.4s ease-in-out;
-      transition: opacity 0.4s ease-in-out;
-      cursor: move;
-      cursor: grab;
-      cursor: -webkit-grab;
-      float: left;
-    }
-    .applet-launch-container.width25.gu-over-active.gu-over-accept {
-      background-color: green !important;
-    }
-    .applet-launch-container.width25.gu-over-active.gu-over-decline {
-      background-color: red !important;
-    }
+  <div class="applet-launch-container" dragula="'applet-bag'" dragula-model="sidebar.applets">
 
-    .applet-icon {
-      vertical-align: top;
-      display: inline-block;
-      text-align: center;
-      width: 100px;
-    }
-    .applet-icon .name {
-      color: #FFFFFF;
-      font-size: 14px;
-      margin-top: 3px;
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .container div,
-    .gu-mirror {
-      margin: 10px;
-      padding: 10px;
-      background-color: rgba(0, 0, 0, 0.2);
-      transition: opacity 0.4s ease-in-out;
-    }
-  </style>
+  
+    <div class="applet-icon" ng-repeat="a in sidebar.applets">
+      <!-- wallet icon -->
+      <div ng-if="a.header.id == 'wallet-applet'" class="wallet-image"
+        ng-style="{'color':a.view.avatarColor, 'background':a.view.avatarBackground, 'border':a.view.avatarBorder}"
+        menu-close ng-click="applet.open(a)">
+        <i class="icon-wallet size-20"></i>
+      </div>
 
-  <div class="applet-launch-container"
-    dragula="'applet-bag'" ng-repeat="applet in sidebar.applets" dragula-model="applets">
-    <div class="applet-icon">
-      <img height="60" width="60" ng-src="{{applet.view.iconImage}}">
-      <span class="name">{{applet.header.name}}</span>
+      <!-- applet icon -->
+      <img ng-if="a.header.id != 'wallet-applet'" class="applet-image" ng-src="{{a.view.launchIconImgSrc}}"
+        ng-click="applet.open(a)">
+
+      <!-- applet name -->
+      <span class="applet-name">{{a.header.name}}</span>
     </div>
   </div>
-
-  <div class="applet-launch-container" dragula="test-bag">
-    <div class="applet-icon">
-      <img height="60" width="60" src="themes/Cosmos/skins/American%20Red%20Cross/icon.png">
-      <span class="name">applet 1</span>
-    </div>
-    <div class="applet-icon">
-      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
-      <span class="name">applet 2</span>
-    </div>
-    <div class="applet-icon">
-      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
-      <span class="name">applet 3</span>
-    </div>
-    <div class="applet-icon">
-      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
-      <span class="name">applet 4</span>
-    </div>
-    <div class="applet-icon">
-      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
-      <span class="name">applet 5</span>
-    </div>
-    <div class="applet-icon">
-      <img height="60" width="60" src="applets/bitrefill/img/icon.png">
-      <span class="name">applet 6</span>
-    </div>
-  </div>
-
 
 </div>
