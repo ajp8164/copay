@@ -191,7 +191,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   };
 
   this.openDestinationAddressModal = function(wallets, address) {
-    self.destinationWalletNeedsBackup = null;
     self.lockAddress = false;
     self._address = null;
 
@@ -453,7 +452,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   };
 
   this.submitForm = function() {
-    if (!$scope._amount || !$scope._address || self.destinationWalletNeedsBackup) return;
+    if (!$scope._amount || !$scope._address) return;
     var fc = profileService.focusedClient;
     var unitToSat = this.unitToSatoshi;
     var currentSpendUnconfirmed = configWallet.spendUnconfirmed;
@@ -586,7 +585,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
   this.resetForm = function() {
     this.resetError();
-    this.destinationWalletNeedsBackup = null;
     this._paypro = null;
     this.lockedCurrentFeePerKb = null;
 

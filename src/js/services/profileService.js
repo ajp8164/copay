@@ -177,18 +177,6 @@ angular.module('copayApp.services')
       });
     };
 
-    root.isBackupNeeded = function(walletId, cb) {
-      var c = root.getClient(walletId);
-      if (c.isPrivKeyExternal()) return cb(false);
-      if (!c.credentials.mnemonic) return cb(false);
-      if (c.credentials.network == 'testnet') return cb(false);
-
-      storageService.getBackupFlag(walletId, function(err, val) {
-        if (err || val) return cb(false);
-        return cb(true);
-      });
-    };
-
     root._seedWallet = function(opts, cb) {
       opts = opts || {};
       if (opts.bwsurl)
@@ -302,8 +290,8 @@ angular.module('copayApp.services')
 
         // check if exist
         if (lodash.find(root.profile.credentials, {
-          'walletId': walletData.walletId
-        })) {
+            'walletId': walletData.walletId
+          })) {
           return cb(gettext('Cannot join the same wallet more that once'));
         }
       } catch (ex) {
@@ -697,6 +685,18 @@ angular.module('copayApp.services')
           });
         }
         return cb();
+      });
+    };
+
+    root.isBackupNeeded = function(walletId, cb) {
+      var c = root.getClient(walletId);
+      if (c.isPrivKeyExternal()) return cb(false);
+      if (!c.credentials.mnemonic) return cb(false);
+      if (c.credentials.network == 'testnet') return cb(false);
+
+      storageService.getBackupFlag(walletId, function(err, val) {
+        if (err || val) return cb(false);
+        return cb(true);
       });
     };
 
