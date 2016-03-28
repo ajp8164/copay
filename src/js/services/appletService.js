@@ -2,7 +2,7 @@
 
 angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, lodash, Applet, Skin, profileService, configService, themeService, FocusedWallet) {
 
-	const APPLET_WALLET_IDENTIFIER = 'wallet-applet';
+	var APPLET_WALLET_IDENTIFIER = 'wallet-applet';
 
 	var root = {};
 	root._userPropertyKeys = [];

@@ -391,7 +391,10 @@ a.missing-copayers {
   background: #000;
   width: 100%;
   height: 100%;
-  padding: 7px;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-top: 25px;
+  padding-bottom: 7px;
 }
 
 .modal-content ul li a {
