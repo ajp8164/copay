@@ -16,17 +16,17 @@ generateIconsAndSplash() {
   mkdir -p project/resources
   checkOK
 
-  ICON_FILE=../brands/%BRAND-ID%/resources/icon.psd
-  SPLASH_FILE=../brands/%BRAND-ID%/resources/splash.psd
+  ICON_FILE=../brands/%BRAND-ID%/resources/icon.png
+  SPLASH_FILE=../brands/%BRAND-ID%/resources/splash.png
 
-  if [ -f ../brands/%BRAND-ID%/resources/$1/icon.psd ];
+  if [ -f ../brands/%BRAND-ID%/resources/$1/icon.png ];
   then
-    ICON_FILE=../brands/%BRAND-ID%/resources/$1/icon.psd
+    ICON_FILE=../brands/%BRAND-ID%/resources/$1/icon.png
   fi
 
-  if [ -f ../brands/%BRAND-ID%/resources/$1/splash.psd ];
+  if [ -f ../brands/%BRAND-ID%/resources/$1/splash.png ];
   then
-    SPLASH_FILE=../brands/%BRAND-ID%/resources/$1/splash.psd
+    SPLASH_FILE=../brands/%BRAND-ID%/resources/$1/splash.png
   fi
 
   cp $ICON_FILE project/resources
