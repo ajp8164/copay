@@ -47,8 +47,8 @@ angular.module('copayApp.controllers').controller('scannerController', function(
       return;
     }
     _scanStop();
-    $scope.onScan({ data: data });
     $scope.cancel();
+    $scope.onScan({ data: data });
   };
 
   var _successCallback = function(stream) {
