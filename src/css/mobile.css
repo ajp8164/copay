@@ -391,8 +391,8 @@ a.missing-copayers {
   background: #000;
   width: 100%;
   height: 100%;
-  padding-left: 7px;
-  padding-right: 7px;
+  padding-left: 0px;
+  padding-right: 0px;
   padding-top: 25px;
   padding-bottom: 7px;
 }
@@ -443,8 +443,6 @@ a.missing-copayers {
   vertical-align: top;
   display: inline-block;
   text-align: center;
-  width: 80px;
-  margin: 5px;
 }
 
 .applet-icon .wallet-image {

@@ -28,11 +28,11 @@ angular.module('copayApp.model').factory('Skin', function ($log, lodash, Applet)
   };
 
   Skin.prototype.isApplet = function() {
-    return (!lodash.isEmpty(this.applet));
+    return this.header.kind == 'applet';
   };
 
   Skin.prototype.isVanity = function() {
-    return (!lodash.isEmpty(this.view));
+    return this.header.kind == 'vanity';
   };
 
   Skin.prototype.getApplet = function() {

@@ -48,7 +48,6 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
   function showApplet(applet) {
 		root.appletModal.show();
-  	$log.debug('Opened applet \'' + applet.header.name + '\'');
   };
 
   function hideApplet() {
@@ -57,7 +56,6 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 		$css.removeAll();
 		removeAppletProperties();
     root.appletModal.remove();
-  	$log.debug('Closed applet');
   };
 
 	function isAppletWallet(applet) {
@@ -156,7 +154,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 				backdropClickToClose: false,
 				hardwareBackButtonClose: false,
 	      animation: 'animated zoomIn',
-	      hideDelay: 1000
+	      hideDelay: 1000,
+	      applet: applet,
+	      walletId: FocusedWallet.getWalletId()
 	    });
 
 			// Present the modal, allow some time to render before presentation.
@@ -219,11 +219,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   };
 
   root.doCloseApplet = function() {
-    root.appletModal.hide();
-
 		$timeout(function() {
 			hideApplet();
-    }, 300);
+    });
   };
 
 	root.setProperty = function(key, value) {
@@ -236,13 +234,13 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 		root._userPropertyKeys.push(key);
 	};
 
-  $rootScope.$on('modal.shown', function() {
-  	$rootScope.$emit('Local/AppletOpened');
+  $rootScope.$on('modal.shown', function(event, modal) {
+  	$rootScope.$emit('Local/AppletShown', modal.applet, modal.walletId);
 		$rootScope.applet.ready = true;
   });
 
-  $rootScope.$on('modal.hidden', function() {
-  	$rootScope.$emit('Local/AppletClosed');
+  $rootScope.$on('modal.hidden', function(event, modal) {
+  	$rootScope.$emit('Local/AppletHidden', modal.applet, modal.walletId);
 		$rootScope.applet.ready = false;
   });
 

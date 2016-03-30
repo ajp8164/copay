@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('themeService', function($rootScope, $log, $http, $timeout, $q, configService, themeCatalogService, Theme, Skin, lodash, notification, gettextCatalog, brand) {
+angular.module('copayApp.services').factory('themeService', function($rootScope, $log, $http, $timeout, $q, configService, themeCatalogService, Theme, Skin, Applet, lodash, notification, gettextCatalog, brand) {
 
   // The $rootScope is used to track theme and skin objects.  Views reference $rootScope for rendering.
   // 
@@ -688,18 +688,19 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   // setSkinForWallet() - sets the skin for the specified wallet.
   // 
   root.setSkinForWallet = function(skinId, walletId, history, callback) {
-    var reapplyingSkin = (skinId == root.getPublishedSkinId());
+    var fromSkinId = root.getPublishedSkinId();
+    var reapplyingSkin = (skinId == fromSkinId);
 
     $log.debug('' + (reapplyingSkin ?  'Reapplying skin... [walletId: ' + walletId + ']' : 'Switching skin... [walletId: ' + walletId + ']'));
 
-    $log.debug('' + (root.getPublishedSkinById(skinId) != undefined && skinId != root.getPublishedSkinId() ? 
-      'Old skin: ' + root.getPublishedSkinById(root.getPublishedSkinId()).header.name + '\n' +
+    $log.debug('' + (root.getPublishedSkinById(skinId) != undefined && skinId != fromSkinId ? 
+      'Old skin: ' + root.getPublishedSkinById(fromSkinId).header.name + '\n' +
       'New skin: ' + root.getPublishedSkinById(skinId).header.name :
       'Current skin: ' + (root.getPublishedSkinById(skinId) != undefined ? root.getPublishedSkinById(skinId).header.name : 'not set, setting to skinId ' + skinId)));
 
     // Retain a history of applied skins.
     if (history && !reapplyingSkin) {
-      root._pushSkin(root.getPublishedSkinId());
+      root._pushSkin(fromSkinId);
     }
 
     root.walletId = walletId;
@@ -729,7 +730,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
           callback();
         }
 
-        $rootScope.$emit('Local/SkinUpdated');
+        root.broadcastSkinEvent(skinId, fromSkinId, root.walletId);
       });
 
     } else {
@@ -755,8 +756,23 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
           callback();
         }
 
-        $rootScope.$emit('Local/SkinUpdated');
+        root.broadcastSkinEvent(skinId, fromSkinId, root.walletId);
       });
+    }
+  };
+
+  // broadcastSkinEvent() - Send event to subscribers.
+  // 
+  root.broadcastSkinEvent = function(toSkinId, fromSkinId, walletId) {
+    var toSkin = new Skin(root.getPublishedSkinById(toSkinId));
+    var fromSkin = new Skin(root.getPublishedSkinById(fromSkinId));
+
+    if (toSkin.isVanity() && fromSkin.isVanity()) {
+      $rootScope.$emit('Local/SkinUpdated', toSkin, walletId);
+    } else if (toSkin.isApplet() && fromSkin.isVanity()) {
+      $rootScope.$emit('Local/AppletEnter', new Applet(root.getPublishedSkinById(toSkinId)), walletId);
+    } else if (toSkin.isVanity() && fromSkin.isApplet()) {
+      $rootScope.$emit('Local/AppletLeave', new Applet(root.getPublishedSkinById(fromSkinId)), walletId);
     }
   };
 

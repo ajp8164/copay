@@ -27,6 +27,12 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 	// applet.u.* - Applet user properties.
 	//   <div ng-style="{'color':applet.u.my-color}"></div>
 	//   
+	// EVENTS
+	// 
+  // 'Local/AppletEnter' - broadcast when opening an applet, before the applet is shown
+  // 'Local/AppletShown' - broadcast when opening an applet, after the applet is shown
+  // 'Local/AppletLeave' - broadcast when closing an applet, before before the applet is hidden
+  // 'Local/AppletHidden' - broadcast when closing an applet, after the applet is hidden
 
 	// Return the applet from the current skin.
 	// 

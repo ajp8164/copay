@@ -1,4 +1,5 @@
-<ion-content scroll="true" ng-controller="sidebarRightController as sidebar"
+<div style="width:80%; margin-left:10%">
+<ion-content scroll="false" has-bouncing="false" ng-controller="sidebarRightController as sidebar"
   class="sidebar-right"
   ng-style="{'background':theme.view.sidebarRBackground}">
 
@@ -6,7 +7,7 @@
 
     <!-- Using collection-repeat here due to an issue with ngRepeat and ngAnimate -->
     <!-- See https://github.com/angular/angular.js/issues/3613 -->
-    <div class="applet-icon" collection-repeat="a in sidebar.applets" item-width="80px" item-height="84px">
+    <div class="applet-icon" ng-repeat="a in sidebar.applets" item-width="25%" item-height="84px">
       <!-- wallet icon -->
       <div ng-if="a.header.id == 'wallet-applet'"
         class="wallet-image"
@@ -32,3 +33,4 @@
   </div>
 
 </ion-content>
+</div>

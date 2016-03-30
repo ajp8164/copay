@@ -44,7 +44,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
     }
   };
 
-  $rootScope.$on('Local/AppletOpened', function() {
+  $rootScope.$on('Local/AppletShown', function() {
     $("#round-slider").roundSlider({
       radius: 125,
       width: 30,
