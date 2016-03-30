@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "Valencia",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",

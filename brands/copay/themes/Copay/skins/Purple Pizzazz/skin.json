@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "Purple Pizzazz",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",
