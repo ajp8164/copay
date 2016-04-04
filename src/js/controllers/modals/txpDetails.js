@@ -41,18 +41,22 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
 
   function paymentTimeControl(expirationTime) {
     $scope.paymentExpired = false;
-    var countDown;
     setExpirationTime();
-    countDown = $interval(function() {
+    $scope.countDown = $interval(function() {
       setExpirationTime();
     }, 1000);
 
     function setExpirationTime() {
-      if (moment().isAfter(expirationTime * 1000)) {
+      var now = Math.floor(Date.now() / 1000);
+      if (now > expirationTime) {
         $scope.paymentExpired = true;
-        if (countDown) $interval.cancel(countDown);
+        if ($scope.countDown) $interval.cancel($scope.countDown);
+        return;
       }
-      $scope.expires = moment(expirationTime * 1000).fromNow();
+      var totalSecs = expirationTime - now;
+      var m = Math.floor(totalSecs / 60);
+      var s = totalSecs % 60;
+      $scope.expires = ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
     };
   };
   

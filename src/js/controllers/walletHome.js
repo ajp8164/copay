@@ -23,6 +23,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   ret.addresses = [];
   ret.isMobile = isMobile.any();
   ret.isWindowsPhoneApp = isMobile.Windows() && isCordova;
+  ret.countDown = null;
   var vanillaScope = ret;
 
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
@@ -585,6 +586,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
   this.resetForm = function() {
     this.resetError();
+    if (this.countDown) $interval.cancel(this.countDown);
     this._paypro = null;
     this.lockedCurrentFeePerKb = null;
 
@@ -685,25 +687,31 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
   function _paymentTimeControl(expirationTime) {
     self.paymentExpired = false;
-    var countDown;
     setExpirationTime();
-    countDown = $interval(function() {
+
+    self.countDown = $interval(function() {
       setExpirationTime();
     }, 1000);
 
     function setExpirationTime() {
-      if (moment().isAfter(expirationTime * 1000)) {
-        setExpiredPaymentValues();
-        if (countDown) $interval.cancel(countDown);
+      var now = Math.floor(Date.now() / 1000);
+      if (now > expirationTime) {
+        setExpiredValues();
+        return;
       }
-      self.remainingTimeStr = moment(expirationTime * 1000).fromNow();
+
+      var totalSecs = expirationTime - now;
+      var m = Math.floor(totalSecs / 60);
+      var s = totalSecs % 60;
+      self.remainingTimeStr = ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
     };
 
-    function setExpiredPaymentValues() {
+    function setExpiredValues() {
       self.paymentExpired = true;
       self.remainingTimeStr = null;
       self._paypro = null;
       self.error = gettext('Cannot sign: The payment request has expired');
+      if (self.countDown) $interval.cancel(self.countDown);
     };
   };
 
