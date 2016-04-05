@@ -29,6 +29,10 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 	//   
 	// EVENTS
 	// 
+	// Each of the following events provide the following arguments to the subscriber:
+	// applet - the subject Applet
+	// walletId - the wallet identifier on which the applet is presented
+	// 
   // 'Local/AppletEnter' - broadcast when opening an applet, before the applet is shown
   // 'Local/AppletShown' - broadcast when opening an applet, after the applet is shown
   // 'Local/AppletLeave' - broadcast when closing an applet, before before the applet is hidden

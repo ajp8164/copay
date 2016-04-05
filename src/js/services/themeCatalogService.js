@@ -14,7 +14,9 @@ angular.module('copayApp.services').factory('themeCatalogService', function(stor
       themeSchemaVersion: brand.features.theme.requiredSchema
     },
 
-    themes: {}
+    themes: {},
+
+    appletLayout: {}
 
   };
 

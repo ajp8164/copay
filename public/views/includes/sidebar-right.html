@@ -1,36 +1,65 @@
-<div style="width:80%; margin-left:10%">
 <ion-content scroll="false" has-bouncing="false" ng-controller="sidebarRightController as sidebar"
   class="sidebar-right"
   ng-style="{'background':theme.view.sidebarRBackground}">
 
-  <div class="applet-launch-container" dragula="'applet-bag'" dragula-model="sidebar.applets">
-
-    <!-- Using collection-repeat here due to an issue with ngRepeat and ngAnimate -->
-    <!-- See https://github.com/angular/angular.js/issues/3613 -->
-    <div class="applet-icon" ng-repeat="a in sidebar.applets" item-width="25%" item-height="84px">
-      <!-- wallet icon -->
-      <div ng-if="a.header.id == 'wallet-applet'"
-        class="wallet-image"
-        ng-style="{'color':a.view.avatarColor, 'background':a.view.avatarBackground, 'border':a.view.avatarBorder}"
-        menu-toggle="right" ng-click="applet.open(a)">
-        <i class="icon-wallet size-20"></i>
-      </div>
-
-      <!-- builtin capability icon -->
-      <div ng-if="a.header.id == 'builtin-applet'"
-        class="builtin-image" ng-style="{'background':a.view.iconBackground}"
-        menu-toggle="right" ng-click="applet.open(a)">
-      </div>
-
-      <!-- applet icon -->
-      <img ng-if="a.header.id != 'wallet-applet' && a.header.id != 'builtin-applet'"
-        class="applet-image" ng-src="{{a.view.launchIconImgSrc}}"
-        ng-click="applet.open(a)">
-
-      <!-- applet name -->
-      <span class="applet-name">{{a.header.name}}</span>
-    </div>
+  <!-- status bar -->
+  <div ng-class="index.useViewManagedStatusBar ? 'status-bar' : 'no-status-bar'">
   </div>
 
+  <!-- wallet bar -->
+  <div class="wallet-bar">
+    <i class="icon-wallet"></i>
+    <span class="wallet-name">
+      {{sidebar.currentWallet().alias || sidebar.currentWallet().name}}
+    </span>
+    <span ng-if="sidebar.currentWallet().n >= 1" class="wallet-copayers">({{sidebar.currentWallet().m}}/{{sidebar.currentWallet().n}})</span>
+    <span class="wallet-balance">{{sidebar.currentWallet().balance}} {{sidebar.currentWallet().altBalance}}
+      <img ng-show="sidebar.currentWallet().network == 'testnet'" src="img/icon-testnet-white.svg">
+    </span>
+  </div>
+
+  <!-- applet grid -->
+  <div gridster="sidebar.gridsterOpts" class="applet-launch-container">
+    <ul>
+      <li class="applet-icon" gridster-item="appletLayoutMap" ng-repeat="applet in sidebar.applets">
+
+        <!-- wallet icon -->
+        <div ng-if="applet.header.id == 'wallet-applet'"
+          class="wallet-image"
+          ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
+          menu-toggle="right" ng-click="applet.open()">
+          <div class="applet-clickable">
+            <i class="icon-wallet p5t size-20"></i>
+            <div class="applet-icon-wallet-bar">
+              <span class="applet-icon-wallet-info">
+                {{applet.model.isoCode}}
+                {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
+                <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
+                  class="applet-icon-wallet-testnet">
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- builtin capability icon -->
+        <div ng-if="applet.header.id == 'builtin-applet'"
+          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+          menu-toggle="right" ng-click="applet.open()">
+          <div class="applet-clickable"></div>
+        </div>
+
+        <!-- applet icon -->
+        <div ng-if="applet.header.id != 'wallet-applet' && applet.header.id != 'builtin-applet'"
+          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+          ng-click="applet.open()">
+          <div class="applet-clickable"></div>
+        </div>
+
+        <!-- applet name -->
+        <span class="applet-name">{{applet.header.name}}</span>
+
+      </li>
+    </ul>
+  </div>
+  
 </ion-content>
-</div>

@@ -1,5 +1,5 @@
 'use strict';
-angular.module('copayApp.model').factory('Applet', function ($log, lodash, PluginRegistry, BitPayService, BitrefillService) { // TODO: decouple injected service names
+angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, lodash, PluginRegistry, BitPayService, BitrefillService) { // TODO: decouple injected service names
 
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
@@ -41,6 +41,16 @@ angular.module('copayApp.model').factory('Applet', function ($log, lodash, Plugi
     var serviceClass = PluginRegistry.getServiceProviderClass(this.services[serviceIndex].providerId);
     return eval('new ' + serviceClass + '(this.services[serviceIndex])');
   };
-  
+
+  Applet.prototype.open = function() {
+    // Invoke rootScope published function to avoid dependency on appletService.
+    $rootScope.applet.open(this);
+  };
+
+  Applet.prototype.close = function() {
+    // Invoke rootScope published function to avoid dependency on appletService.
+    $rootScope.applet.close();
+  };
+    
   return Applet;
 });
