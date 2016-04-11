@@ -128,6 +128,9 @@ if [ ! -d $PROJECT ]; then
   cordova plugin add cordova-plugin-globalization
   checkOK
 
+  cordova plugin add cordova.plugins.diagnostic
+  checkOK
+
   cordova plugin add cordova-plugin-splashscreen
   checkOK
 
