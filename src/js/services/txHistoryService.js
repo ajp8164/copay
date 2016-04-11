@@ -54,9 +54,9 @@ angular.module('copayApp.services').factory('txHistoryService', function($rootSc
 
   root.setCompactTxHistory = function() {
     root.nextTxHistory = root.historyShowMoreLimit;
-    root.txHistory = root.completeHistory.slice(0, root.historyShowLimit);
+    root.txHistory = root.completeHistory ? root.completeHistory.slice(0, root.historyShowLimit) : null;
     root.txHistorySearchResults = root.txHistory;
-    root.historyShowMore = root.completeHistory.length > root.historyShowLimit;
+    root.historyShowMore = root.completeHistory ? root.completeHistory.length > root.historyShowLimit : null;
   };
 
   root.showMore = function() {

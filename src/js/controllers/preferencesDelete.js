@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesDeleteWalletController',
-  function($scope, $rootScope, $filter, $timeout, $ionicModal, $log, notification, profileService, isCordova, go, gettext, gettextCatalog, animationService, themeService) {
+  function($scope, $rootScope, $filter, $timeout, $ionicModal, $log, notification, profileService, isCordova, go, gettext, gettextCatalog, animationService, themeService, applicationService) {
     this.isCordova = isCordova;
     this.error = null;
     $scope.isDeletingWallet = false;
@@ -48,6 +48,7 @@ angular.module('copayApp.controllers').controller('preferencesDeleteWalletContro
             {color: themeService.getPublishedTheme().view.primaryColor,
              iconColor: themeService.getPublishedTheme().view.notificationBarIconColor,
              barBackground: themeService.getPublishedTheme().view.notificationBarBackground});
+          applicationService.restart();
         }
       });
     };
