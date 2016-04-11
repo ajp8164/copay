@@ -154,6 +154,10 @@
               </div>
             </div>
 
+            <div class="release size-12" ng-show="newRelease" ng-click="$root.openExternalLink('https://github.com/bitpay/copay/releases/latest')" ng-style="{'background':skin.view.homeListItemBackground, 'border-bottom':skin.view.homeListItemBorderBottom}, {'color':skin.view.viewPrimaryTextColor}">
+              <span>{{newRelease}}</span><i class="icon-arrow-right3 right size-18"></i>
+            </div>
+
             <div class="oh pr" ng-if="index.txps[0]">
               <h4 ng-show="index.requiresMultipleSignatures" class="title m0"
                 ng-style="{'color':skin.view.homeListSectionHeaderTextColor, 'background':skin.view.homeListSectionHeaderBackground}" translate>Payment Proposals</h4>
