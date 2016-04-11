@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, bwcService, pushNotificationsService, lodash, go, profileService, configService, isCordova, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, nodeWebkit, addonManager, isChromeApp, bwsError, txFormatService, uxLanguage, $state, glideraService, isMobile, addressbookService, themeService, brand, txHistoryService) {
+angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, bwcService, lodash, go, profileService, configService, isCordova, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, nodeWebkit, addonManager, isChromeApp, bwsError, txFormatService, uxLanguage, $state, glideraService, isMobile, addressbookService, themeService, brand, txHistoryService) {
   var self = this;
   var errors = bwcService.getErrors();
 
@@ -21,7 +21,6 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   ret.isSafari = isMobile.Safari();
   ret.useViewManagedStatusBar = isMobile.iOS() && isCordova;
   ret.isWindowsPhoneApp = isMobile.Windows() && isCordova;
-  ret.usePushNotifications = ret.isCordova && !isMobile.Windows() && brand.features.pushNotification.enabled;
   ret.onGoingProcess = {};
   ret.prevState = 'walletHome';
   ret.physicalScreenWidth = ((window.innerWidth > 0) ? window.innerWidth : screen.width);
@@ -940,10 +939,6 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     });
   });
 
-  $rootScope.$on('Local/pushNotificationsReady', function(event) {
-    pushNotificationsService.enableNotifications(profileService.walletClients);
-  });
-
   self.debouncedUpdate = lodash.throttle(function() {
     self.updateAll({
       quiet: true
@@ -1045,7 +1040,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     });
   });
 
-  //untilItChange FALSE 
+  //untilItChange FALSE
   lodash.each(['NewTxProposal', 'TxProposalFinallyRejected', 'TxProposalRemoved', 'NewOutgoingTxByThirdParty',
     'Local/GlideraTx'
   ], function(eventName) {
