@@ -292,5 +292,41 @@ angular.module('copayApp.services')
       fileStorageService.remove('themeCatalog', cb);
     };
 
+    // Applet catalog service requires fileStorageService.
+    root.getAppletCatalog = function(cb) {
+      if (!fileSystemAPISupported)
+        throw new Error('storageService#getAppletCatalog called when storage service does not support it');
+      fileStorageService.get('appletCatalog', cb);
+    };
+
+    root.storeAppletCatalog = function(val, cb) {
+      if (!fileSystemAPISupported)
+        throw new Error('storageService#storeAppletCatalog called when storage service does not support it');
+      $log.debug('Storing Applet Catalog', val);
+      fileStorageService.set('appletCatalog', val, cb);
+    };
+
+    root.clearAppletCatalog = function(cb) {
+      if (!fileSystemAPISupported)
+        throw new Error('storageService#clearAppletCatalog called when storage service does not support it');
+      fileStorageService.remove('appletCatalog', cb);
+    };
+
+    // KV storage service requires fileStorageService.
+    // Each unique key creates a new file.  It is the responsibility of the caller manage storage and
+    // to remove files (keys) no longer needed.
+    root.getValueByKey = function(key, cb) {
+      if (!fileSystemAPISupported)
+        throw new Error('storageService#getValueByKey called when storage service does not support it');
+      fileStorageService.get(key, cb);
+    };
+
+    root.storeValueByKey = function(key, val, cb) {
+      if (!fileSystemAPISupported)
+        throw new Error('storageService#storeValueByKey called when storage service does not support it');
+      $log.debug('Storing ' + key, val);
+      fileStorageService.set(key, val, cb);
+    };
+
     return root;
   });

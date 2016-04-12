@@ -435,13 +435,13 @@ module.exports = function(grunt) {
       }
 
       // Detect and fail if duplicate plugin id exists.
-      if (pluginIds.indexOf(data.id) < 0) {
-        pluginIds.push(data.id);
+      if (pluginIds.indexOf(data.pluginId) < 0) {
+        pluginIds.push(data.pluginId);
       } else {
-        throw new Error('Duplicate plugin id detected: \'' + data.id + '\'');
+        throw new Error('Duplicate plugin id detected: \'' + data.pluginId + '\'');
       }
 
-      console.log('> [' + data.type + '] \'' + data.name + '\', id=' + data.id);
+      console.log('> [' + data.type + '] \'' + data.name + '\', id=' + data.pluginId);
       content += cleanJSONQuotesOnKeys(JSON.stringify(data, null, 2));
     }
 

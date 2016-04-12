@@ -5,8 +5,9 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
   var self = this;
 
   this.applet = copayAppletApi.getApplet();
-  var bitrefillService = this.applet.getService('bitrefill-service');
-  var paymentService = this.applet.getService('payment-service');
+  this.session = copayAppletApi.getAppletSession();
+  var bitrefillService = this.applet.getService('com.bitpay.copay.plugin.service.bitrefill');
+  var paymentService = this.applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
   this.phoneNumber = '1234567';
   this.operators = null;
@@ -37,7 +38,7 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
   }];
 
   function init() {
-    copayAppletApi.setTitle("Top Up Mobile Phone");
+    self.session.setData("title", "Top Up Mobile Phone", true);
 
   	// Disable swipe page sliding.
     $ionicSlideBoxDelegate.enableSlide(false);

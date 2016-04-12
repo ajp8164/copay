@@ -4,7 +4,7 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
 
   // Service identification
   // 
-  var id = 'bitpay';
+  var id = 'com.bitpay.copay.plugin.service.invoice-payment';
 
   // Private properties
   //

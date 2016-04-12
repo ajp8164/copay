@@ -5,7 +5,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
   var self = this;
 
   this.applet = copayAppletApi.getApplet();
-  this.paymentService = this.applet.getService('payment-service');
+  this.paymentService = this.applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
   // Settings
   // 

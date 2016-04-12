@@ -86,10 +86,10 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   };
 
   root._get_local = function(endpoint) {
-    $log.debug('GET ' + themeCatalogService.getApplicationDirectory() + endpoint);
+    $log.debug('GET ' + themeCatalogService.getStorageRoot() + endpoint);
     return {
       method: 'GET',
-      url: themeCatalogService.getApplicationDirectory() + endpoint,
+      url: themeCatalogService.getStorageRoot() + endpoint,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -127,7 +127,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   // Return the absolute resource url for the specified theme.
   // This value is always local.
   root._getLocalThemeResourceUrl = function(themeName) {
-    return themeCatalogService.getApplicationDirectory() + root._encodeURI(root._getThemeResourcePath(themeName));
+    return themeCatalogService.getStorageRoot() + root._encodeURI(root._getThemeResourcePath(themeName));
   };
 
   // Return the relative resource path for the specified theme's skin.
@@ -138,7 +138,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   // Return the absolute resource url for the specified theme's skin.
   // This value is always local.
   root._getLocalSkinResourceUrl = function(themeName, skinName) {
-    return themeCatalogService.getApplicationDirectory() + root._encodeURI(root._getSkinResourcePath(themeName, skinName));
+    return themeCatalogService.getStorageRoot() + root._encodeURI(root._getSkinResourcePath(themeName, skinName));
   };
 
   // Get the skin index for the specified skinName in the theme.
@@ -288,7 +288,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
 
       // The theme service catalog might not support writing theme content, if not then we skip writing the content
       // (in this case the theme content is available in $rootScope only; cannot import themes or skins in this case).
-      if (themeCatalogService.supportsWritingThemeContent()) {
+      if (themeCatalogService.supportsWriting()) {
 
         themeCatalogService.init($rootScope.themes, function() {
          $rootScope.$emit('Local/ThemeUpdated');
@@ -1141,7 +1141,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
 
   root.importTheme = function(discoveredThemeName, notify, callback) {
 
-    if (!themeCatalogService.supportsWritingThemeContent())
+    if (!themeCatalogService.supportsWriting())
       throw new Error('themeService#importTheme improperly called when platform does not support writing theme content');
 
     var catalog = themeCatalogService.getSync();

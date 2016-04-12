@@ -44,6 +44,12 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 	  return appletService.getApplet();
 	};
 
+	// Return the applet session.
+	// 
+	root.getSession = function() {
+	  return appletService.getSession(root.getApplet());
+	};
+
 	// Return the path to the applets public uri.
 	// 
 	root.appletPath = function(uri) {
@@ -59,21 +65,7 @@ angular.module('copayApp.api').factory('copayAppletApi', function(appletService)
 	// Close the current applet and return to the prior skin.
 	// 
 	root.closeApplet = function() {
-		appletService.doCloseApplet();
-	};
-
-	// Set the applet title string.
-	// This value overrides the applet skin value (applet.header.title).
-	// 
-	root.setTitle = function(str) {
-		appletService.setProperty('title', str);
-	};
-
-	// Set an applet user property.
-	// Property may be used in views as 'applet.u.my-prop-name'.
-	// 
-	root.setProperty = function(name, str) {
-		appletService.setUserProperty(name, str);
+		appletService.doCloseApplet(root.getApplet());
 	};
 
   return root;

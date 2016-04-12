@@ -1,6 +1,6 @@
 {
   "type": "service",
-  "id": "bitpay",
+  "pluginId": "com.bitpay.copay.plugin.service.invoice-payment",
   "name": "BitPay Payment Service",
   "description": "Create and pay a BitPay invoice.",
   "author": "BitPay, Inc.",

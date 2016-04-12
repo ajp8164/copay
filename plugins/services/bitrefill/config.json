@@ -1,6 +1,6 @@
 {
   "type": "service",
-  "id": "bitrefill",
+  "pluginId": "com.bitpay.copay.plugin.service.bitrefill",
   "name": "Bitrefill Service",
   "description": "Top up prepaid mobile phones with bitcoin.",
   "author": "Bitrefill",

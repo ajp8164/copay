@@ -4,7 +4,7 @@ angular.module('copayApp.plugins').factory('BitrefillService', function ($log, $
 
   // Service identification
   // 
-  var id = 'bitrefill';
+  var id = 'com.bitpay.copay.plugin.service.bitrefill';
 
   // Private properties
   //

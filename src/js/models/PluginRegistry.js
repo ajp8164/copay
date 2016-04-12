@@ -9,17 +9,17 @@ angular.module('copayApp.model').factory('PluginRegistry', function (plugins, lo
 
   // Static methods
   // 
-  PluginRegistry.checkEntry = function(id) {
+  PluginRegistry.checkEntry = function(pluginId) {
     // Throws exception if not found.
-    PluginRegistry.getEntry(id);
+    PluginRegistry.getEntry(pluginId);
   };
 
-  PluginRegistry.getEntry = function(id) {
+  PluginRegistry.getEntry = function(pluginId) {
     var index = lodash.findIndex(plugins, function(plugin) {
-      return (plugin.id == id);
+      return (plugin.pluginId == pluginId);
     });
     if (index < 0) {
-      throw new Error('Could not find service plugin with id \'' + id + '\'');
+      throw new Error('Could not find plugin with id \'' + pluginId + '\'');
     }
     return plugins[index];
   };
@@ -30,8 +30,8 @@ angular.module('copayApp.model').factory('PluginRegistry', function (plugins, lo
     });
   };
 
-  PluginRegistry.getServiceProviderClass = function(id) {
-    return PluginRegistry.getEntry(id).serviceClass;
+  PluginRegistry.getServiceProviderClass = function(pluginId) {
+    return PluginRegistry.getEntry(pluginId).serviceClass;
   };
 
   return PluginRegistry;
