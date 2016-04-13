@@ -78,7 +78,6 @@ angular
     $stateProvider
       .state('translators', {
         url: '/translators',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -188,7 +187,6 @@ angular
       })
       .state('preferencesLanguage', {
         url: '/preferencesLanguage',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -199,7 +197,6 @@ angular
       .state('preferencesUnit', {
         url: '/preferencesUnit',
         templateUrl: 'views/preferencesUnit.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -210,7 +207,6 @@ angular
       .state('preferencesFee', {
         url: '/preferencesFee',
         templateUrl: 'views/preferencesFee.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -370,7 +366,6 @@ angular
       })
       .state('preferencesAltCurrency', {
         url: '/preferencesAltCurrency',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -461,7 +456,6 @@ angular
       .state('about', {
         url: '/about',
         templateUrl: 'views/preferencesAbout.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -472,7 +466,6 @@ angular
       .state('logs', {
         url: '/logs',
         templateUrl: 'views/preferencesLogs.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -671,7 +664,7 @@ angular
     };
 
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-      $log.debug('Route change from:', fromState.name || '-', ' to:',  toState.name);
+      $log.debug('Route change from:', fromState.name || '-', ' to:', toState.name);
 
       if (!profileService.profile && toState.needProfile) {
 

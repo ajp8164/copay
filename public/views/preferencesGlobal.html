@@ -121,7 +121,7 @@
       <div ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>About {{index.brand.shortName}}</div>
     </li>    
   </ul>
-  <div ng-show="prefGlobal.usePushNotifications && !PNEnabledByUser && isIOS">
+  <div ng-show="prefGlobal.usePushNotifications && !PNEnabledByUser && isIOSApp">
     <div class="text-centered text-gray size-12 m10" ng-style="{'color':theme.view.viewSecondaryTextColor}"
       translate>Push notifications for Copay are currently disabled. Enable them in the Settings app.</div>
     <ul class="no-bullet m0" ng-click="prefGlobal.openSettings()">

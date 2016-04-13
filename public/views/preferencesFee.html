@@ -1,5 +1,5 @@
-<div 
-  class="topbar-container" 
+<div
+  class="topbar-container"
   ng-include="'views/includes/topbar.html'"
   ng-init="titleSection='Bitcoin Network Fee Policy'; goBackToState = 'preferencesGlobal'; useTheme = true">
 </div>
@@ -23,7 +23,7 @@
     </div>
   </div>  
   <ul class="no-bullet m0"> 
-    <li ng-repeat="fee in (index.network == 'livenet' ? prefFee.feeLevels.livenet : prefFee.feeLevels.testnet)"
+    <li ng-repeat="fee in prefFee.feeLevels.livenet"
       ng-click="prefFee.save(fee.level)"
       ng-style="{'color':theme.view.viewPrimaryTextColor, 'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
       {{prefFee.feeOpts[fee.level]|translate}}
@@ -33,8 +33,7 @@
   </ul>
 
   <div class="row m20t">
-    <div class="text-gray size-12 text-center" ng-style="{'color':theme.view.viewSecondaryTextColor}" ng-repeat="fee in (index.network == 'livenet' ? prefFee.feeLevels.livenet :
-      prefFee.feeLevels.testnet)" ng-if="fee.level == prefFee.currentFeeLevel">
+    <div class="text-gray size-12 text-center" ng-style="{'color':theme.view.viewSecondaryTextColor}" ng-repeat="fee in prefFee.feeLevels.livenet" ng-if="fee.level == prefFee.currentFeeLevel">
       <div ng-show="fee.nbBlocks">
         <span translate>Average confirmation time: {{fee.nbBlocks * 10}} minutes</span>.
       </div>
