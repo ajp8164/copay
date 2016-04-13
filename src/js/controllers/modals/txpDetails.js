@@ -116,7 +116,7 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
         });
         return;
       }
-      $modalInstance.close(txp);
+      $scope.close(txp);
       return;
     });
   };

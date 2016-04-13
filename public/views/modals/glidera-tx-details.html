@@ -25,9 +25,9 @@
   </nav>
 
   <ion-content class="modal-content"
-    ng-class="{'status-bar-content':index.useViewManagedStatusBar}" ng-style="{'background':skin.view.viewBackground}">
+    ng-class="{'status-bar-content':index.useViewManagedStatusBar}" ng-style="{'background':theme.view.viewBackground}">
     <div class="header-modal bg-gray text-center"
-      ng-style="{'background':skin.view.viewSectionHeaderBackground}">
+      ng-style="{'background':theme.view.viewSectionHeaderBackground}">
       <div class="p20">
         <img src="img/bought.svg" alt="bought" width="80" ng-show="tx.type == 'BUY' && tx.status == 'COMPLETE'">
         <img src="img/bought-pending.svg" alt="bought" width="65" ng-show="tx.type == 'BUY' && tx.status == 'PROCESSING'">
@@ -36,7 +36,7 @@
       </div>
       <span ng-style="{'color':theme.view.viewPrimaryTextColor}" ng-show="tx.type == 'BUY'">Bought</span>
       <span ng-style="{'color':theme.view.viewPrimaryTextColor}" ng-show="tx.type == 'SELL'">Sold</span>
-      <b>{{tx.qty}}</b> BTC
+      <b ng-style="{'color':theme.view.viewPrimaryTextColor}">{{tx.qty}}</b> BTC
       <div class="size-36 m20b" ng-style="{'color':theme.view.viewSecondaryTextColor}">
         {{tx.subtotal|currency:'':2}} {{tx.currency}}
       </div>

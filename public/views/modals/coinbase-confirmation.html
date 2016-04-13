@@ -1,0 +1,20 @@
+<ion-modal-view ng-controller="coinbaseConfirmationController" ng-style="{'background':theme.view.viewBackground}">
+  <div class="m20tp text-center">
+    <div class="row">
+    <h1 class="text-center m20b p20h" ng-style="{'color':skin.view.viewPrimaryTextColor}">Are you sure you would like to log out of your Coinbase account?</h1>
+    <p class="text-gray p20h" ng-style="{'color':theme.view.viewSecondaryTextColor}">You will need to log back in to buy or sell bitcoin in Copay.</p>
+    <div class="large-6 medium-6 small-6 columns">
+      <button class="button light-gray expand outline round"
+        ng-style="{'background':theme.view.secondaryButtonBackground, 'border':theme.view.secondaryButtonBorder, 'color':theme.view.secondaryButtonTextColor}" ng-click="cancel()">
+        <i class="fi-arrow-left"></i> <span class="tu">Back</span>
+      </button>
+    </div>
+    <div class="large-6 medium-6 small-6 columns">
+      <button class="button expand round" ng-click="ok()"
+        ng-style="{'background':theme.view.alertButtonBackground, 'border':theme.view.alertButtonBorder, 'color':theme.view.alertButtonTextColor}">
+        <span>Log out</span>
+      </button>
+    </div>
+    </div>
+  </div>
+</ion-modal-view>

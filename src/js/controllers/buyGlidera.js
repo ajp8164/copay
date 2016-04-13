@@ -41,19 +41,20 @@ angular.module('copayApp.controllers').controller('buyGlideraController',
       self.error = null;
       self.selectedWalletId = null;
       self.selectedWalletName = null;
+      
       $scope.type = 'BUY';
       $scope.wallets = wallets;
       $scope.noColor = true;
       $scope.self = self;
 
-      $ionicModal.fromTemplateUrl('views/modals/glidera-wallets.html', {
+      $ionicModal.fromTemplateUrl('views/modals/wallets.html', {
         scope: $scope,
         backdropClickToClose: false,
         hardwareBackButtonClose: false,
         animation: 'slide-in-up'
       }).then(function(modal) {
-        $scope.glideraWalletsModal = modal;
-        $scope.glideraWalletsModal.show();
+        $scope.walletsModal = modal;
+        $scope.walletsModal.show();
       });
     };
 

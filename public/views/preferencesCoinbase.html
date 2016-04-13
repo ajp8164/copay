@@ -1,0 +1,62 @@
+<div
+  class="topbar-container"
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='Preferences'; goBackToState = 'coinbase'; useTheme = true">
+</div>
+
+<ion-content class="content preferences" ng-controller="preferencesCoinbaseController as coinbase"
+  ng-class="{'status-bar-content':index.useViewManagedStatusBar}" ng-style="{'background':theme.view.viewBackground}">
+
+  <ul ng-if="index.coinbaseAccount && !index.coinbaseError" class="no-bullet m0">
+    <h4 class="title m0" ng-style="{'color':theme.view.viewSectionHeaderColor, 'background':theme.view.viewSectionHeaderBackground}">Account</h4>
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">ID</span>
+    <span class="right text-gray enable_text_select" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseAccount.id}}
+    </span>
+    </li>
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Name</span>
+    <span class="right text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseAccount.name}}
+    </span>
+    </li>
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Balance</span>
+    <span class="right text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseAccount.balance.amount}} {{index.coinbaseAccount.balance.currency}}
+    </span>
+    </li>
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Native Balance</span>
+    <span class="right text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseAccount.native_balance.amount}} {{index.coinbaseAccount.native_balance.currency}}
+    </span>
+    </li>
+
+    <h4 class="title m0">User Information</h4> 
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">ID</span>
+    <span class="right text-gray enable_text_select" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseUser.id}}
+    </span>
+    </li>
+    <li ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+    <span ng-style="{'color':theme.view.viewPrimaryTextColor}">Email</span>
+    <span class="right text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
+      {{index.coinbaseUser.email}}
+    </span>
+    </li>
+  </ul>
+  <ul class="no-bullet m0">
+    <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
+    <li ng-click="coinbase.revokeToken(index.coinbaseTestnet)"
+      ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+      <i class="icon-arrow-right3 size-24 right text-gray"></i>
+      <span ng-style="{'color':theme.view.viewAlertTextColor}">Log out</span>
+    </li>
+  </ul>
+  <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
+
+</ion-content>
+<div class="extra-margin-bottom"></div>

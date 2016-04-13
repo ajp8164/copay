@@ -32,12 +32,11 @@
     },
     "glidera": {
       "enabled": true,
-      "auth": {
-        "clientId": "8a9e8a9cf155db430c1ea6c7889afed1",
-        "clientSecret": "24ddec578f38d5488bfe13601933c05f",
-        "cordovaClientId": "9c8023f0ac0128235b7b27a6f2610c83",
-        "cordovaClientSecret": "30431511407b47f25a83bffd72881d55"
-      }
+      "auth": {}
+    },
+    "coinbase": {
+      "enabled": true,
+      "auth": {}
     },
     "theme": {
       "name": "Copay",

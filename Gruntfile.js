@@ -23,6 +23,7 @@ module.exports = function(grunt) {
 
   // Brand Configuration
   var brandConfig = grunt.file.readJSON('./brands/' + brandId + '/config.json');
+  var brandKeys = grunt.file.readJSON('./brands/' + brandId + '/keys.json');
 
   // Project Configuration
   grunt.initConfig({
@@ -387,6 +388,14 @@ module.exports = function(grunt) {
     brandConfig.features.theme.definition.theme = brandConfig.features.theme.name;
     brandConfig.features.theme.definition.skins = getAllFoldersFromFolder('./brands/' + brandId + '/themes/' + brandConfig.features.theme.definition.theme + '/skins/');
     delete brandConfig.features.theme.name;
+
+    // Transfer api keys to the brand configuration.
+    brandConfig.features.glidera.auth.clientId = brandKeys.glidera.clientId;
+    brandConfig.features.glidera.auth.clientSecret = brandKeys.glidera.clientSecret;
+    brandConfig.features.glidera.auth.cordovaClientId = brandKeys.glidera.cordovaClientId;
+    brandConfig.features.glidera.auth.cordovaClientSecret = brandKeys.glidera.cordovaClientSecret;
+    brandConfig.features.coinbase.auth.clientId = brandKeys.coinbase.clientId;
+    brandConfig.features.coinbase.auth.clientSecret = brandKeys.coinbase.clientSecret;
 
     var content = '';
     content += '\'use strict\';\n\n';

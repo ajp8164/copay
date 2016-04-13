@@ -52,14 +52,14 @@ angular.module('copayApp.controllers').controller('sellGlideraController',
       $scope.noColor = true;
       $scope.self = self;
 
-      $ionicModal.fromTemplateUrl('views/modals/glidera-wallets.html', {
+      $ionicModal.fromTemplateUrl('views/modals/wallets.html', {
         scope: $scope,
         backdropClickToClose: false,
         hardwareBackButtonClose: false,
         animation: 'slide-in-up'
       }).then(function(modal) {
-        $scope.glideraWalletsModal = modal;
-        $scope.glideraWalletsModal.show();
+        $scope.walletsModal = modal;
+        $scope.walletsModal.show();
       });
     };
 
@@ -102,7 +102,7 @@ angular.module('copayApp.controllers').controller('sellGlideraController',
       self.error = null;
 
 
-      txService.prepare(function(err) {
+      txService.prepare({selectedClient: fc}, function(err) {
         if (err) {
           self.error = err;
           return;
@@ -146,7 +146,7 @@ angular.module('copayApp.controllers').controller('sellGlideraController',
                     return;
                   }
 
-                  txService.sign(txp, function(err, txp) {
+                  txService.sign(txp, {selectedClient: fc}, function(err, txp) {
                     if (err) {
                       self.loading = null;
                       self.error = err;

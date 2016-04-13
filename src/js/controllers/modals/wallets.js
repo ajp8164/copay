@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('glideraWalletsController', function($scope, bwsError, profileService) {
+angular.module('copayApp.controllers').controller('walletsController', function($scope, bwsError, profileService) {
 
 	var self = $scope.self;
 
@@ -19,8 +19,8 @@ angular.module('copayApp.controllers').controller('glideraWalletsController', fu
   };
 
   $scope.cancel = function() {
-    $scope.glideraWalletsModal.hide();
-    $scope.glideraWalletsModal.remove();
+    $scope.walletsModal.hide();
+    $scope.walletsModal.remove();
   };
 
 });

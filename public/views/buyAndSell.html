@@ -1,0 +1,25 @@
+<div 
+  class="topbar-container" 
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='Buy & Sell Bitcoin'; closeToHome = true; useTheme = true">
+</div>
+
+<ion-content class="content preferences" ng-class="{'status-bar-content':index.useViewManagedStatusBar}"
+  ng-style="{'background':theme.view.viewBackground}">
+
+  <ul class="no-bullet manage text-center">	
+    <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
+    <li ng-show="index.glideraVisible" ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+  		<a ng-click="$root.go('glidera')">
+        <img src="img/glidera-logo.png" width="150">
+  		</a>
+  	</li>
+    <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
+    <li ng-show="index.coinbaseVisible" ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+  		<a ng-click="$root.go('coinbase')">
+        <img src="img/coinbase-logo.png" width="150">
+  		</a>
+  	</li>
+  </ul>
+
+</ion-content>
