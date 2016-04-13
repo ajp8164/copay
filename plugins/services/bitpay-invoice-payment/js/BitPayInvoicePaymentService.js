@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPaymentService, $rootScope, $log, gettext, copayPluginApi) {
+angular.module('copayApp.plugins').factory('BitPayInvoicePaymentService', function (AbstractPaymentService, $rootScope, $log, gettext, CPlugin) {
 
   // Service identification
   // 
@@ -44,27 +44,27 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
 
   // Constructor
   // 
-  function BitPayService(obj) {
+  function BitPayInvoicePaymentService(obj) {
     self = this;
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         self[property] = obj[property];
       }
     }
-    var my = copayPluginApi.getRegistryEntry(id);
+    var my = CPlugin.getRegistryEntry(id);
     self.providerName = my.name;
     self.providerDescription = my.description;
   };
 
-  BitPayService.prototype = new AbstractPaymentService();
+  BitPayInvoicePaymentService.prototype = new AbstractPaymentService();
 
   // Public methods
   // 
-  BitPayService.prototype.getPaymentRequest = function() {
+  BitPayInvoicePaymentService.prototype.getPaymentRequest = function() {
     return self.paymentRequest;
   };
 
-  BitPayService.prototype.createPaymentRequest = function(data, cb) {
+  BitPayInvoicePaymentService.prototype.createPaymentRequest = function(data, cb) {
     var postData = {
       // Required parameters
       token: self.api.auth.token,
@@ -108,7 +108,7 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
     return self;
   };
 
-  BitPayService.prototype.sendPayment = function(memo, cb) {
+  BitPayInvoicePaymentService.prototype.sendPayment = function(memo, cb) {
     $rootScope.$emit('Local/PaymentServiceStatus', gettext('Sending payment'));
     AbstractPaymentService.sendPayment({
       payProUrl: self.paymentRequest.data.paymentUrls.BIP73,
@@ -121,7 +121,7 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
 
   // Convenience method for creating the payment request and sending it in one operation.
   // 
-  BitPayService.prototype.createAndSendPayment = function(data, memo, cb) {
+  BitPayInvoicePaymentService.prototype.createAndSendPayment = function(data, memo, cb) {
     self.createPaymentRequest(data, function(err, response) {
       if (err) {
         return cb(err);
@@ -133,7 +133,7 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
   };
 
   // TODO
-  BitPayService.prototype.setNotification = function() {
+  BitPayInvoicePaymentService.prototype.setNotification = function() {
     // Setup a reminder notification service to send app notification when a payment is upcoming.
     // 
     //  occurance: once,
@@ -157,5 +157,5 @@ angular.module('copayApp.plugins').factory('BitPayService', function (AbstractPa
     return;
   };
 
-  return BitPayService;
+  return BitPayInvoicePaymentService;
 });

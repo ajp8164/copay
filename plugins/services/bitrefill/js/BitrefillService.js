@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.plugins').factory('BitrefillService', function ($log, $base64, $http, copayPluginApi) {
+angular.module('copayApp.plugins').factory('BitrefillService', function ($log, $base64, $http, CPlugin) {
 
   // Service identification
   // 
@@ -19,7 +19,7 @@ angular.module('copayApp.plugins').factory('BitrefillService', function ($log, $
         self[property] = obj[property];
       }
     }
-    var my = copayPluginApi.getRegistryEntry(id);
+    var my = CPlugin.getRegistryEntry(id);
     self.providerName = my.name;
     self.providerDescription = my.description;
   };

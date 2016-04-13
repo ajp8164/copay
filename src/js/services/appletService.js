@@ -80,7 +80,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	var walletSkin = themeService.getPublishedSkinForWalletId(credentials.walletId);
   	return {
 	    "header": {
-	      "id": APPLET_WALLET_IDENTIFIER_PREFIX + credentials.walletId,
+	      "appletId": APPLET_WALLET_IDENTIFIER_PREFIX + credentials.walletId,
 	      "name": config.aliasFor[credentials.walletId] || credentials.walletName,
 	    },
 	    "model": {
@@ -104,7 +104,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function createBuiltinAppletSchema(capability) {
   	return {
 	    "header": {
-	      "id": capability.id,
+	      "appletId": capability.id,
 	      "name": capability.name
 	    },
 	    "model": {
@@ -174,12 +174,6 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     } else {
     	$log.debug('Warning: applet session not found for removal: ' + removedSession.id + ' (applet ID: ' + removedSession.applet.header.appletId + ')');
 	  }
-  };
-
-  function getSession(applet) {
-    return lodash.find(root._appletSessionPool, function(session) {
-      return (session.isForApplet(applet));
-    });
   };
 
   function openApplet(applet) {
@@ -258,6 +252,12 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     	// TODO: no storage, applets not supported on this device
     }
 	};
+
+  root.getSession = function(applet) {
+    return lodash.find(root._appletSessionPool, function(session) {
+      return (session.isForApplet(applet));
+    });
+  };
 
   // Return the collection of all available applets.
   root.getApplets = function() {

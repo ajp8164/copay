@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.plugins').factory('AbstractPaymentService', function ($log, $http, copayWalletApi) {
+angular.module('copayApp.plugins').factory('AbstractPaymentService', function ($log, $http, CWallet) {
  
   // Constructor
   // See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz
@@ -12,7 +12,7 @@ angular.module('copayApp.plugins').factory('AbstractPaymentService', function ($
   // 
   // Convenience method to maintain interation with this service by the caller.
   AbstractPaymentService.sendPayment = function(data, cb) {
-    return copayWalletApi.sendPayment(data, cb);
+    return CWallet.sendPayment(data, cb);
   };
 
   // Public methods

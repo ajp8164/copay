@@ -1,35 +1,35 @@
 'use strict';
 
-angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $log, copayAppletApi, copayWalletApi, copayFxApi) {
+angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $log, CContext, CWallet, CUtils, CApplet) {
 
   var self = this;
 
-  this.applet = copayAppletApi.getApplet();
+  this.applet = CContext.getApplet();
   this.paymentService = this.applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
   // Settings
   // 
   var BITS_PER_BTC = 1e6;
-  var fxBits = copayFxApi.getRate(copayWalletApi.getWalletAltCurrencyIsoCode()) / BITS_PER_BTC;
-  var csRateBits = copayFxApi.getRate(this.applet.model.csCurrency) / BITS_PER_BTC;
+  var fxBits = CUtils.getRate(CWallet.getAltCurrencyIsoCode()) / BITS_PER_BTC;
+  var csRateBits = CUtils.getRate(this.applet.model.csCurrency) / BITS_PER_BTC;
 
   // Always in bits
   this.min = parseInt(this.applet.model.csMinimum) / csRateBits;
   this.max = parseInt(this.applet.model.csMaximum) / csRateBits;
   this.initialAmount = parseInt(this.applet.model.csInitialAmount) / csRateBits;
   this.displayAmount = this.initialAmount;
-  this.currency = copayWalletApi.getWalletCurrencyName();
+  this.currency = CWallet.getCurrencyName();
 
   this.init = function() {
     // Default to showing the alternative currency first.
-    this.setCurrency(copayWalletApi.getWalletAltCurrencyIsoCode());
+    this.setCurrency(CWallet.getAltCurrencyIsoCode());
   };
 
   this.setCurrency = function(c) {
     if (c) {
       this.currency = c;
     } else {
-      this.currency = (this.currency == copayWalletApi.getWalletCurrencyName() ? copayWalletApi.getWalletAltCurrencyIsoCode() : copayWalletApi.getWalletCurrencyName());
+      this.currency = (this.currency == CWallet.getCurrencyName() ? CWallet.getAltCurrencyIsoCode() : CWallet.getCurrencyName());
     }
     this.updateDisplayAmount(self.roundSlider ? self.roundSlider.getValue() : this.initialAmount);
   };

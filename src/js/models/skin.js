@@ -5,10 +5,7 @@ angular.module('copayApp.model').factory('Skin', function ($log, lodash, Applet)
    // Skin is contructed with it's parent theme.
    // 
   function Skin(obj, theme) {
-    this.header = obj.header || {};
-    this.resources = obj.resources || [];
-    this.view = obj.view || {};
-    this.applet = obj.applet || {};
+    lodash.assign(this, obj);
     this.theme = theme;
     return this;
   };

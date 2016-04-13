@@ -1,5 +1,5 @@
 'use strict';
-angular.module('copayApp.model').factory('AppletSession', function ($log, appletDataService) {
+angular.module('copayApp.model').factory('AppletSession', function ($rootScope, $log, appletDataService) {
 
   var STATE_VALID = 'valid';
   var STATE_INVALID = 'invalid';
@@ -73,7 +73,8 @@ angular.module('copayApp.model').factory('AppletSession', function ($log, applet
 
     // Optionally publish the value to root scope.
     if (publish) {
-      $rootScope.applet[key] = value;
+      $rootScope.applet.session = $rootScope.applet.session || {};
+      $rootScope.applet.session[key] = value;
       this.publishedKeys.push(key);
     }
   };
@@ -82,12 +83,11 @@ angular.module('copayApp.model').factory('AppletSession', function ($log, applet
     checkStateIsValid(this);
     // Write applet data to storage.
     appletDataService.setData(this.applet.header.appletId, this.userData, function(err, data) {
-      var response = null;
       if (err) {
-        response = 'Error writing session data: ' + err.message;
+        err = 'Error writing session data: ' + err.message;
       }
       if (callback) {
-        callback(response);
+        callback(err);
       }
     });
   };

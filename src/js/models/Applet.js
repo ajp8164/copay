@@ -1,13 +1,10 @@
 'use strict';
-angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, lodash, PluginRegistry, BitPayService, BitrefillService) { // TODO: decouple injected service names
+angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $injector, lodash, PluginRegistry) {
 
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
   function Applet(obj, skin) {
-    this.header = obj.header || {};
-    this.services = obj.services || [];
-    this.model = obj.model || {};
-    this.view = obj.view || {};
+    lodash.assign(this, obj);
     this.skin = skin;
     return this;
   };
@@ -35,11 +32,12 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, l
       throw new Error('Configuration for skin \'' + this.skin.header.name + '\' is missing required configuration for service plugin id \'' + pluginId + '\'');
     }
 
-    // This plugin defines the specified service.
-    // Find the plugin specified service provider in the registry and return a service class instance.
-    // 
+    // Find the plugin specified service class in the registry, use $injector to get the factory object,
+    // and create a new service instance.  Using the $injector here allows this class (factory) from having
+    // to declare dependencies on dynamically defined (plugin) service classes (factory's).
     var serviceClass = PluginRegistry.getServiceProviderClass(pluginId);
-    return eval('new ' + serviceClass + '(this.services[serviceIndex])');
+    var service = $injector.get(serviceClass);
+    return eval(new service(this.services[serviceIndex]));
   };
 
   Applet.prototype.open = function() {
