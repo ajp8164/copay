@@ -1,6 +1,8 @@
 'use strict';
 angular.module('copayApp.model').factory('AppletSession', function ($rootScope, $log, appletDataService) {
 
+  var self = this;
+
   var STATE_VALID = 'valid';
   var STATE_INVALID = 'invalid';
 
@@ -53,12 +55,11 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
   AppletSession.prototype.restore = function(callback) {
     checkStateIsValid(this);
     // Restore applet data from storage.
-    var self = this;
     appletDataService.getData(_applet.header.appletId, function(err, data) {
       if (err) {
         throw new Error('Error reading applet storage: ' + err.message);
       }
-      self._userData = data;
+      _userData = data;
       callback(data);
     });
   };
