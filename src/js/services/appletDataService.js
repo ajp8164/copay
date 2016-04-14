@@ -41,7 +41,11 @@ angular.module('copayApp.services').factory('appletDataService', function($log, 
   root.getData = function(appletId, cb) {
     var appletKey = getAppletKey(appletId);
     storageService.getValueByKey(appletKey, function(err, data) {
-      data = data || {};
+      if (data) {
+        data = JSON.parse(data);
+      } else {
+        data = {};
+      }
       $log.debug('Applet data read (' + appletKey + '):', data);
       return cb(err, data);
     });

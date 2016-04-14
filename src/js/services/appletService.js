@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, lodash, Applet, AppletSession, Skin, profileService, configService, appletCatalogService, themeService, FocusedWallet, go) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, lodash, Applet, Skin, profileService, configService, appletCatalogService, appletSessionService, themeService, FocusedWallet, go) {
 
 	var APPLET_WALLET_IDENTIFIER_PREFIX = 'wallet-applet.';
 	var APPLET_BUILTIN_IDENTIFIER_PREFIX = 'builtin-applet.';
@@ -8,24 +8,14 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 	var root = {};
   root.initialized = false;
 
-	// Session.
-	// Use of the session ID prevents applets from gaining access to other applets data.
-	// A random applet session ID is provided to the applet on launch. This ID must be provided by the applet in
-	// api calls made by the applet. Prior to executing the api call the session ID is validated.  If the session ID
-	// is not valid then the api call is not executed and an error is thrown.
-	// 
-	root._appletSessionPool = [];
-
-  function initAppletEnvironment() {
-		var applet = root.getApplet();
+  function initAppletEnvironment(applet) {
+    // Make applet properties available to views.
 		publishAppletProperties(applet);
 
 		// Set the applet main view.
-		// 
   	root.appletMainViewUrl = applet.mainViewUrl();
 
   	// Bind stylesheet(s) for this applet.
-  	// 
   	applet.stylesheets().forEach(function(stylesheet) {
 		  $css.bind({ 
 		    href: stylesheet
@@ -35,7 +25,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
   function publishAppletFunctions() {
 		$rootScope.applet = {
-			close: function() { return root.doCloseApplet(); },
+			close: function(sessionId) { return root.doCloseApplet(sessionId); },
 			open: function(applet) { return root.doOpenApplet(applet); },
 			path: function(uri) { return root.appletPath(uri); }
 		};
@@ -138,82 +128,46 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	return builtinApplets;
   };
 
-  function createSession(applet) {
-    var existingSessionIndex = lodash.findIndex(root._appletSessionPool, function(session) {
-      return (session.isForApplet(applet));
-    });
-
-    if (existingSessionIndex >= 0) {
-    	// Session state error; found an existing session for the applet.
-    	// Quietly remove the existing state.
-    	var removedSession = lodash.pullAt(root._appletSessionPool, existingSessionIndex);
-    	removedSession = removedSession[0];
-    	$log.debug('Applet session state error - forcibly removed session: ' + removedSession.id + ' (applet ID: ' + removedSession.applet.header.appletId + ')');
-    } else {
-    	// Create a new session.
-    	var newSession = new AppletSession(applet);
-	  	root._appletSessionPool.push(newSession);
-    	$log.debug('Applet session created: ' + newSession.id + ' (applet ID: ' + newSession.applet.header.appletId + ')');
-	  }
-  };
-
-  function destroySession(applet) {
-    var existingSessionIndex = lodash.findIndex(root._appletSessionPool, function(session) {
-      return (session.isForApplet(applet));
-    });
-
-    if (existingSessionIndex >= 0) {
-    	var removedSession = lodash.pullAt(root._appletSessionPool, existingSessionIndex);
-    	removedSession = removedSession[0];
-    	removedSession.flush(function(err, data) {
-    		if (err) {
-		    	$log.debug('Error while writing applet session data during applet close: ' + err.message + ' (applet ID: ' + removedSession.applet.header.appletId + '), session was closed anyway, session data was lost');
-    		}
-	    	$log.debug('Applet session successfully removed: ' + removedSession.id + ' (applet ID: ' + removedSession.applet.header.appletId + ')');
-    	});
-    } else {
-    	$log.debug('Warning: applet session not found for removal: ' + removedSession.id + ' (applet ID: ' + removedSession.applet.header.appletId + ')');
-	  }
-  };
-
   function openApplet(applet) {
   	// Create a session id for the applet.
-  	createSession(applet);
+  	appletSessionService.createSession(applet, function(session) {
 
-  	// Apply the skin containing the applet.
-    themeService.setAppletByNameForWallet(applet.header.name, FocusedWallet.getWalletId(), function() {
-	  	initAppletEnvironment();
+      $rootScope.$emit('Local/AppletEnter', applet, FocusedWallet.getWalletId());
 
-	  	// Create the applet modal.
-	  	// 
-			root.appletModal = $ionicModal.fromTemplate('\
-				<ion-modal-view class="applet-modal">\
-	 			  <ion-nav-bar class="bar-positive" ng-style="{\'color\': applet.view.navBarTitleColor, \'background\': applet.view.navBarBackground, \'border-bottom\': applet.view.navBarBottomBorder}">\
-	 			  <div ng-style="{\'background\': applet.view.navBarBackground}">\
-				  	<ion-nav-title>{{applet.title || skin.header.name}}</ion-nav-title>\
-				  	<ion-nav-buttons side="right">\
-	    				<button class="button button-icon button-applet-header icon ion-close" ng-click="applet.close()" ng-style="{\'color\': applet.view.navBarButtonColor}"></button>\
-						</ion-nav-buttons>\
-					</div>\
-			  	</ion-nav-bar>\
-					<ion-content class="has-header" ng-style="{\'background\': applet.view.background}">\
-						<div ng-include=\"\'' + root.appletMainViewUrl + '\'\">\
-					</ion-content>\
-				</ion-modal-view>\
-				', {
-				scope: $rootScope,
-				backdropClickToClose: false,
-				hardwareBackButtonClose: false,
-	      animation: 'animated zoomIn',
-	      hideDelay: 1000,
-	      applet: applet,
-	      walletId: FocusedWallet.getWalletId()
-	    });
+      // Apply the skin containing the applet.
+      themeService.setAppletByNameForWallet(applet.header.name, FocusedWallet.getWalletId(), function() {
+        initAppletEnvironment(applet);
 
-			// Present the modal, allow some time to render before presentation.
-			$timeout(function() {
-				showApplet(applet)
-	    }, 50);
+        // Create the applet modal.
+        root.appletModal = $ionicModal.fromTemplate('\
+          <ion-modal-view class="applet-modal">\
+            <ion-nav-bar class="bar-positive" ng-style="{\'color\': applet.view.navBarTitleColor, \'background\': applet.view.navBarBackground, \'border-bottom\': applet.view.navBarBottomBorder}">\
+            <div ng-style="{\'background\': applet.view.navBarBackground}">\
+              <ion-nav-title>{{applet.title || skin.header.name}}</ion-nav-title>\
+              <ion-nav-buttons side="right">\
+                <button class="button button-icon button-applet-header icon ion-close" ng-click="applet.close(\'' + session.id + '\')" ng-style="{\'color\': applet.view.navBarButtonColor}"></button>\
+              </ion-nav-buttons>\
+            </div>\
+            </ion-nav-bar>\
+            <ion-content class="has-header" ng-style="{\'background\': applet.view.background}">\
+              <div ng-include="\'' + root.appletMainViewUrl + '\'" ng-init="sessionId=\'' + session.id + '\'">\
+            </ion-content>\
+          </ion-modal-view>\
+          ', {
+          scope: $rootScope,
+          backdropClickToClose: false,
+          hardwareBackButtonClose: false,
+          animation: 'animated zoomIn',
+          hideDelay: 1000,
+          session: session,
+          walletId: FocusedWallet.getWalletId()
+        });
+
+        // Present the modal, allow some time to render before presentation.
+        $timeout(function() {
+          showApplet();
+        }, 50);
+      });
     });
   };
 
@@ -252,12 +206,6 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     	// TODO: no storage, applets not supported on this device
     }
 	};
-
-  root.getSession = function(applet) {
-    return lodash.find(root._appletSessionPool, function(session) {
-      return (session.isForApplet(applet));
-    });
-  };
 
   // Return the collection of all available applets.
   root.getApplets = function() {
@@ -299,21 +247,21 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	}
   };
 
-  root.doCloseApplet = function() {
-		$timeout(function() {
-			var applet = root.getApplet();
-			hideApplet();
-			destroySession(applet);
+  root.doCloseApplet = function(sessionId) {
+    $rootScope.$emit('Local/AppletLeave', appletSessionService.getSession(sessionId).getApplet(), FocusedWallet.getWalletId());
+    appletSessionService.getSession(sessionId).getApplet().finalize(function() {
+      hideApplet();
+      appletSessionService.destroySession(sessionId);
     });
   };
 
   $rootScope.$on('modal.shown', function(event, modal) {
-  	$rootScope.$emit('Local/AppletShown', modal.applet, modal.walletId);
+  	$rootScope.$emit('Local/AppletShown', modal.session.getApplet(), modal.walletId);
 		$rootScope.applet.ready = true;
   });
 
   $rootScope.$on('modal.hidden', function(event, modal) {
-  	$rootScope.$emit('Local/AppletHidden', modal.applet, modal.walletId);
+  	$rootScope.$emit('Local/AppletHidden', modal.session.getApplet(), modal.walletId);
 		$rootScope.applet.ready = false;
   });
 

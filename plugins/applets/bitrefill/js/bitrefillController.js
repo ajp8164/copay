@@ -4,19 +4,18 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
 
   var self = this;
 
-  this.applet = CContext.getApplet();
-  this.session = CContext.getSession();
-
-  var bitrefillService = this.applet.getService('com.bitpay.copay.plugin.service.bitrefill');
-  var paymentService = this.applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
+  var _session;
+  var _applet;
+  var _bitrefillService;
+  var _paymentService;
 
   this.phoneNumber = '1234567';
-  this.operators = null;
-  this.selectedOp = null;
-  this.country = null;
-  this.pkgs = null;
-  this.pkg = null;
-  this.amount = null;
+  this.operators;
+  this.selectedOp;
+  this.country;
+  this.pkgs;
+  this.pkg;
+  this.amount;
   this.pageId = 0;
 
   var pages = [{
@@ -38,10 +37,15 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
   	buttonPreviousText: 'BACK'
   }];
 
-  function init() {
-    self.session.set("title", "Top Up Mobile Phone", true);
+  this.init = function(sessionId) {
+    _session = CContext.getSession(sessionId);
+    _applet = _session.getApplet();
+    _bitrefillService = _applet.getService('com.bitpay.copay.plugin.service.bitrefill');
+    _paymentService = _applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
-  	// Disable swipe page sliding.
+    _applet.property('title', 'Top Up Mobile Phone');
+
+    // Disable swipe page sliding.
     $ionicSlideBoxDelegate.enableSlide(false);
   };
 
@@ -90,7 +94,7 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
 
     self.setOngoingProcess(gettext('Looking up operator'));
 
-    bitrefillService.lookupNumber(self.phoneNumber, operatorSlug, function(err, result) {
+    _bitrefillService.lookupNumber(self.phoneNumber, operatorSlug, function(err, result) {
 	    self.setOngoingProcess();
       if (err) {
         return handleError(err.message || err.error.message || err);
@@ -116,5 +120,4 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
     });
   };
 
-  init();  
 });

@@ -1,5 +1,7 @@
 'use strict';
-angular.module('copayApp.api').factory('CSession', function () {
+angular.module('copayApp.api').factory('CSession', function (lodash, CApplet) {
+
+  var _session;
 
   /**
    * Constructor.  An instance of this class must be obtained from CContext.
@@ -8,7 +10,8 @@ angular.module('copayApp.api').factory('CSession', function () {
    * @constructor
    */
   function CSession(appletSession) {
-    this.session = appletSession;
+    lodash.assign(this, appletSession);
+    _session = appletSession;
     return this;
   };
 
@@ -23,7 +26,7 @@ angular.module('copayApp.api').factory('CSession', function () {
    * @param {flushCallback} callback - A callback on completion.
    */
   CSession.prototype.flush = function(callback) {
-    return this.session.flush(callback);
+    return _session.flush(callback);
   };
 
   /**
@@ -32,14 +35,22 @@ angular.module('copayApp.api').factory('CSession', function () {
    * @return {Object} The object stored at the specified key.
    */
   CSession.prototype.get = function(key) {
-    return this.session.get(key);
+    return _session.get(key);
+  };
+
+  /**
+   * Return the applet for this session.
+   * @return {CApplet} An applet object.
+   */
+  CSession.prototype.getApplet = function () {
+    return new CApplet(_session.getApplet());
   };
 
   /**
    * Restore all session data from persistent storage.
    */
   CSession.prototype.restore = function() {
-    return this.session.restore();
+    return _session.restore();
   };
 
   /**
@@ -49,7 +60,7 @@ angular.module('copayApp.api').factory('CSession', function () {
    * @param {Boolean} [publish] - Publish the specified session data to the view scope as 'applet.session.<key>'.
    */
   CSession.prototype.set = function(key, value, publish) {
-    return this.session.set(key, value, publish);
+    return _session.set(key, value, publish);
   };
 
   return CSession;

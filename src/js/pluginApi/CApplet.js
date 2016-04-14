@@ -72,5 +72,16 @@ angular.module('copayApp.api').factory('CApplet', function (lodash, PluginRegist
     return PluginRegistry.getEntry(this.header.pluginId).path + resource;
   };
 
+  /**
+   * Set or get an applet property. Available property names are:
+   *   'title' - set the applet header bar text.
+   * @param {String} name - The applet property name to set or get.
+   * @param {String} [value] - The value to set.
+   * @return {String} The value of the specified property.
+   */
+  CApplet.prototype.property = function(name, value) {
+    return _applet.property(name, value);
+  };
+
   return CApplet;
 });

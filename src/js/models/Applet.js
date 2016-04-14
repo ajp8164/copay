@@ -1,12 +1,27 @@
 'use strict';
 angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $injector, lodash, PluginRegistry) {
 
+  var self = this;
+  var _publishedKeys = [];
+
+  Applet.validProperties = [
+    'title'
+  ];
+
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
   function Applet(obj, skin) {
     lodash.assign(this, obj);
     this.skin = skin;
     return this;
+  };
+
+  // Private methods
+  //
+  function checkPropertyValid(key) {
+    if (lodash.findIndex(Applet.validProperties) < 0) {
+      throw new Error('Error: unknown applet property \'' + key + '\'');
+    }
   };
 
   // Public methods
@@ -21,6 +36,15 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
 
   Applet.prototype.mainViewUrl = function() {
     return PluginRegistry.getEntry(this.header.pluginId).mainViewUri;
+  };
+
+  Applet.prototype.property = function(key, value) {
+    checkPropertyValid(key);
+    if (value) {
+      $rootScope.applet[key] = value;
+      _publishedKeys.push(key);
+    }
+    return $rootScope.applet[key];
   };
 
   Applet.prototype.getService = function(pluginId) {
@@ -47,8 +71,16 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
 
   Applet.prototype.close = function() {
     // Invoke rootScope published function to avoid dependency on appletService.
-    $rootScope.applet.close(this);
+    $rootScope.applet.close();
   };
-    
+
+  Applet.prototype.finalize = function(callback) {
+    // Delete published properties.
+    for (var i = 0; i < _publishedKeys.length; i++) {
+      delete $rootScope.applet[_publishedKeys[i]];
+    }
+    callback();
+  };
+
   return Applet;
 });

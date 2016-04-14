@@ -769,10 +769,6 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
 
     if (toSkin.isVanity() && fromSkin.isVanity()) {
       $rootScope.$emit('Local/SkinUpdated', toSkin, walletId);
-    } else if (toSkin.isApplet() && fromSkin.isVanity()) {
-      $rootScope.$emit('Local/AppletEnter', new Applet(root.getPublishedSkinById(toSkinId)), walletId);
-    } else if (toSkin.isVanity() && fromSkin.isApplet()) {
-      $rootScope.$emit('Local/AppletLeave', new Applet(root.getPublishedSkinById(fromSkinId)), walletId);
     }
   };
 

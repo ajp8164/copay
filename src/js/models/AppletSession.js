@@ -4,25 +4,26 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
   var STATE_VALID = 'valid';
   var STATE_INVALID = 'invalid';
 
+  var _applet = null;
+  var _userData = {};
+  var _publishedKeys = [];
+
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
-  function AppletSession(applet) {
+  function AppletSession(applet, callback) {
     if (!applet) {
       throw new Error('Error: no applet provided to create session');
     }
-    this.applet = applet;
+    _applet = applet;
     this.state = STATE_VALID;
     this.timestamp = new Date();
-    this.id = new Date().getTime();
-    this.userData = {};
-    this.publishedKeys = [];
-    this.restore();
+    this.id = '' + new Date().getTime();
     return this;
   };
 
   function checkStateIsValid(session) {
     if (session.state == STATE_INVALID) {
-      throw new Error('Error: invalid session state, (applet ID = ' + this.applet.header.appletId + ')');
+      throw new Error('Error: invalid session state, (applet ID = ' + _applet.header.appletId + ')');
     }
   }
 
@@ -39,20 +40,26 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
 
   // Public methods
   //
-  AppletSession.prototype.isForApplet = function(applet) {
+  AppletSession.prototype.isForApplet = function(appletId) {
     checkStateIsValid(this);
-    return this.applet.header.appletId == applet.header.appletId;
+    return _applet.header.appletId == appletId;
   };
 
-  AppletSession.prototype.restore = function() {
+  AppletSession.prototype.getApplet = function() {
+    checkStateIsValid(this);
+    return _applet;
+  };
+
+  AppletSession.prototype.restore = function(callback) {
     checkStateIsValid(this);
     // Restore applet data from storage.
     var self = this;
-    appletDataService.getData(this.applet.header.appletId, function(err, data) {
+    appletDataService.getData(_applet.header.appletId, function(err, data) {
       if (err) {
         throw new Error('Error reading applet storage: ' + err.message);
       }
-      self.userData = data;
+      self._userData = data;
+      callback(data);
     });
   };
 
@@ -61,7 +68,7 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
     if (!key) {
       throw new Error('Error getting session data, no key specified');
     }
-    return this.userData[key] || null;
+    return _userData[key] || null;
   };
 
   AppletSession.prototype.set = function(key, value, publish) {
@@ -69,20 +76,20 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
     if (!key) {
       throw new Error('Error setting session data, no key specified');
     }
-    this.userData[key] = value || null;
+    _userData[key] = value || null;
 
     // Optionally publish the value to root scope.
     if (publish) {
       $rootScope.applet.session = $rootScope.applet.session || {};
       $rootScope.applet.session[key] = value;
-      this.publishedKeys.push(key);
+      _publishedKeys.push(key);
     }
   };
 
   AppletSession.prototype.flush = function(callback) {
     checkStateIsValid(this);
     // Write applet data to storage.
-    appletDataService.setData(this.applet.header.appletId, this.userData, function(err, data) {
+    appletDataService.setData(_applet.header.appletId, _userData, function(err, data) {
       if (err) {
         err = 'Error writing session data: ' + err.message;
       }
@@ -97,7 +104,7 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
     if (flush) {
       // Write applet data to storage.
       var self = this;
-      appletDataService.setData(this.applet.header.appletId, this.userData, function(err, data) {
+      appletDataService.setData(_applet.header.appletId, _userData, function(err, data) {
         var response = null;
         if (err) {
           response = 'Error writing session data: ' + err.message;

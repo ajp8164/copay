@@ -1,28 +1,53 @@
 'use strict';
 
-angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $log, CContext, CWallet, CUtils, CApplet) {
+angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $scope, $log, lodash, CContext, CWallet, CUtils) {
 
   var self = this;
 
-  this.applet = CContext.getApplet();
-  this.paymentService = this.applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
-
-  // Settings
-  // 
   var BITS_PER_BTC = 1e6;
-  var fxBits = CUtils.getRate(CWallet.getAltCurrencyIsoCode()) / BITS_PER_BTC;
-  var csRateBits = CUtils.getRate(this.applet.model.csCurrency) / BITS_PER_BTC;
+  var SESSION_PREFS = 'preferences';
 
-  // Always in bits
-  this.min = parseInt(this.applet.model.csMinimum) / csRateBits;
-  this.max = parseInt(this.applet.model.csMaximum) / csRateBits;
-  this.initialAmount = parseInt(this.applet.model.csInitialAmount) / csRateBits;
-  this.displayAmount = this.initialAmount;
-  this.currency = CWallet.getCurrencyName();
+  var _session;
+  var _applet;
+  var _paymentService;
+  var _prefs;
+  var _fxBits;
+  var _csRateBits;
 
-  this.init = function() {
-    // Default to showing the alternative currency first.
-    this.setCurrency(CWallet.getAltCurrencyIsoCode());
+  $rootScope.$on('Local/AppletLeave', function(event) {
+    // Save preferences before close.
+    _session.set(SESSION_PREFS, _prefs);
+  });
+
+  this.init = function(sessionId) {
+    _session = CContext.getSession(sessionId);
+    _applet = _session.getApplet();
+    _paymentService = _applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
+
+    _fxBits = CUtils.getRate(CWallet.getAltCurrencyIsoCode()) / BITS_PER_BTC;
+    _csRateBits = CUtils.getRate(_applet.model.csCurrency) / BITS_PER_BTC;
+
+    // All values in bits.
+    this.min = parseInt(_applet.model.csMinimum) / _csRateBits;
+    this.max = parseInt(_applet.model.csMaximum) / _csRateBits;
+    this.initialAmount = parseInt(_applet.model.csInitialAmount) / _csRateBits;
+    this.displayAmount = this.initialAmount;
+    this.currency = CWallet.getCurrencyName();
+
+    this.applyPreferences();
+  };
+
+  this.applyPreferences = function() {
+    // Read and apply applet prefrences.
+    _prefs = _session.get(SESSION_PREFS) || {};
+
+    // Set currency display.
+    _prefs.currencyDisplayAlt = (lodash.isUndefined(_prefs.currencyDisplayAlt) ? true : _prefs.currencyDisplayAlt);
+    if (_prefs.currencyDisplayAlt) {
+      this.setCurrency(CWallet.getAltCurrencyIsoCode());
+    } else {
+      this.setCurrency(CWallet.getCurrencyName());
+    }
   };
 
   this.setCurrency = function(c) {
@@ -32,20 +57,23 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
       this.currency = (this.currency == CWallet.getCurrencyName() ? CWallet.getAltCurrencyIsoCode() : CWallet.getCurrencyName());
     }
     this.updateDisplayAmount(self.roundSlider ? self.roundSlider.getValue() : this.initialAmount);
+
+    // Update the preference setting.
+    _prefs.currencyDisplayAlt = (this.currency == CWallet.getAltCurrencyIsoCode());
   };
 
   this.updateDisplayAmount = function(amount) {
     if (this.currency == 'bits') {
-      this.displayAmount = amount;
+      this.displayAmount = parseInt(amount);
     } else if (this.currency == 'BTC') {
       this.displayAmount = amount / BITS_PER_BTC;
     } else {
-      this.displayAmount = parseInt(amount * fxBits);
+      this.displayAmount = parseInt(amount * _fxBits);
     }
   };
 
   $rootScope.$on('Local/AppletShown', function() {
-    $("#round-slider").roundSlider({
+    $('#round-slider').roundSlider({
       radius: 125,
       width: 30,
       handleSize: '+0',
@@ -62,7 +90,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
         $rootScope.$apply();
       }
     });
-    self.roundSlider = $("#round-slider").data("roundSlider");
+    self.roundSlider = $('#round-slider').data('roundSlider');
   });
 
   // Services
@@ -94,5 +122,4 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
     }
   };
 
-  this.init();
 });
