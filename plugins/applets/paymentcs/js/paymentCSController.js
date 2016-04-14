@@ -72,7 +72,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
     }
   };
 
-  $rootScope.$on('Local/AppletShown', function() {
+  $rootScope.$on('Local/AppletShown', function(event, applet, wealletId) {
     $('#round-slider').roundSlider({
       radius: 125,
       width: 30,

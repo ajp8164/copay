@@ -510,11 +510,15 @@ a.missing-copayers {
 
 .wallet-bar .icon-wallet {
   position: relative;
-  top: -2px;
+  top: -3px;
   left: 5px;
   display: inline-block;
   font-size: 12px;
   color: #FFFFFF;
+}
+
+.platform-ios .wallet-bar .icon-wallet {
+  top: -5px;
 }
 
 .wallet-bar img {
@@ -537,6 +541,10 @@ a.missing-copayers {
   color: #FFFFFF;
 }
 
+.platform-ios .wallet-bar .wallet-name {
+  top: -4px;
+}
+
 .wallet-bar .wallet-copayers {
   position: relative;
   top: -2px;
@@ -551,6 +559,10 @@ a.missing-copayers {
   right: 5px;
   font-size: 12px;
   color: #FFFFFF;
+}
+
+.platform-ios .wallet-bar .icon-balance {
+  top: 1px;
 }
 
 /*
