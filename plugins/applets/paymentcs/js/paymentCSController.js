@@ -5,7 +5,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
   var self = this;
 
   var BITS_PER_BTC = 1e6;
-  var SESSION_PREFS = 'preferences';
+  var SESSION_KEY_PREFS = 'preferences';
 
   var _session;
   var _applet;
@@ -16,7 +16,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
 
   $rootScope.$on('Local/AppletLeave', function(event) {
     // Save preferences before close.
-    _session.set(SESSION_PREFS, _prefs);
+    _session.set(SESSION_KEY_PREFS, _prefs);
   });
 
   this.init = function(sessionId) {
@@ -39,7 +39,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
 
   this.applyPreferences = function() {
     // Read and apply applet prefrences.
-    _prefs = _session.get(SESSION_PREFS) || {};
+    _prefs = _session.get(SESSION_KEY_PREFS) || {};
 
     // Set currency display.
     _prefs.currencyDisplayAlt = (lodash.isUndefined(_prefs.currencyDisplayAlt) ? true : _prefs.currencyDisplayAlt);

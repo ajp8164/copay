@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, lodash, Applet, Skin, profileService, configService, appletCatalogService, appletSessionService, themeService, FocusedWallet, go) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, profileService, configService, appletCatalogService, appletSessionService, themeService, FocusedWallet, go) {
 
 	var APPLET_WALLET_IDENTIFIER_PREFIX = 'wallet-applet.';
 	var APPLET_BUILTIN_IDENTIFIER_PREFIX = 'builtin-applet.';
@@ -34,7 +34,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function publishAppletProperties(applet) {
 		$rootScope.applet.header = applet.header;
 		$rootScope.applet.model = applet.model;
-		$rootScope.applet.view = applet.view;
+    $rootScope.applet.view = applet.view;
+    $rootScope.applet.title = applet.header.name;
   };
 
   function removeAppletProperties() {
@@ -139,19 +140,33 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
         initAppletEnvironment(applet);
 
         // Create the applet modal.
+        // 
         root.appletModal = $ionicModal.fromTemplate('\
           <ion-modal-view class="applet-modal">\
-            <ion-nav-bar class="bar-positive" ng-style="{\'color\': applet.view.navBarTitleColor, \'background\': applet.view.navBarBackground, \'border-bottom\': applet.view.navBarBottomBorder}">\
-            <div ng-style="{\'background\': applet.view.navBarBackground}">\
-              <ion-nav-title>{{applet.title || skin.header.name}}</ion-nav-title>\
-              <ion-nav-buttons side="right">\
-                <button class="button button-icon button-applet-header icon ion-close" ng-click="applet.close(\'' + session.id + '\')" ng-style="{\'color\': applet.view.navBarButtonColor}"></button>\
-              </ion-nav-buttons>\
-            </div>\
-            </ion-nav-bar>\
-            <ion-content class="has-header" ng-style="{\'background\': applet.view.background}">\
+            <ion-footer-bar class="footer-bar-applet" ng-style="{\'background\': applet.view.footerBarBackground, \'border-top\': applet.view.footerBarTopBorder}">\
+              <button class="footer-bar-item item-center button button-clear button-icon ion-ios-circle-filled button-applet-close"\
+              ng-style="{\'background\': applet.view.footerBarBackground, \'color\': applet.view.footerBarButtonColor}" ng-click="applet.close(\'' + session.id + '\')"></button>\
+              <button class="footer-bar-item item-right button button-clear button-icon ion-more"\
+              ng-style="{\'background\': applet.view.footerBarBackground, \'color\': applet.view.footerBarButtonColor}" ng-click="appletInfoPopover.show($event)"></button>\
+            </ion-footer-bar>\
+            <script id="templates/appletInfoPopover.html" type="text/ng-template">\
+              <ion-popover-view class="popover-applet-info">\
+                <ion-content>\
+                  <div class="card">\
+                    <div class="item item-divider">\
+                      <span class="section">' + (FocusedWallet.getInfo().client.alias || FocusedWallet.getInfo().client.credentials.walletName || "---") + '</span>\
+                    </div>\
+                    <div class="item item-text-wrap">\
+                      <span class="text">' + (FocusedWallet.getBalanceAsString('totalAmount', false) || '--- ' + FocusedWallet.getInfo().config.settings.unitName) + '</span><br>\
+                      <span class="text">' + (FocusedWallet.getBalanceAsString('totalAmount', true) || '--- ' +  FocusedWallet.getInfo().config.settings.alternativeIsoCode) + '</span>\
+                    </div>\
+                  </div>\
+                </ion-content>\
+              </ion-popover-view>\
+            </script>\
+            <ion-pane ng-style="{\'background\': applet.view.background}">\
               <div ng-include="\'' + root.appletMainViewUrl + '\'" ng-init="sessionId=\'' + session.id + '\'">\
-            </ion-content>\
+            </ion-pane>\
           </ion-modal-view>\
           ', {
           scope: $rootScope,
@@ -161,6 +176,12 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
           hideDelay: 1000,
           session: session,
           walletId: FocusedWallet.getWalletId()
+        });
+
+        $ionicPopover.fromTemplateUrl('templates/appletInfoPopover.html', {
+          scope: root.appletModal.scope,
+        }).then(function(popover) {
+          $rootScope.appletInfoPopover = popover;
         });
 
         // Present the modal, allow some time to render before presentation.
