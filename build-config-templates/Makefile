@@ -5,21 +5,19 @@ sign:
 verify: 
 	gpg --verify browser-extensions/chrome/%APP-EXE-NAME%-chrome-extension.zip.sig browser-extensions/chrome/%APP-EXE-NAME%-chrome-extension.zip
 
-sign-desktop:
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-linux32.zip.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-linux32.zip
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-linux64.zip.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-linux64.zip
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-osx32.dmg.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-osx32.dmg
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-osx64.dmg.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-osx64.dmg
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-win32.exe.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-win32.exe
-	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-win64.exe.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-win64.exe
+sign-osx:
+	codesign -s 3rd webkitbuilds/%APP-EXE-NAME%-osx.dmg 
 
-verify-desktop:
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-linux32.zip.sig webkitbuilds/%APP-EXE-NAME%-linux32.zip
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-linux64.zip.sig webkitbuilds/%APP-EXE-NAME%-linux64.zip
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-osx32.dmg.sig webkitbuilds/%APP-EXE-NAME%-osx32.dmg
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-osx64.dmg.sig webkitbuilds/%APP-EXE-NAME%-osx64.dmg
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-win32.exe.sig webkitbuilds/%APP-EXE-NAME%-win32.exe
-	gpg --verify webkitbuilds/%APP-EXE-NAME%-win64.exe.sig webkitbuilds/%APP-EXE-NAME%-win64.exe
+verify-osx:
+	codesign -dv webkitbuilds/%APP-EXE-NAME%-osx.dmg 
+
+sign-desktop:  sign-osx
+	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-linux.zip.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-linux.zip
+	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-win.exe.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-win.exe
+
+verify-desktop: verify-osx
+	gpg --verify webkitbuilds/%APP-EXE-NAME%-linux.zip.sig webkitbuilds/%APP-EXE-NAME%-linux.zip
+	gpg --verify webkitbuilds/%APP-EXE-NAME%-win.exe.sig webkitbuilds/%APP-EXE-NAME%-win.exe
 
 chrome:
 	browser-extensions/chrome/build.sh
