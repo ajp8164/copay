@@ -152,13 +152,13 @@ if [ ! -d $PROJECT ]; then
   cordova plugin add https://github.com/VersoSolutions/CordovaClipboard
   checkOK
 
-  cordova plugin add https://github.com/katzer/cordova-plugin-email-composer.git#f53df5c31c50d4f39d214a5cbe49abb0c5727a49
+  cordova plugin add cordova-plugin-email-composer@0.8.3
   checkOK
 
   cordova plugin add https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git && cordova prepare
   checkOK
 
-  cordova plugin add hu.dpal.phonegap.plugins.spinnerdialog
+  cordova plugin add cordova-plugin-spinner-dialog
   checkOK
 
   cordova plugin add cordova-plugin-dialogs
@@ -170,7 +170,7 @@ if [ ! -d $PROJECT ]; then
   cordova plugin add cordova-plugin-console
   checkOK
 
-  cordova plugin add hu.dpal.phonegap.plugins.uniquedeviceid
+  cordova plugin add cordova-plugin-uniquedeviceid
   checkOK
 
   cordova plugin add cordova-plugin-file@3.0.0
@@ -183,9 +183,6 @@ if [ ! -d $PROJECT ]; then
   checkOK
 
   cordova plugin add cordova-ios-requires-fullscreen
-  checkOK
-
-  cordova plugin add cordova-plugin-disable-bitcode
   checkOK
 
   cordova plugin add cordova-plugin-screen-orientation
