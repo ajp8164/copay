@@ -8,11 +8,17 @@
 }
 
 .hello-navbar-title {
+  font-size: 14px !important;
 	color: #FFFFFF;
 }
 
 .hello-navbar-button {
 	color: #FFFFFF !important;
+}
+
+.hello-slide-box {
+	width: 100%;
+	height: 100%;
 }
 
 /*

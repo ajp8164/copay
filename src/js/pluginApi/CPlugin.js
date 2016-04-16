@@ -1,5 +1,5 @@
 'use strict';
-angular.module('copayApp.api').factory('CPlugin', function (PluginRegistry) {
+angular.module('copayApp.api').factory('CPlugin', function ($log, CSystem, PluginRegistry) {
 
   /**
    * {PluginObject}
@@ -25,7 +25,7 @@ angular.module('copayApp.api').factory('CPlugin', function (PluginRegistry) {
    *
    * Service specific plugin properties.
    * 
-   *   serviceClass: String - The class name of the plugin (used to create an instance of the plugin).
+   *   serviceApi: String - The class name of the plugin API (used to create an instance of the plugin).
    */
 
   /**
@@ -46,6 +46,24 @@ angular.module('copayApp.api').factory('CPlugin', function (PluginRegistry) {
    */
   CPlugin.getRegistryEntry = function(pluginId) {
     return PluginRegistry.getEntry(pluginId);
+  };
+
+  /**
+   * Validate that the specified service description object contains all required properties.
+   * @param {String} serviceDesc - A service description object specified in a skin.
+   * @param {Array} requiredProperties - An array of required properties; e.g., ['.a','.b','.b.c'].
+   * @param {String} pluginId - The plugin id of the requestor.
+   * @throws Will throw an error if serviceDesc is missing any required properties.
+   * @static
+   */
+  CPlugin.validateServiceDesc = function(serviceDesc, requiredProperties, pluginId) {
+    var result = CSystem.checkObject(serviceDesc, requiredProperties);
+    if (result.missing.length > 0) {
+      throw new Error('Error: A skin with service plugin \'' + pluginId + '\' is missing required properties \'' + result.missing.toString() + '\'');
+    }
+    if (result.other.length > 0) {
+      $log.warn('Warning: A skin with service plugin \'' + pluginId + '\' has unrecognized properties \'' + result.other.toString() + '\'');
+    }
   };
 
   return CPlugin;

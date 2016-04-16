@@ -1,7 +1,7 @@
 <div class="applet-content" ng-controller="helloController as hello" ng-init="hello.init(sessionId)">
 
   <ion-nav-bar class="hello-navbar">
-    <ion-nav-title class="title-applet-header hello-navbar-title">{{applet.title}}</ion-nav-title>
+    <ion-nav-title class="hello-navbar-title">{{applet.title}}</ion-nav-title>
     <ion-nav-buttons side="left">
       <a class="button button-applet-header button-clear applet-icon-left ion-chevron-left hello-navbar-button"
       	ng-click="hello.previous()" ng-show="hello.slideIndex > 0">Prev</a>
@@ -14,21 +14,15 @@
 
 	<ion-content class="has-header">
 
-		<ion-slide-box on-slide-changed="hello.slideChanged(index)" style="width: 100%; height: 100%;">
+		<ion-slide-box class="hello-slide-box" on-slide-changed="hello.slideChanged(index)">
 		  <ion-slide>
-		    <div class="">
-			  	<div class="hello">Hello :-)</div>
-		    </div>
+		  	<span>Hello :-)</span>
 		  </ion-slide>
 		  <ion-slide>
-		    <div class="">
-			  	<div class="hello">Hello :-)</div>
-		    </div>
+		  	<span>Hello :-)</span>
 		  </ion-slide>
 		  <ion-slide>
-		    <div class="">
-			  	<div class="hello">Hello :-)</div>
-		    </div>
+		  	<span>Hello :-)</span>
 		  </ion-slide>
 		</ion-slide-box>
 

@@ -81,8 +81,7 @@ angular.module('copayApp.api').factory('CWallet', function (configService, txFor
 
   /**
    * Sends a bitcoin payment from the current wallet.
-   * This method does not present any user interface confirmation or intervention.
-   * It is recommended that the caller obtainm user confirmation prior to calling this method.
+   * This method presents a user interface confirmation prior to sending payment.
    *
    * {payproData} - For payment-protocol payments provide the following payment data object.
    * 

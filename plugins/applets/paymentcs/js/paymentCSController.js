@@ -1,10 +1,9 @@
 'use strict';
 
-angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $scope, $log, lodash, CContext, CWallet, CUtils) {
+angular.module('copayApp.plugins').controller('paymentCSController', function($rootScope, $scope, $log, lodash, CContext, CWallet, CUtils, CConst) {
 
   var self = this;
 
-  var BITS_PER_BTC = 1e6;
   var SESSION_KEY_PREFS = 'preferences';
 
   var _session;
@@ -24,8 +23,8 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
     _applet = _session.getApplet();
     _paymentService = _applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
-    _fxBits = CUtils.getRate(CWallet.getAltCurrencyIsoCode()) / BITS_PER_BTC;
-    _csRateBits = CUtils.getRate(_applet.model.csCurrency) / BITS_PER_BTC;
+    _fxBits = CUtils.getRate(CWallet.getAltCurrencyIsoCode()) / CConst.BITS_PER_BTC;
+    _csRateBits = CUtils.getRate(_applet.model.csCurrency) / CConst.BITS_PER_BTC;
 
     // All values in bits.
     this.min = parseInt(_applet.model.csMinimum) / _csRateBits;
@@ -66,13 +65,13 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
     if (this.currency == 'bits') {
       this.displayAmount = parseInt(amount);
     } else if (this.currency == 'BTC') {
-      this.displayAmount = amount / BITS_PER_BTC;
+      this.displayAmount = amount / CConst.BITS_PER_BTC;
     } else {
       this.displayAmount = parseInt(amount * _fxBits);
     }
   };
 
-  $rootScope.$on('Local/AppletShown', function(event, applet, wealletId) {
+  $rootScope.$on('Local/AppletShown', function(event, applet, walletId) {
     $('#round-slider').roundSlider({
       radius: 125,
       width: 30,
@@ -96,7 +95,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
   // Services
   // 
   this.pay = function() {
-    if (this.paymentService) {
+    if (_paymentService) {
 
       var amount = this.displayAmount;
       var currency = this.currency;
@@ -104,7 +103,7 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
       // If currency is bits then convert to BTC.
       if (this.currency == 'bits') {
         currency = 'BTC';
-        amount = this.displayAmount / BITS_PER_BTC;
+        amount = this.displayAmount / CConst.BITS_PER_BTC;
       }
 
       // TODO: this.service.provider.required.buyer.fields
@@ -112,11 +111,11 @@ angular.module('copayApp.plugins').controller('paymentCSController', function($r
         price: amount,
         currency: currency
       };
-      var memo = this.paymentService.memo;
+      var memo = _paymentService.memo;
 
-      this.paymentService.createAndSendPayment(data, memo, function(err) {
+      _paymentService.createAndSendPayment(data, memo, function(err) {
         if (err) {
-          $log.debug('ERROR with payment: '+JSON.stringify(err));
+          $log.debug('Error with payment: ' + err.message);
         }
       });
     }

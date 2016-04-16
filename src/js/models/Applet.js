@@ -59,8 +59,8 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
     // Find the plugin specified service class in the registry, use $injector to get the factory object,
     // and create a new service instance.  Using the $injector here allows this class (factory) from having
     // to declare dependencies on dynamically defined (plugin) service classes (factory's).
-    var serviceClass = PluginRegistry.getServiceProviderClass(pluginId);
-    var service = $injector.get(serviceClass);
+    var serviceApi = PluginRegistry.getServiceApi(pluginId);
+    var service = $injector.get(serviceApi);
     return eval(new service(this.services[serviceIndex]));
   };
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, $log, $timeout, $filter, lodash, isChromeApp, gettext, configService, txStatus, txFormatService, rateService) {
+angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, $log, $timeout, $filter, lodash, isChromeApp, gettext, configService, txStatus, txFormatService, rateService, confirmDialog) {
  
   // Static properties
   // 
@@ -296,35 +296,44 @@ angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, 
             $log.debug(err);
           }
 
-          bwc.sendTxProposal({
-            toAddress: txData.toAddress,
-            amount: txData.amount,
-            message: txData.memo,
-            payProUrl: txData.url ? txData.url : null,
-            feePerKb: feePerKb,
-            excludeUnconfirmedUtxos: !configService.getSync().wallet.spendUnconfirmed
-          }, function(err, txp) {
-            if (err) {
-              $rootScope.$emit('Local/FocusedWalletStatus');
-              FocusedWallet.lock();
-              return cb(err);
-            }
+          var config = configService.getSync().wallet.settings;
+          var confirmMessage = 'Send ' + (txData.amount / config.unitToSatoshi) + ' ' + config.unitName + ' to ' + txData.toAddress + '?';
 
-            if (!bwc.canSign() && !bwc.isPrivKeyExternal()) {
-              $log.info('No signing proposal: No private key')
-              $rootScope.$emit('Local/FocusedWalletStatus');
-              txStatus.notify($rootScope, bwc, txp, function() {
-                $rootScope.$emit('Local/TxProposalAction');
-              });
+          confirmDialog.show(confirmMessage, function(confirmed) {
+            if (!confirmed) {
               return cb();
             }
 
-            FocusedWallet.signAndBroadcast(txp, function(err) {
-              $rootScope.$emit('Local/FocusedWalletStatus');
+            bwc.sendTxProposal({
+              toAddress: txData.toAddress,
+              amount: txData.amount,
+              message: txData.memo,
+              payProUrl: txData.url ? txData.url : null,
+              feePerKb: feePerKb,
+              excludeUnconfirmedUtxos: !configService.getSync().wallet.spendUnconfirmed
+            }, function(err, txp) {
               if (err) {
-                $rootScope.$emit('Local/TxProposalAction');
-                cb(err.message);
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                FocusedWallet.lock();
+                return cb(err);
               }
+
+              if (!bwc.canSign() && !bwc.isPrivKeyExternal()) {
+                $log.info('No signing proposal: No private key')
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                txStatus.notify($rootScope, bwc, txp, function() {
+                  $rootScope.$emit('Local/TxProposalAction');
+                });
+                return cb();
+              }
+
+              FocusedWallet.signAndBroadcast(txp, function(err) {
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                if (err) {
+                  $rootScope.$emit('Local/TxProposalAction');
+                  cb(err.message);
+                }
+              });
             });
           });
         });

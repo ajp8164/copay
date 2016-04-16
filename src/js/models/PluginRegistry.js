@@ -30,8 +30,8 @@ angular.module('copayApp.model').factory('PluginRegistry', function (plugins, lo
     });
   };
 
-  PluginRegistry.getServiceProviderClass = function(pluginId) {
-    return PluginRegistry.getEntry(pluginId).serviceClass;
+  PluginRegistry.getServiceApi = function(pluginId) {
+    return PluginRegistry.getEntry(pluginId).serviceApi;
   };
 
   return PluginRegistry;
