@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "Brilliant Rose",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",

@@ -140,14 +140,15 @@ module.exports = function(grunt) {
         src: [
           'bower_components/jquery/dist/jquery.js',
           'bower_components/roundSlider/dist/roundslider.min.js',
-          'bower_components/gridly/javascripts/jquery.gridly.js'
+          'bower_components/angular-gridster/dist/angular-gridster.min.js',
+          'bower_components/javascript-detect-element-resize/detect-element-resize.js'
         ],
         dest: 'public/lib/ui-components.js'
       },
       ui_components_css: {
         src: [
           'bower_components/roundSlider/dist/roundslider.min.css',
-          'bower_components/gridly/javascripts/jquery.gridly.css'
+          'bower_components/angular-gridster/dist/angular-gridster.min.css'
         ],
         dest: 'public/css/ui-components.css',
       },
@@ -443,13 +444,13 @@ module.exports = function(grunt) {
       }
 
       // Detect and fail if duplicate plugin id exists.
-      if (pluginIds.indexOf(data.id) < 0) {
-        pluginIds.push(data.id);
+      if (pluginIds.indexOf(data.pluginId) < 0) {
+        pluginIds.push(data.pluginId);
       } else {
-        throw new Error('Duplicate plugin id detected: \'' + data.id + '\'');
+        throw new Error('Duplicate plugin id detected: \'' + data.pluginId + '\'');
       }
 
-      console.log('> [' + data.type + '] \'' + data.name + '\', id=' + data.id);
+      console.log('> [' + data.type + '] \'' + data.name + '\', id=' + data.pluginId);
       content += cleanJSONQuotesOnKeys(JSON.stringify(data, null, 2));
     }
 

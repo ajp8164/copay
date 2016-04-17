@@ -1,7 +1,6 @@
-<div ng-controller="bitrefillController as c">
-  <div class="applet-content">
+<div class="applet-content" ng-controller="bitrefillController as c" ng-init="c.init(sessionId)">
 
-    <style type="text/css">
+  <style type="text/css">
     .slider-pager-page {
       color: gray !important;
       font-size: 75%;
@@ -12,17 +11,18 @@
     }
   </style>
 
-  <ion-slide-box style="height: 100%" on-slide-changed="slideHasChanged($index)">
-    <ion-slide>
-      <div ng-include="applet.path('views/phone-number.html')"></div>
-    </ion-slide>
-    <ion-slide>
-      <div ng-include="applet.path('views/amount.html')"></div>
-    </ion-slide>
-    <ion-slide>
-      <div ng-include="applet.path('views/pay.html')"></div>
-    </ion-slide>
-  </ion-slide-box>
+  <ion-content>
+    <ion-slide-box style="height: 100%" on-slide-changed="slideHasChanged($index)">
+      <ion-slide>
+        <div ng-include="applet.path('views/phone-number.html')"></div>
+      </ion-slide>
+      <ion-slide>
+        <div ng-include="applet.path('views/amount.html')"></div>
+      </ion-slide>
+      <ion-slide>
+        <div ng-include="applet.path('views/pay.html')"></div>
+      </ion-slide>
+    </ion-slide-box>
 
 <!--
     <div class="text-center m20t" style="position: absolute; bottom: 20px; width: 100%;">
@@ -32,6 +32,6 @@
       </button>
     </div>
 -->
-
-  </div>
+  </ion-content>
+  
 </div>

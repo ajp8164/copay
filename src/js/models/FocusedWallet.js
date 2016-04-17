@@ -1,15 +1,22 @@
 'use strict';
 
-angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, $log, $timeout, $ionicModal, lodash, isChromeApp, gettext, configService, txStatus) {
+angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, $log, $timeout, $filter, lodash, isChromeApp, gettext, configService, txStatus, txFormatService, rateService, confirmDialog) {
  
   // Static properties
   // 
   FocusedWallet.bwc = null;
+  FocusedWallet.status = null;
 
   // Listen for wallet client changes and statically cache the Bitcore Wallet Client (bwc) when a change is made.
   // 
   $rootScope.$on('Local/NewFocusedWallet', function(event, bwc) {
-      FocusedWallet.bwc = bwc;
+    FocusedWallet.bwc = bwc;
+  });
+
+  // Listen for balance updates.
+  // 
+  $rootScope.$on('Local/WalletStatus', function(event, walletStatus) {
+    FocusedWallet.status = walletStatus;
   });
 
   // Constructor
@@ -27,6 +34,77 @@ angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, 
 
   FocusedWallet.getWalletId = function() {
     return FocusedWallet.bwc.credentials.walletId;
+  };
+
+  FocusedWallet.getInfo = function() {
+    return {
+      config: configService.getSync().wallet,
+      client: FocusedWallet.bwc,
+      status: FocusedWallet.status
+    };
+  };
+
+  FocusedWallet.getBalance = function(kind) {
+    if (FocusedWallet.status == null) {
+      return null;
+    }
+
+    var config = configService.getSync().wallet;
+    switch (kind) {
+      case ('availableAmount'):
+        var availableBalanceSat = FocusedWallet.status.balance.availableConfirmedAmount;
+        if (config.spendUnconfirmed) {
+          availableBalanceSat = FocusedWallet.status.balance.availableAmount;
+        }
+        var availableBalanceAlternative = rateService.toFiat(availableBalanceSat, config.settings.alternativeIsoCode);
+        availableBalanceAlternative = $filter('noFractionNumber')(availableBalanceAlternative, 2);
+
+        return {
+          native: availableBalanceSat,
+          alternative: parseInt(availableBalanceAlternative)
+        };
+        break;
+      case ('lockedAmount'):
+        var lockedBalanceSat = FocusedWallet.status.balance.lockedConfirmedAmount;
+        if (config.spendUnconfirmed) {
+          lockedBalanceSat = FocusedWallet.status.balance.lockedAmount;
+        }
+        var lockedBalanceAlternative = rateService.toFiat(lockedBalanceSat, config.settings.alternativeIsoCode);
+        lockedBalanceAlternative = $filter('noFractionNumber')(lockedBalanceAlternative, 2);
+
+        return {
+          native: lockedBalanceSat,
+          alternative: parseInt(lockedBalanceAlternative)
+        };
+        break;
+      case ('totalAmount'):
+        var totalBalanceSat = FocusedWallet.status.balance.totalConfirmedAmount;
+        if (config.spendUnconfirmed) {
+          totalBalanceSat = FocusedWallet.status.balance.totalAmount;
+        }
+        var totalBalanceAlternative = rateService.toFiat(totalBalanceSat, config.settings.alternativeIsoCode);
+        totalBalanceAlternative = $filter('noFractionNumber')(totalBalanceAlternative, 2);
+
+        return {
+          native: totalBalanceSat,
+          alternative: parseInt(totalBalanceAlternative)
+        };
+        break;
+      default:
+        throw ('Error: unknown balance kind - ' + kind);
+    };
+  };
+
+  FocusedWallet.getBalanceAsString = function(kind, alternative) {
+    var config = configService.getSync().wallet.settings;
+    var balance = FocusedWallet.getBalance(kind);
+    if (balance == null) {
+      return '';
+    } else {
+      var b = (alternative ? balance.alternative : balance.native);
+      var unit = (alternative ? config.alternativeIsoCode : config.unitName);
+      return txFormatService.formatAmount(b) + ' ' + unit;
+    }
   };
 
   FocusedWallet.getFee = function(cb) {
@@ -218,35 +296,44 @@ angular.module('copayApp.model').factory('FocusedWallet', function ($rootScope, 
             $log.debug(err);
           }
 
-          bwc.sendTxProposal({
-            toAddress: txData.toAddress,
-            amount: txData.amount,
-            message: txData.memo,
-            payProUrl: txData.url ? txData.url : null,
-            feePerKb: feePerKb,
-            excludeUnconfirmedUtxos: !configService.getSync().wallet.spendUnconfirmed
-          }, function(err, txp) {
-            if (err) {
-              $rootScope.$emit('Local/FocusedWalletStatus');
-              FocusedWallet.lock();
-              return cb(err);
-            }
+          var config = configService.getSync().wallet.settings;
+          var confirmMessage = 'Send ' + (txData.amount / config.unitToSatoshi) + ' ' + config.unitName + ' to ' + txData.toAddress + '?';
 
-            if (!bwc.canSign() && !bwc.isPrivKeyExternal()) {
-              $log.info('No signing proposal: No private key')
-              $rootScope.$emit('Local/FocusedWalletStatus');
-              txStatus.notify($rootScope, bwc, txp, function() {
-                $rootScope.$emit('Local/TxProposalAction');
-              });
+          confirmDialog.show(confirmMessage, function(confirmed) {
+            if (!confirmed) {
               return cb();
             }
 
-            FocusedWallet.signAndBroadcast(txp, function(err) {
-              $rootScope.$emit('Local/FocusedWalletStatus');
+            bwc.sendTxProposal({
+              toAddress: txData.toAddress,
+              amount: txData.amount,
+              message: txData.memo,
+              payProUrl: txData.url ? txData.url : null,
+              feePerKb: feePerKb,
+              excludeUnconfirmedUtxos: !configService.getSync().wallet.spendUnconfirmed
+            }, function(err, txp) {
               if (err) {
-                $rootScope.$emit('Local/TxProposalAction');
-                cb(err.message);
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                FocusedWallet.lock();
+                return cb(err);
               }
+
+              if (!bwc.canSign() && !bwc.isPrivKeyExternal()) {
+                $log.info('No signing proposal: No private key')
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                txStatus.notify($rootScope, bwc, txp, function() {
+                  $rootScope.$emit('Local/TxProposalAction');
+                });
+                return cb();
+              }
+
+              FocusedWallet.signAndBroadcast(txp, function(err) {
+                $rootScope.$emit('Local/FocusedWalletStatus');
+                if (err) {
+                  $rootScope.$emit('Local/TxProposalAction');
+                  cb(err.message);
+                }
+              });
             });
           });
         });

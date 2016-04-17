@@ -1,14 +1,11 @@
 'use strict';
 
-angular.module('copayApp.model').factory('Theme', function () {
+angular.module('copayApp.model').factory('Theme', function (lodash) {
 
    // Constructor
    // See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz
   function Theme(obj) {
-    this.header = obj.header || {};
-    this.resources = obj.resources || [];
-    this.view = obj.view || {};
-    this.skins = obj.skins || [];
+    lodash.assign(this, obj);
     return this;
   };
 

@@ -1,70 +1,65 @@
-<nav class="sidebar" ng-controller="sidebarRightController as sidebar">
-<!--
-  <div class="sidebar-bg" ng-style="{'background':theme.view.sidebarRBackground}">
--->
+<ion-content scroll="false" has-bouncing="false" ng-controller="sidebarRightController as sidebar"
+  class="sidebar-right"
+  ng-style="{'background':theme.view.sidebarRBackground}">
 
-    <style>
-      .brick.small {
-        width: 140px;
-        height: 140px;
-      }
+  <!-- status bar -->
+  <div ng-class="index.useViewManagedStatusBar ? 'status-bar' : 'no-status-bar'">
+  </div>
 
-      .brick.large {
-        width: 300px;
-        height: 300px;
-      }
-    </style>
+  <!-- wallet bar -->
+  <div class="wallet-bar">
+    <i class="icon-wallet"></i>
+    <span class="wallet-name">
+      {{sidebar.currentWallet().alias || sidebar.currentWallet().name}}
+    </span>
+    <span ng-if="sidebar.currentWallet().n > 1" class="wallet-copayers">({{sidebar.currentWallet().m}}/{{sidebar.currentWallet().n}})</span>
+    <span class="wallet-balance">{{sidebar.currentWallet().balance}} {{sidebar.currentWallet().altBalance}}
+      <img ng-show="sidebar.currentWallet().network == 'testnet'" src="img/icon-testnet-white.svg">
+    </span>
+  </div>
 
-    <div class="gridly" style="width:200px; height:500px">
-      <div class="brick small" style="background: red"></div>
-      <div class="brick small" style="background: green"></div>
-      <div class="brick large" style="background: blue"></div>
-      <div class="brick small" style="background: yellow"></div>
-      <div class="brick small" style="background: white"></div>
-      <div class="brick large" style="background: aqua"></div>
-    </div>
+  <!-- applet grid -->
+  <div gridster="sidebar.gridsterOpts" class="applet-launch-container">
+    <ul>
+      <li class="applet-icon" gridster-item="appletLayoutMap" ng-repeat="applet in sidebar.applets">
 
-    <!-- Grid layout -->
-    <div class="row" style="padding-left: 1px;" ng-show="sidebar.appletGalleryLayout == 'grid'">
-      <div class="columns large-2 medium-3 small-4 end" style="padding: 1px 1px 1px 0;" ng-repeat="a in sidebar.applets">
-        <img menu-close ng-src="{{a.header.galleryImage}}" ng-click="applet.open(a.header.name)"/>
-        <div class="gallery-grid-text">
-          <div ng-if="theme.header.preferences.showAppletGalleryGridLabel">{{a.header.name}}</div>
-          <div ng-if="!theme.header.preferences.showAppletGalleryGridLabel">&nbsp;</div>
+        <!-- wallet icon -->
+        <div ng-if="applet.header.appletId.includes('wallet-applet')"
+          class="wallet-image"
+          ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
+          menu-toggle="right" ng-click="applet.open()">
+          <div class="applet-clickable">
+            <i class="icon-wallet p5t size-20"></i>
+            <div class="applet-icon-wallet-bar">
+              <span class="applet-icon-wallet-info">
+                {{applet.model.isoCode}}
+                {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
+                <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
+                  class="applet-icon-wallet-testnet">
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-<!--
 
-    <!-- List layout --
-    <div ng-show="sidebar.appletGalleryLayout == 'list'">
-      <ul class="no-bullet m0">
-        <li class="p0i oa" ng-repeat="a in sidebar.applets">
+        <!-- builtin capability icon -->
+        <div ng-if="applet.header.appletId.includes('builtin-applet')"
+          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+          menu-toggle="right" ng-click="applet.open()">
+          <div class="applet-clickable"></div>
+        </div>
 
-          <div menu-close class="gallery-list-container" ng-click="applet.open(a.header.name)">
-            <img class="gallery-list-image" ng-src="{{a.header.galleryImage}}"/>
-            <div class="gallery-list-text-lg">{{a.header.name}}</div>
-            <div class="gallery-list-text-sm">{{a.header.description}}</div>
-          </div>
+        <!-- applet icon -->
+        <div ng-if="!applet.header.appletId.includes('wallet-applet') && !applet.header.appletId.includes('builtin-applet')"
+          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+          ng-click="applet.open()">
+          <div class="applet-clickable"></div>
+        </div>
 
-        </li>
-      </ul>
-    </div>
+        <!-- applet name -->
+        <span class="applet-name">{{applet.header.name}}</span>
 
-    <!-- List detail layout --
-    <div ng-show="sidebar.appletGalleryLayout == 'list-detail'">
-      <ul class="no-bullet m0">
-        <li class="p0i oa" ng-repeat="a in sidebar.applets">
-
-          <div menu-close class="gallery-listd-container" ng-click="applet.open(a.header.name)">
-            <img class="gallery-listd-image" ng-src="{{a.header.galleryImage}}"/>
-            <div class="gallery-listd-text-lg">{{a.header.name}}</div>
-            <div class="gallery-listd-text-sm">{{a.header.description}}</div>
-          </div>
-
-        </li>
-      </ul>
-    </div>
--->
-  </div> <!-- sidebar-bg -->
-</nav>
+      </li>
+    </ul>
+  </div>
+  
+</ion-content>

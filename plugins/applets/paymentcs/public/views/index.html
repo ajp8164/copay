@@ -1,7 +1,7 @@
-<div ng-controller="paymentCSController as c">
-  <div class="applet-content">
+<div class="applet-content" ng-controller="paymentCSController as c" ng-init="c.init(sessionId)">
 
-  	<div class="my-slider">
+	<ion-content>
+		<div class="my-slider">
 			<style type="text/css" scoped>
 				.rs-control .rs-range-color {
 				  background: {{applet.view.csRangeBackground}};
@@ -46,11 +46,12 @@
 		</div>
 
 		<div class="text-center" style="position: absolute; width: 100%; bottom: 10px">
-      <button class="button outline round tiny" style="margin-bottom: 0" ng-click="c.pay()"
-      	ng-style="{'background': applet.view.payButtonBackground, 'border': applet.view.payButtonBorder, 'color': applet.view.payButtonColor}">
-        <span translate>{{applet.view.payButtonText}}</span>
-      </button>
+	    <button class="button outline round tiny" style="margin-bottom: 0" ng-click="c.pay()"
+	    	ng-style="{'background': applet.view.payButtonBackground, 'border': applet.view.payButtonBorder, 'color': applet.view.payButtonColor}">
+	      <span translate>{{applet.view.payButtonText}}</span>
+	    </button>
 		</div>
 
-	</div>
+	</ion-content>
+	
 </div>

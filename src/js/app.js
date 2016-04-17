@@ -6,6 +6,7 @@ var modules = [
   'base64',
   'door3.css',
   'ionic',
+  'gridster',
   'mm.foundation',
   'monospaced.qrcode',
   'gettext',

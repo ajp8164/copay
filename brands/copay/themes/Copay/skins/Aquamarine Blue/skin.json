@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "Aquamarine Blue",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",

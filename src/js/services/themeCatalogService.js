@@ -15,7 +15,7 @@ angular.module('copayApp.services').factory('themeCatalogService', function(stor
     },
 
     themes: {}
-
+    
   };
 
   var catalogCache = null;
@@ -32,12 +32,12 @@ angular.module('copayApp.services').factory('themeCatalogService', function(stor
     return lodash.isEmpty(catalogCache.themes);
   };
 
-  root.supportsWritingThemeContent = function() {
+  root.supportsWriting = function() {
     // Theme and skin discovery and import requires more storage space than local storage can provide.
     return storageService.fileStorageAvailable();
   }
 
-  root.getApplicationDirectory = function() {
+  root.getStorageRoot = function() {
     return storageService.getApplicationDirectory();
   };
 
@@ -119,7 +119,7 @@ angular.module('copayApp.services').factory('themeCatalogService', function(stor
 
   root.reset = function(cb) {
     catalogCache = lodash.clone(defaultCatalog);
-    storageService.removeCatalog(cb);
+    storageService.clearThemeCatalog(cb);
   };
 
   root.getDefaults = function() {

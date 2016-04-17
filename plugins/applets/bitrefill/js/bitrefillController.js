@@ -1,20 +1,21 @@
 'use strict';
 
-angular.module('copayApp.plugins').controller('bitrefillController', function($rootScope, $scope, $log, $ionicSlideBoxDelegate, lodash, gettext, copayAppletApi, copayWalletApi) {
+angular.module('copayApp.plugins').controller('bitrefillController', function($rootScope, $scope, $log, $ionicSlideBoxDelegate, lodash, gettext, CContext, CWallet) {
 
   var self = this;
 
-  this.applet = copayAppletApi.getApplet();
-  var bitrefillService = this.applet.getService('bitrefill-service');
-  var paymentService = this.applet.getService('payment-service');
+  var _session;
+  var _applet;
+  var _bitrefillService;
+  var _paymentService;
 
   this.phoneNumber = '1234567';
-  this.operators = null;
-  this.selectedOp = null;
-  this.country = null;
-  this.pkgs = null;
-  this.pkg = null;
-  this.amount = null;
+  this.operators;
+  this.selectedOp;
+  this.country;
+  this.pkgs;
+  this.pkg;
+  this.amount;
   this.pageId = 0;
 
   var pages = [{
@@ -36,10 +37,15 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
   	buttonPreviousText: 'BACK'
   }];
 
-  function init() {
-    copayAppletApi.setTitle("Top Up Mobile Phone");
+  this.init = function(sessionId) {
+    _session = CContext.getSession(sessionId);
+    _applet = _session.getApplet();
+    _bitrefillService = _applet.getService('com.bitpay.copay.plugin.service.bitrefill');
+    _paymentService = _applet.getService('com.bitpay.copay.plugin.service.invoice-payment');
 
-  	// Disable swipe page sliding.
+    _applet.property('title', 'Top Up Mobile Phone');
+
+    // Disable swipe page sliding.
     $ionicSlideBoxDelegate.enableSlide(false);
   };
 
@@ -88,7 +94,7 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
 
     self.setOngoingProcess(gettext('Looking up operator'));
 
-    bitrefillService.lookupNumber(self.phoneNumber, operatorSlug, function(err, result) {
+    _bitrefillService.lookupNumber(self.phoneNumber, operatorSlug, function(err, result) {
 	    self.setOngoingProcess();
       if (err) {
         return handleError(err.message || err.error.message || err);
@@ -102,7 +108,7 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
         var pkgs = result.operator.packages;
         pkgs.forEach(function(pkg) {
           pkg.valueStr = pkg.value + ' ' + self.selectedOp.currency;
-          pkg.btcValueStr = copayWalletApi.formatAmount(pkg.satoshiPrice) + ' ' + copayWalletApi.getWalletCurrencyName();
+          pkg.btcValueStr = CWallet.formatAmount(pkg.satoshiPrice) + ' ' + CWallet.getWalletCurrencyName();
         });
         self.pkgs = pkgs;
         if (!result.operator.isRanged) {
@@ -114,5 +120,4 @@ angular.module('copayApp.plugins').controller('bitrefillController', function($r
     });
   };
 
-  init();  
 });

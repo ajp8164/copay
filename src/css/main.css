@@ -642,7 +642,7 @@ ul.manage li {
   line-height: 2.7rem;
 }
 
-.sidebar li.nav-item.selected .name-wallet {
+.sidebar-left li.nav-item.selected .name-wallet {
   color: #233e81;
 }
 

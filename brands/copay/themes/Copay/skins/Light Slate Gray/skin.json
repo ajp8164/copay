@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "Light Slate Gray",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",

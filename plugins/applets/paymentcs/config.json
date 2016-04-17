@@ -1,6 +1,6 @@
 {
   "type": "applet",
-  "id": "paymentcs-applet",
+  "pluginId": "com.bitpay.copay.plugin.applet.paymentcs",
   "name": "Payment with circular slider",
   "description": "Creates and pays a BitPay invoice to a merchant.",
   "author": "BitPay, Inc.",

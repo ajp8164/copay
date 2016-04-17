@@ -1,6 +1,7 @@
 {
   "header": {
     "version": "1.0",
+    "kind": "vanity",
     "name": "West Side",
     "description": "A Copay skin.",
     "author": "BitPay, Inc.",

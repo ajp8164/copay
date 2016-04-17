@@ -388,6 +388,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
 
         if (err) {
           self.handleError(err);
+          self.loadingWallet = false;
           return;
         }
         $log.debug('Wallet Status:', walletStatus);
@@ -407,6 +408,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
 
         // Notify external addons or plugins
         $rootScope.$emit('Local/BalanceUpdated', walletStatus.balance);
+        $rootScope.$emit('Local/WalletStatus', walletStatus);
         $rootScope.$apply();
 
 
