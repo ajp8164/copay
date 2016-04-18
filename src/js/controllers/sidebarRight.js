@@ -132,6 +132,18 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     throw new Error('Unable to place applet!');
   };
 
+  this.isAppletBuiltin = function(applet) {
+    return appletService.isAppletBuiltin(applet);
+  };
+
+  this.isAppletPlugin = function(applet) {
+    return appletService.isAppletPlugin(applet);
+  };
+
+  this.isAppletWallet = function(applet) {
+    return appletService.isAppletWallet(applet);
+  };
+
   this.currentWallet = function() {
     // Map only the information we need for the ui.
     var info = FocusedWallet.getInfo();

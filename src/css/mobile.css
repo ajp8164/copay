@@ -445,7 +445,7 @@ a.missing-copayers {
   padding-top: 10px;
 }
 
-.applet-icon .wallet-image {
+.applet-icon .wallet-underlay {
   width: 60px;
   height: 60px;
   margin: auto;
@@ -453,6 +453,11 @@ a.missing-copayers {
   color: #FFFFFF;
   font-size: 2.3rem;
   font-weight: 700;
+}
+
+.applet-icon .wallet-icon {
+  height: 60px;
+  border-radius: 10px;
 }
 
 .applet-icon .applet-image {
@@ -484,7 +489,7 @@ a.missing-copayers {
   border-radius: 0 0 10px 10px;
   height: 14px;
   position: relative;
-  top: 5px;
+  top: -14px;
 }
 
 .applet-icon-wallet-info {

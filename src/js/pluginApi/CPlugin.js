@@ -2,30 +2,31 @@
 angular.module('copayApp.api').factory('CPlugin', function ($log, CSystem, PluginRegistry) {
 
   /**
-   * {PluginObject}
+   * PluginObject.
+   * -------------
    * 
    * Plugins are registered during the application build process.  Each plugin is represented
    * as a plugin registry entry and defines properties as follows.
    *
-   *  Properties shared by all plugins.
-   *  
-   *   type: String - The type of plugin, 'applet' or 'service'.
-   *   pluginId: String - The unique plugin identifier.
-   *   name: String - Human readable name of the plugin.
-   *   description: String - A short description of the plugin.
-   *   author: String - The author of the plugin.
-   *   date: String - The date the plugin is made available (typ. 'mm/dd/yyyy').
-   *   version: String - A version identfier for the plugin (typ. 'x.y.z').
+   * Properties shared by all plugins.
    *
+   *   {String} type - The type of plugin, 'applet' or 'service'.
+   *   {String} pluginId - The unique plugin identifier.
+   *   {String} name - Human readable name of the plugin.
+   *   {String} description - A short description of the plugin.
+   *   {String} author - The author of the plugin.
+   *   {String} date - The date the plugin is made available (typ. 'mm/dd/yyyy').
+   *   {String} version - A version identfier for the plugin (typ. 'x.y.z').
+   * 
    * Applet specific plugin properties.
    * 
-   *   mainViewUri: String - The relative path to the applet main view.
-   *   path: String - The relative path to the applet root location.
-   *   stylesheets: Array of String - A list of style sheets to apply when the applet is opened.
+   *   {String} mainViewUri - The relative path to the applet main view.
+   *   {String} path - The relative path to the applet root location.
+   *   {Array of String} stylesheets - A list of style sheets to apply when the applet is opened.
    *
    * Service specific plugin properties.
    * 
-   *   serviceApi: String - The class name of the plugin API (used to create an instance of the plugin).
+   *   {String} serviceApi - The class name of the plugin API (use to create an instance of the plugin).
    */
 
   /**

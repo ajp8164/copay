@@ -15,6 +15,8 @@ angular.module('copayApp.plugins').controller('helloController', function($rootS
   this.init = function(sessionId) {
     _session = CContext.getSession(sessionId);
     _applet = _session.getApplet();
+    _applet.property('title', 'Hello :-)');
+
     this.readPreferences();
     this.initSlidebox();
   };

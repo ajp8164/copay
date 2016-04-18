@@ -1,44 +1,46 @@
 'use strict';
-angular.module('copayApp.api').factory('CApplet', function (lodash, PluginRegistry) {
+angular.module('copayApp.api').factory('CApplet', function (lodash) {
 
-  /////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // ROOT SCOPE
-  //
-  // Root scope provides access to applet services and properties.
-  // Suitable for call from views.
-  // 
-  // appletService.open - Open an applet.
-  //   <div ng-click="applet.open(applet)"></div>
-  //   
-  // appletService.close - Close an open applet
-  //   <div ng-click="applet.close()"></div>
-  //   
-  // applet.path - Return the qualified path to the specified resource.
-  //   <img ng-src="{{applet.path('img/my-image.png')}}">
-  //   
-  // applet.model - Applet model property.
-  //   <circular-slider
-  //     max="{{c.applet.model.csMaximum}}">
-  //   </circular-slider>
-  //   
-  // applet.view - Applet view property.
-  //   <div ng-style="{'background':applet.view.background}"></div>
-  //   
-  /////////////////////////////////////////////////////////////////////////////////////////////
-  //   
-  // EVENTS
-  // 
-  // Each of the following events provide the following arguments to the subscriber:
-  // applet - the subject Applet
-  // walletId - the wallet identifier on which the applet is presented
-  // 
-  // 'Local/AppletEnter' - broadcast when opening an applet, before the applet is shown
-  // 'Local/AppletShown' - broadcast when opening an applet, after the applet is shown
-  // 'Local/AppletLeave' - broadcast when closing an applet, before before the applet is hidden
-  // 'Local/AppletHidden' - broadcast when closing an applet, after the applet is hidden
-  // 
-  /////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Applet Properties.
+   * ------------------
+   * 
+   * Root scope provides access to the folling applet functions and properties.
+   * 
+   * appletService.open - Open an applet.
+   *   <div ng-click="applet.open(applet)"></div>
+   *   
+   * appletService.close - Close an open applet
+   *   <div ng-click="applet.close()"></div>
+   *   
+   * applet.header - Applet header property.
+   *   <span>{{applet.header.name}}</span>
+   *   
+   * applet.path - Return the qualified path to the specified resource.
+   *   <img ng-src="{{applet.path+'img/my-image.png'}}">
+   *   
+   * applet.model - Applet model property.
+   *   <circular-slider
+   *     max="{{c.applet.model.csMaximum}}">
+   *   </circular-slider>
+   *   
+   * applet.view - Applet view property.
+   *   <div ng-style="{'background':applet.view.background}"></div>
+   * 
+   *
+   * Applet Events.
+   * --------------
+   * 
+   * Each of the following events provide the following arguments to the subscriber:
+   *   applet - the subject Applet object
+   *   walletId - the wallet identifier on which the applet is presented
+   * 
+   * 'Local/AppletEnter' - broadcast when opening an applet, before the applet is shown
+   * 'Local/AppletShown' - broadcast when opening an applet, after the applet is shown
+   * 'Local/AppletLeave' - broadcast when closing an applet, before before the applet is hidden
+   * 'Local/AppletHidden' - broadcast when closing an applet, after the applet is hidden
+   * 
+   */
 
   var _applet;
 
@@ -61,15 +63,6 @@ angular.module('copayApp.api').factory('CApplet', function (lodash, PluginRegist
    */
   CApplet.prototype.getService = function(pluginId) {
     return _applet.getService(pluginId);
-  };
-
-  /**
-   * Returns the constructed path to an applet public resource (e.g., an image).
-   * @param {String} resource - A resource name.
-   * @return {String} The path to the specified resource.
-   */
-  CApplet.prototype.path = function(resource) {
-    return PluginRegistry.getEntry(this.header.pluginId).path + resource;
   };
 
   /**

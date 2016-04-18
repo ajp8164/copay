@@ -409,10 +409,20 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   };
 
   // Push the skin id onto the top of history stack.
-  root._pushSkin = function(skinId) {
+  root._pushSkin = function(skinId, walletId) {
+    // The history stack only tracks skin changes for the same wallet. If the wallet has changed then clear the stack first.
+    if ((root.skinHistory.length > 0) && (root.skinHistory[0].walletId != walletId)) {
+      root.skinHistory = [];
+    }
+
+    var historyObj = {
+      skinId: skinId,
+      walletId: walletId
+    };
+
     // Avoid sequential duplicates.
-    if (root.skinHistory[root.skinHistory.length-1] != skinId) {
-      root.skinHistory.push(skinId);
+    if (!lodash.isEqual(root.skinHistory[root.skinHistory.length-1], historyObj)) {
+      root.skinHistory.push(historyObj);
       root.skinHistory = root.skinHistory.slice(0, MAX_SKIN_HISTORY);
     }
   };
@@ -713,7 +723,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
 
     // Retain a history of applied skins.
     if (history && !reapplyingSkin) {
-      root._pushSkin(fromSkinId);
+      root._pushSkin(fromSkinId, walletId);
     }
 
     root.walletId = walletId;
@@ -749,20 +759,35 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
     } else {
 
       // Perform typical skin change.
-      var opts = {
-        theme: {
-          skinFor: {}
-        }
-      };
+      var newSkin = new Skin(root.getPublishedSkinById(skinId));
 
-      opts.theme.skinFor[root.walletId] = root.getPublishedSkinById(skinId).header.name;
+      if (newSkin.isVanity()) {
+        // Save selected skin to storage.
+        var opts = {
+          theme: {
+            skinFor: {}
+          }
+        };
 
-      configService.set(opts, function(err) {
-        if (err) {
-          $rootScope.$emit('Local/DeviceError', err);
-          return;
-        }
+        opts.theme.skinFor[root.walletId] = newSkin.header.name;
 
+        configService.set(opts, function(err) {
+          if (err) {
+            $rootScope.$emit('Local/DeviceError', err);
+            return;
+          }
+
+          root._publishCatalog();
+
+          if (callback) {
+            callback();
+          }
+
+          root.broadcastSkinEvent(skinId, fromSkinId, root.walletId);
+        });
+
+      } else {
+        // Do not save selected skin to storage.
         root._publishCatalog();
 
         if (callback) {
@@ -770,7 +795,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
         }
 
         root.broadcastSkinEvent(skinId, fromSkinId, root.walletId);
-      });
+      }
     }
   };
 
@@ -794,9 +819,9 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
   // popSkin() - set the previous skin for the current wallet.
   //
   root.popSkin = function(callback) {
-    var skinId = root._popSkin();
-    if (skinId) {
-      root.setSkinForWallet(skinId, root.walletId, false, callback);
+    var historyObj = root._popSkin();
+    if (historyObj.skinId) {
+      root.setSkinForWallet(historyObj.skinId, root.walletId, false, callback);
     } else {
       $log.debug('Attempted to pop skin with empty skin history');
     }

@@ -3,9 +3,10 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
 
   var self = this;
 
-  var STATE_VALID = 'valid';
-  var STATE_INVALID = 'invalid';
+  var STATE_INITIAL = 0;
+  var STATE_VALID = 1;
 
+  var _state = STATE_INITIAL;
   var _applet = null;
   var _userData = {};
   var _publishedKeys = [];
@@ -17,17 +18,21 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
       throw new Error('Error: no applet provided to create session');
     }
     _applet = applet;
-    this.state = STATE_VALID;
     this.timestamp = new Date();
     this.id = '' + new Date().getTime();
+    setState(STATE_VALID);
     return this;
   };
 
+  function setState(state) {
+    _state = _state | state;
+  };
+
   function checkStateIsValid(session) {
-    if (session.state == STATE_INVALID) {
+    if (!session.isValid()) {
       throw new Error('Error: invalid session state, (applet ID = ' + _applet.header.appletId + ')');
     }
-  }
+  };
 
   function doClose(session) {
     // Delete user data.
@@ -37,11 +42,15 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
     for (var i = 0; i < session.publishedKeys.length; i++) {
       delete $rootScope.applet[key];
     }
-    session.state = STATE_INVALID;
+    setState(~STATE_VALID);
   };
 
   // Public methods
   //
+  AppletSession.prototype.isValid = function() {
+    return _state & STATE_VALID;
+  };
+
   AppletSession.prototype.isForApplet = function(appletId) {
     checkStateIsValid(this);
     return _applet.header.appletId == appletId;

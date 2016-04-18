@@ -1,68 +1,33 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, profileService, configService, appletCatalogService, appletSessionService, themeService, FocusedWallet, go) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, PluginRegistry, profileService, configService, appletCatalogService, appletSessionService, themeService, FocusedWallet, go) {
 
-	var APPLET_WALLET_IDENTIFIER_PREFIX = 'wallet-applet.';
-	var APPLET_BUILTIN_IDENTIFIER_PREFIX = 'builtin-applet.';
+  var APPLET_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.applet.wallet.';
+  var PLUGIN_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.plugin.wallet.';
+  var APPLET_IDENTIFIER_BUILTIN_PREFIX = 'com.bitpay.copay.applet.builtin.';
+  var PLUGIN_IDENTIFIER_BUILTIN_PREFIX = 'com.bitpay.copay.plugin.builtin.';
 
 	var root = {};
   root.initialized = false;
 
-  function initAppletEnvironment(applet) {
-    // Make applet properties available to views.
-		publishAppletProperties(applet);
-
-		// Set the applet main view.
-  	root.appletMainViewUrl = applet.mainViewUrl();
-
-  	// Bind stylesheet(s) for this applet.
-  	applet.stylesheets().forEach(function(stylesheet) {
-		  $css.bind({ 
-		    href: stylesheet
-		  }, $rootScope);
-  	});
-  };
-
   function publishAppletFunctions() {
 		$rootScope.applet = {
 			close: function(sessionId) { return root.doCloseApplet(sessionId); },
-			open: function(applet) { return root.doOpenApplet(applet); },
-			path: function(uri) { return root.appletPath(uri); }
+			open: function(applet) { return root.doOpenApplet(applet); }
 		};
   };
 
-  function publishAppletProperties(applet) {
-		$rootScope.applet.header = applet.header;
-		$rootScope.applet.model = applet.model;
-    $rootScope.applet.view = applet.view;
-    $rootScope.applet.title = applet.header.name;
-  };
-
-  function removeAppletProperties() {
-		delete $rootScope.applet.header;
-		delete $rootScope.applet.model;
-		delete $rootScope.applet.view;
-  };
-
-  function showApplet() {
+  function showApplet(session) {
+    appletSessionService.activateSession(session.id);
 		root.appletModal.show();
   };
 
-  function hideApplet() {
+  function hideApplet(session) {
 		// Pop the skin containing the applet off the stack (re-apply prior skin).
+    appletSessionService.deactivateSession(session.id);
 	  themeService.popSkin();
-		$css.removeAll();
-		removeAppletProperties();
     root.appletModal.remove();
   };
-
-	function isAppletWallet(applet) {
-		return applet.header.appletId.includes(APPLET_WALLET_IDENTIFIER_PREFIX);
-	};
-
-	function isAppletBuiltin(applet) {
-		return applet.header.appletId.includes(APPLET_BUILTIN_IDENTIFIER_PREFIX);
-	};
 
   // Creates an applet schema from wallet credentials.
   function createWalletAppletSchema(credentials) {
@@ -71,8 +36,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   	var walletSkin = themeService.getPublishedSkinForWalletId(credentials.walletId);
   	return {
 	    "header": {
-	      "appletId": APPLET_WALLET_IDENTIFIER_PREFIX + credentials.walletId,
-	      "name": config.aliasFor[credentials.walletId] || credentials.walletName,
+        "appletId": APPLET_IDENTIFIER_WALLET_PREFIX + credentials.walletId,
+        "pluginId": PLUGIN_IDENTIFIER_WALLET_PREFIX + credentials.walletId,
+	      "name": config.aliasFor[credentials.walletId] || credentials.walletName
 	    },
 	    "model": {
 	      "isoCode": config.wallet.settings.unitName == 'bits' || config.wallet.settings.unitName == 'BTC' ? 'XBT' : config.wallet.settings.alternativeIsoCode,
@@ -95,7 +61,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function createBuiltinAppletSchema(capability) {
   	return {
 	    "header": {
-	      "appletId": capability.id,
+        "appletId": APPLET_IDENTIFIER_BUILTIN_PREFIX + capability.id,
+        "pluginId": PLUGIN_IDENTIFIER_BUILTIN_PREFIX + capability.id,
 	      "name": capability.name
 	    },
 	    "model": {
@@ -116,16 +83,57 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     return lodash.sortBy(walletApplets, 'header.name');
   };
 
-  // TODO: remove this behavior when the builtin capabilities are implmented as real applets.
   function getBuiltinApplets() {
-  	var builtinApplets = [];
+    var builtinApplets = [];
+    var iconPath = themeService.getCurrentTheme().header.path + '/applet-icons/';
+
+    // Create wallet
+    builtinApplets.push(new Applet(createBuiltinAppletSchema({
+      id: 'create-wallet',
+      name: 'Create Wallet',
+      uri: 'create',
+      launchIconBackground: 'url(' + iconPath + 'wallet-new.png) center / cover no-repeat rgba(0,0,0,0)',
+    })));
+
+    // Join wallet
+    builtinApplets.push(new Applet(createBuiltinAppletSchema({
+      id: 'join-wallet',
+      name: 'Join Wallet',
+      uri: 'join',
+      launchIconBackground: 'url(' + iconPath + 'wallet-join.png) center / cover no-repeat rgba(0,0,0,0)',
+    })));
+
+    // Import wallet
+    builtinApplets.push(new Applet(createBuiltinAppletSchema({
+      id: 'import-wallet',
+      name: 'Import Wallet',
+      uri: 'import',
+      launchIconBackground: 'url(' + iconPath + 'wallet-import.png) center / cover no-repeat rgba(0,0,0,0)',
+    })));
+
+    // Global preferences
+    builtinApplets.push(new Applet(createBuiltinAppletSchema({
+      id: 'prefs-global',
+      name: 'Settings',
+      uri: 'preferencesGlobal',
+      launchIconBackground: 'url(' + iconPath + 'settings.png) center / cover no-repeat rgba(0,0,0,0)',
+    })));
+
   	// Glidera
   	builtinApplets.push(new Applet(createBuiltinAppletSchema({
-  		id: APPLET_BUILTIN_IDENTIFIER_PREFIX + 'glidera',
+  		id: 'glidera',
   		name: 'Glidera',
   		uri: 'glidera',
-  		launchIconBackground: 'url(img/glidera-icon.png) center / cover no-repeat #FFFFFF',
+  		launchIconBackground: 'url(' + iconPath + 'glidera.png) center / cover no-repeat rgba(0,0,0,0)',
   	})));
+
+    // Coinbase
+    builtinApplets.push(new Applet(createBuiltinAppletSchema({
+      id: 'coinbase',
+      name: 'Coinbase',
+      uri: 'coinbase',
+      launchIconBackground: 'url(' + iconPath + 'coinbase.png) center / cover no-repeat rgba(0,0,0,0)',
+    })));
   	return builtinApplets;
   };
 
@@ -137,7 +145,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
       // Apply the skin containing the applet.
       themeService.setAppletByNameForWallet(applet.header.name, FocusedWallet.getWalletId(), function() {
-        initAppletEnvironment(applet);
+        applet.initEnvironment();
 
         // Create the applet modal.
         // 
@@ -165,7 +173,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
               </ion-popover-view>\
             </script>\
             <ion-pane ng-style="{\'background\': applet.view.background}">\
-              <div ng-include="\'' + root.appletMainViewUrl + '\'" ng-init="sessionId=\'' + session.id + '\'">\
+              <div ng-include="\'' + applet.mainViewUrl() + '\'" ng-init="sessionId=\'' + session.id + '\'">\
             </ion-pane>\
           </ion-modal-view>\
           ', {
@@ -186,7 +194,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
         // Present the modal, allow some time to render before presentation.
         $timeout(function() {
-          showApplet();
+          showApplet(session);
         }, 50);
       });
     });
@@ -228,6 +236,18 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     }
 	};
 
+  root.isAppletBuiltin = function(applet) {
+    return applet.header.appletId.includes(APPLET_IDENTIFIER_BUILTIN_PREFIX);
+  };
+
+  root.isAppletPlugin = function(applet) {
+    return !root.isAppletBuiltin(applet) && !root.isAppletWallet(applet);
+  };
+
+  root.isAppletWallet = function(applet) {
+    return applet.header.appletId.includes(APPLET_IDENTIFIER_WALLET_PREFIX);
+  };
+
   // Return the collection of all available applets.
   root.getApplets = function() {
   	// Wallet applets.
@@ -242,26 +262,13 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     var builtinApplets = getBuiltinApplets();
 
     // Return a comprehensive list of all applets.
-    return walletApplets.concat(builtinApplets).concat(applets);
+    return builtinApplets.concat(walletApplets).concat(applets);
   };
 
-	root.getApplet = function() {
-	  return themeService.getCurrentSkin().getApplet();
-	};
-
-	root.appletPath = function(uri) {
-		var path = '';
-		var applet = root.getApplet();
-		if (applet) {
-	  	path = root.getApplet().path(uri);
-	  }
-	  return path;
-	};
-
   root.doOpenApplet = function(applet) {
-  	if (isAppletWallet(applet)) {
+  	if (root.isAppletWallet(applet)) {
   		openWallet(applet.model.walletId);
-  	} else if (isAppletBuiltin(applet)) {
+  	} else if (root.isAppletBuiltin(applet)) {
   		openCapability(applet.model.uri);
   	} else {
   		openApplet(applet);
@@ -269,21 +276,22 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   };
 
   root.doCloseApplet = function(sessionId) {
-    $rootScope.$emit('Local/AppletLeave', appletSessionService.getSession(sessionId).getApplet(), FocusedWallet.getWalletId());
-    appletSessionService.getSession(sessionId).getApplet().finalize(function() {
-      hideApplet();
-      appletSessionService.destroySession(sessionId);
+    var session = appletSessionService.getSession(sessionId);
+    var applet = session.getApplet();
+
+    $rootScope.$emit('Local/AppletLeave', applet, FocusedWallet.getWalletId());
+    hideApplet(session);
+    applet.finalize(function() {
+      appletSessionService.destroySession(session.id);
     });
   };
 
   $rootScope.$on('modal.shown', function(event, modal) {
   	$rootScope.$emit('Local/AppletShown', modal.session.getApplet(), modal.walletId);
-		$rootScope.applet.ready = true;
   });
 
   $rootScope.$on('modal.hidden', function(event, modal) {
   	$rootScope.$emit('Local/AppletHidden', modal.session.getApplet(), modal.walletId);
-		$rootScope.applet.ready = false;
   });
 
   root.getAppletsLayout = function() {
@@ -305,6 +313,16 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
         return;
       }
     });
+  };
+
+  root.finalize = function() {
+    // Close any currently running applet.
+    var activeSession = appletSessionService.getActiveSession();
+    if (!lodash.isUndefined(activeSession)) {
+      root.doCloseApplet(activeSession.id);
+    }
+
+    appletSessionService.finalize();
   };
 
   return root;

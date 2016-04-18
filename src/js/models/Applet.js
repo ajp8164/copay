@@ -1,11 +1,15 @@
 'use strict';
-angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $injector, lodash, PluginRegistry) {
+angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $injector, $css, lodash, PluginRegistry) {
 
   var self = this;
   var _publishedKeys = [];
 
-  Applet.validProperties = [
-    'title'
+  // Reserved applet properties should not be overwritten by the applet plugin.
+  Applet.reservedProperties = [
+    'header',
+    'model',
+    'view',
+    'path'
   ];
 
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
@@ -18,31 +22,42 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
 
   // Private methods
   //
-  function checkPropertyValid(key) {
-    if (lodash.findIndex(Applet.validProperties) < 0) {
-      throw new Error('Error: unknown applet property \'' + key + '\'');
-    }
+  function isReservedProperty(key) {
+    return Applet.reservedProperties.includes(key);
+  };
+
+  function publishAppletProperties(applet) {
+    $rootScope.applet.header = applet.header;
+    $rootScope.applet.model = applet.model;
+    $rootScope.applet.view = applet.view;
+    $rootScope.applet.path = PluginRegistry.getEntry(applet.header.pluginId).path;
+    $rootScope.applet.title = applet.header.name;
   };
 
   // Public methods
   //
-  Applet.prototype.path = function(uri) {
-    return PluginRegistry.getEntry(this.header.pluginId).path + uri;
-  };
+  Applet.prototype.initEnvironment = function() {
+    publishAppletProperties(this);
 
-  Applet.prototype.stylesheets = function() {
-    return PluginRegistry.getEntry(this.header.pluginId).stylesheets;
+    // Bind stylesheet(s) for this applet.
+    var stylesheets = PluginRegistry.getEntry(this.header.pluginId).stylesheets;
+    stylesheets.forEach(function(stylesheet) {
+      $css.bind({ 
+        href: stylesheet
+      }, $rootScope);
+    });
   };
 
   Applet.prototype.mainViewUrl = function() {
     return PluginRegistry.getEntry(this.header.pluginId).mainViewUri;
   };
 
-  Applet.prototype.property = function(key, value) {
-    checkPropertyValid(key);
-    if (value) {
+  Applet.prototype.property = function(key, value) {    
+    if (!isReservedProperty(key) && value) {
       $rootScope.applet[key] = value;
-      _publishedKeys.push(key);
+      if (!_publishedKeys.includes(key)) {
+        _publishedKeys.push(key);
+      }
     }
     return $rootScope.applet[key];
   };
@@ -75,6 +90,9 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
   };
 
   Applet.prototype.finalize = function(callback) {
+    // Remove applet stylesheets.
+    $css.removeAll();
+
     // Delete published properties.
     for (var i = 0; i < _publishedKeys.length; i++) {
       delete $rootScope.applet[_publishedKeys[i]];

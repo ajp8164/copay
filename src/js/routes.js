@@ -598,8 +598,12 @@ angular
   })
   .run(function($rootScope, $state, $log, $ionicPlatform, uriHandler, isCordova, profileService, nodeWebkit, uxLanguage, animationService, themeService, appletService, go) {
 
-    if (isCordova) {
+    window.onbeforeunload = function(e) {
+      // If this app is closing then attempt to finalize our state before shutdown.
+      appletService.finalize();
+    };
 
+    if (isCordova) {
       if (screen.width < 768) {
         screen.lockOrientation('portrait');
       } else {

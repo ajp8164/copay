@@ -24,12 +24,12 @@
       <li class="applet-icon" gridster-item="appletLayoutMap" ng-repeat="applet in sidebar.applets">
 
         <!-- wallet icon -->
-        <div ng-if="applet.header.appletId.includes('wallet-applet')"
-          class="wallet-image"
+        <div ng-if="sidebar.isAppletWallet(applet)"
+          class="wallet-underlay"
           ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
           menu-toggle="right" ng-click="applet.open()">
           <div class="applet-clickable">
-            <i class="icon-wallet p5t size-20"></i>
+            <div class="wallet-icon" ng-style="{'background':theme.view.walletAppletLaunchIconBackground}"></div>
             <div class="applet-icon-wallet-bar">
               <span class="applet-icon-wallet-info">
                 {{applet.model.isoCode}}
@@ -42,14 +42,14 @@
         </div>
 
         <!-- builtin capability icon -->
-        <div ng-if="applet.header.appletId.includes('builtin-applet')"
+        <div ng-if="sidebar.isAppletBuiltin(applet)"
           class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
           menu-toggle="right" ng-click="applet.open()">
           <div class="applet-clickable"></div>
         </div>
 
         <!-- applet icon -->
-        <div ng-if="!applet.header.appletId.includes('wallet-applet') && !applet.header.appletId.includes('builtin-applet')"
+        <div ng-if="sidebar.isAppletPlugin(applet)"
           class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
           ng-click="applet.open()">
           <div class="applet-clickable"></div>

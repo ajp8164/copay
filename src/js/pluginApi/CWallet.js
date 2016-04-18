@@ -86,16 +86,16 @@ angular.module('copayApp.api').factory('CWallet', function (configService, txFor
    * {payproData} - For payment-protocol payments provide the following payment data object.
    * 
    * data: {
-   *   payProUrl: String - The full payment protocol service URL.
-   *   memo: String - A human readbale memo attached to the payment.
+   *   {String} payProUrl - The full payment protocol service URL.
+   *   {String} memo - A human readbale memo attached to the payment.
    * }
    * 
    * {paymentData} - For all other payments provide the following payment data object.
    *   
    * data: {
-   *   toAddress: String - A bitcoin destination address.
-   *   amount: Number - The number of satoshi's to send.
-   *   memo: String - A human readbale memo attached to the payment.
+   *   {String} toAddress - A bitcoin destination address.
+   *   {Number} amount - The number of satoshi's to send.
+   *   {String} memo - A human readbale memo attached to the payment.
    * }
    *
    * @param {payproData|paymentData} data - The payment data.
