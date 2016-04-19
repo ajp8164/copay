@@ -11,11 +11,11 @@ sign-osx:
 verify-osx:
 	codesign -dv webkitbuilds/%APP-EXE-NAME%-osx.dmg 
 
-sign-desktop:  sign-osx
+sign-desktop:
 	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-linux.zip.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-linux.zip
 	gpg -u 1112CFA1 --output webkitbuilds/%APP-EXE-NAME%-win.exe.sig --detach-sig webkitbuilds/%APP-EXE-NAME%-win.exe
 
-verify-desktop: verify-osx
+verify-desktop:
 	gpg --verify webkitbuilds/%APP-EXE-NAME%-linux.zip.sig webkitbuilds/%APP-EXE-NAME%-linux.zip
 	gpg --verify webkitbuilds/%APP-EXE-NAME%-win.exe.sig webkitbuilds/%APP-EXE-NAME%-win.exe
 
