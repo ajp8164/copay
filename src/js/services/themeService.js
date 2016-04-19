@@ -295,12 +295,10 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
       if (themeCatalogService.supportsWriting()) {
 
         themeCatalogService.init($rootScope.themes, function() {
-         $rootScope.$emit('Local/ThemeUpdated');
           callback();
         });
 
       } else {
-        $rootScope.$emit('Local/ThemeUpdated');
         callback();
       }
     });
@@ -481,6 +479,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
     var config = configService.getSync();
 
     // (v1.5.mtb only) Check and migrate from themeId and skin id's to names.
+    // TODO - this needs to be handled without knowing theme specifics.
     if (!lodash.isUndefined(config.theme.themeId)) {
       var skinNameForId = [
         'Bison Hide',
@@ -512,7 +511,7 @@ angular.module('copayApp.services').factory('themeService', function($rootScope,
           $rootScope.$emit('Local/DeviceError', err);
           return;
         }
-        $log.debug('Theme preferences migrated successfully');
+        $log.info('Theme preferences migrated successfully');
         callback();
       });
     } else {

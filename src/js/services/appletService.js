@@ -11,10 +11,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   root.initialized = false;
 
   function publishAppletFunctions() {
-		$rootScope.applet = {
-			close: function(sessionId) { return root.doCloseApplet(sessionId); },
-			open: function(applet) { return root.doOpenApplet(applet); }
-		};
+    $rootScope.applet = $rootScope.applet || {};
+		$rootScope.applet.close = function(sessionId) { return root.doCloseApplet(sessionId); };
+		$rootScope.applet.open = function(applet) { return root.doOpenApplet(applet); };
   };
 
   function showApplet(session) {
@@ -215,24 +214,16 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 		if (appletCatalogService.supportsWriting()) {
       appletCatalogService.init(function() {
 
-      	// Cache the applet catalog.
-		    appletCatalogService.get(function(err, catalog) {
-		      $log.debug('Applet catalog read');
-		      if (err) {
-		        $log.debug('Error reading applet catalog');
-		        $rootScope.$emit('Local/DeviceError', err);
-		        return;
-		      }
+				publishAppletFunctions();
+        root.initialized = true;
+        $log.debug('Applet service initialized');
+				callback();
 
-					// Publish applet functions to $rootScope.
-					publishAppletFunctions();
-          root.initialized = true;
-					callback();
-					$log.debug('Applet service initialized');
-				});
       });
     } else {
-    	// TODO: no storage, applets not supported on this device
+      var err = 'Fatal: Applet service initilization - device does not provide storage for applets';
+      $rootScope.$emit('Local/DeviceError', err);
+      return;
     }
 	};
 
@@ -266,6 +257,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   };
 
   root.doOpenApplet = function(applet) {
+    $log.info('Opening applet: ' + applet.header.name);
   	if (root.isAppletWallet(applet)) {
   		openWallet(applet.model.walletId);
   	} else if (root.isAppletBuiltin(applet)) {
@@ -278,6 +270,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   root.doCloseApplet = function(sessionId) {
     var session = appletSessionService.getSession(sessionId);
     var applet = session.getApplet();
+    $log.info('closing applet: ' + applet.header.name);
 
     $rootScope.$emit('Local/AppletLeave', applet, FocusedWallet.getWalletId());
     hideApplet(session);

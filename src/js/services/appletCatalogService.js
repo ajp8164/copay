@@ -8,7 +8,7 @@ angular.module('copayApp.services').factory('appletCatalogService', function(sto
 
     metadata: {},
 
-    appletLayout: {},
+    appletLayout: [],
 
     appletData: []
 
@@ -26,13 +26,13 @@ angular.module('copayApp.services').factory('appletCatalogService', function(sto
 
   root.init = function(cb) {
     $log.debug('Initializing applet catalog');
-    root.get(function(err) {
+    root.get(function(err, appletCatalog) {
       if (err) {
         $rootScope.$emit('Local/DeviceError', err);
         return;
       }
 
-      $log.debug('Applet catalog initialized');
+      $log.debug('Applet catalog initialized: ' + JSON.stringify(appletCatalog));
       cb();
     });
   };

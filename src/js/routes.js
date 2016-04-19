@@ -708,7 +708,8 @@ angular
     var initializePresentation = function(callback) {
       themeService.init(function() {
         appletService.init(function() {
-          $rootScope.$emit('Local/ThemeUpdated', true);
+          $log.info('App presentation ready');
+          $rootScope.$emit('Local/ThemeUpdated');
           callback();
         });
       });

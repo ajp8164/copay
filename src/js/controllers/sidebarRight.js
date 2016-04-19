@@ -50,7 +50,9 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
          handle: '', // optional selector for resize handle
          start: function(event, $element, widget) {}, // optional callback fired when drag is started,
          drag: function(event, $element, widget) {}, // optional callback fired when item is moved,
-         stop: function(event, $element, widget) {} // optional callback fired when item is finished dragging
+         stop: function(event, $element, widget) { // optional callback fired when item is finished dragging
+          saveAppletsLayout(self.applets);
+         }
       }
   };
 
@@ -58,10 +60,6 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     row: 'applet.layout.position[0]',
     col: 'applet.layout.position[1]'
   };
-
-  $scope.$watch('sidebar.applets', function(applets){
-    saveAppletsLayout(applets);
-  }, true);
 
   function saveAppletsLayout(applets) {
     // Don't do anything if there is no layout.
@@ -72,7 +70,7 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     // Create the layout objects from each applet (store minimal data).
     var layout = lodash.map(applets, function(applet) {
       return {
-        header: applet.header,
+        appletId: applet.header.appletId,
         layout: applet.layout
       }
     });
@@ -90,13 +88,20 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     var applets = appletService.getApplets();
     var appletsLayout = appletService.getAppletsLayout();
 
+    // Debug
+    var a = lodash.map(applets, function(applet) {
+      return applet.header.name;
+    });
+    $log.debug('Publishing applets: ' + a.toString());
+    // Debug
+
     if (!lodash.isEmpty(appletsLayout)) {
       // Find and add the applet layout to each applet object.
       // If a layout is not defined for the applet then fit the applet into an available space.
       self.applets = lodash.map(applets, function(applet) {
 
         var appletLayout = lodash.find(appletsLayout, function(appletLayout) {
-          return appletLayout.header.name == applet.header.name;
+          return appletLayout.appletId == applet.header.appletId;
         });
 
         if (!lodash.isUndefined(appletLayout)) {

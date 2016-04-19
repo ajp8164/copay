@@ -13,8 +13,8 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   features += (brand.features.theme.applets.enabled ? 'Applets,' : '');
   features += (brand.features.theme.socialLike.enabled ? 'Like Themes & Skins,' : '');
   features += (brand.features.pushNotification.enabled ? 'Push Notification,' : '');
-  $log.debug('Application branding: ' + brand.shortName);
-  $log.debug('Enabled features: ' + features.substring(0, features.length-1));
+  $log.info('Application branding: ' + brand.shortName);
+  $log.info('Enabled features: ' + features.substring(0, features.length-1));
 
   var ret = {};
   ret.isCordova = isCordova;
