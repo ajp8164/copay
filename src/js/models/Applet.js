@@ -12,11 +12,15 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
     'path'
   ];
 
+  Applet.FLAGS_ALL = 0;
+  Applet.FLAGS_MAY_NOT_HIDE = 1;
+
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
   function Applet(obj, skin) {
     lodash.assign(this, obj);
     this.skin = skin;
+    this.flags = Applet.FLAGS_ALL;
     return this;
   };
 

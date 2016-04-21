@@ -335,7 +335,6 @@ angular
       .state('preferencesSkin', {
         url: '/preferencesSkin',
         templateUrl: 'views/preferencesSkin.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -346,7 +345,6 @@ angular
       .state('preferencesSkinPreview', {
         url: '/preferencesSkinPreview',
         templateUrl: 'views/preferencesSkinPreview.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -357,7 +355,6 @@ angular
       .state('preferencesSkinDiscovery', {
         url: '/preferencesSkinDiscovery',
         templateUrl: 'views/preferencesSkinDiscovery.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -368,7 +365,6 @@ angular
       .state('preferencesSkinDiscoveryPreview', {
         url: '/preferencesSkinDiscoveryPreview',
         templateUrl: 'views/preferencesSkinDiscoveryPreview.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -379,7 +375,6 @@ angular
       .state('preferencesTheme', {
         url: '/preferencesTheme',
         templateUrl: 'views/preferencesTheme.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -390,7 +385,6 @@ angular
       .state('preferencesThemePreview', {
         url: '/preferencesThemePreview',
         templateUrl: 'views/preferencesThemePreview.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -401,7 +395,6 @@ angular
       .state('preferencesThemeDiscovery', {
         url: '/preferencesThemeDiscovery',
         templateUrl: 'views/preferencesThemeDiscovery.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
@@ -412,11 +405,28 @@ angular
       .state('preferencesThemeDiscoveryPreview', {
         url: '/preferencesThemeDiscoveryPreview',
         templateUrl: 'views/preferencesThemeDiscoveryPreview.html',
-        walletShouldBeComplete: true,
         needProfile: true,
         views: {
           'main': {
             templateUrl: 'views/preferencesThemeDiscoveryPreview.html'
+          },
+        }
+      })
+      .state('preferencesApplets', {
+        url: '/preferencesApplets',
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/preferencesApplets.html'
+          },
+        }
+      })
+      .state('preferencesAppletsWallpaper', {
+        url: '/preferencesAppletsWallpaper',
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/preferencesAppletsWallpaper.html'
           },
         }
       })

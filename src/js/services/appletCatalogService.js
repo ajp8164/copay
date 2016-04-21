@@ -8,9 +8,11 @@ angular.module('copayApp.services').factory('appletCatalogService', function(sto
 
     metadata: {},
 
-    appletLayout: [],
+    preferences: {
+      wallpaperImageUrl: ''
+    },
 
-    appletData: []
+    appletState: []
 
   };
 

@@ -7,10 +7,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   var features = '';
   features += (brand.features.glidera.enabled ? 'Glidera,' : '');
   features += (brand.features.coinbase.enabled ? 'Coinbase,' : '');
+  features += (brand.features.applets.enabled ? 'Applets,' : '');
   features += (brand.features.theme.themeDiscovery.enabled ? 'Theme Discovery,' : '');
   features += (brand.features.theme.skinDiscovery.enabled ? 'Skin Discovery,' : '');
   features += (brand.features.theme.skinGallery.enabled ? 'Skin Gallery,' : '');
-  features += (brand.features.theme.applets.enabled ? 'Applets,' : '');
   features += (brand.features.theme.socialLike.enabled ? 'Like Themes & Skins,' : '');
   features += (brand.features.pushNotification.enabled ? 'Push Notification,' : '');
   $log.info('Application branding: ' + brand.shortName);

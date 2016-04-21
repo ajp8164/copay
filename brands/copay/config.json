@@ -38,6 +38,9 @@
       "enabled": true,
       "auth": {}
     },
+    "applets": {
+      "enabled": true
+    },
     "theme": {
       "name": "Copay",
       "requiredSchema": 2,
@@ -48,9 +51,6 @@
         "enabled": false
       },
       "skinGallery": {
-        "enabled": false
-      },
-      "applets": {
         "enabled": false
       },
       "socialLike": {

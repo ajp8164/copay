@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('sidebarRightController', function($scope, $rootScope, $log, lodash, appletService, FocusedWallet, isMobile, isCordova) {
+angular.module('copayApp.controllers').controller('sidebarRightController', function($scope, $rootScope, $log, lodash, appletService, appletCatalogService, FocusedWallet, isMobile, isCordova) {
 
   var self = this;
   this.applets = [];
@@ -51,7 +51,7 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
          start: function(event, $element, widget) {}, // optional callback fired when drag is started,
          drag: function(event, $element, widget) {}, // optional callback fired when item is moved,
          stop: function(event, $element, widget) { // optional callback fired when item is finished dragging
-          saveAppletsLayout(self.applets);
+          saveAppletLayout(self.applets);
          }
       }
   };
@@ -61,7 +61,7 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     col: 'applet.layout.position[1]'
   };
 
-  function saveAppletsLayout(applets) {
+  function saveAppletLayout(applets) {
     // Don't do anything if there is no layout.
     if (lodash.isEmpty(applets)) return;
     if (lodash.isUndefined(applets[applets.length-1].layout)) return;
@@ -75,7 +75,13 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
       }
     });
 
-    appletService.saveAppletsLayout(layout, function(err) {
+    var cat = {
+      appletState: []
+    };
+
+    cat.appletState = layout;
+
+    appletCatalogService.set(cat, function(err) {
       if (err) {
         $rootScope.$emit('Local/DeviceError', err);
         return;
@@ -83,43 +89,8 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     });
   };
 
-  function publishAppletsWithLayout() {
-    // Get all of the applets and apply the stored layout, if any.
-    var applets = appletService.getApplets();
-    var appletsLayout = appletService.getAppletsLayout();
-
-    // Debug
-    var a = lodash.map(applets, function(applet) {
-      return applet.header.name;
-    });
-    $log.debug('Publishing applets: ' + a.toString());
-    // Debug
-
-    if (!lodash.isEmpty(appletsLayout)) {
-      // Find and add the applet layout to each applet object.
-      // If a layout is not defined for the applet then fit the applet into an available space.
-      self.applets = lodash.map(applets, function(applet) {
-
-        var appletLayout = lodash.find(appletsLayout, function(appletLayout) {
-          return appletLayout.appletId == applet.header.appletId;
-        });
-
-        if (!lodash.isUndefined(appletLayout)) {
-          // Add the applets layout to the applet.
-          applet.layout = appletLayout.layout;
-        } else {
-          // Didn't find a layout for the applet, assign a new layout.
-          // This happens when a new applet is added dynamically.
-          applet.layout = findAppletPosition(appletsLayout);
-        }
-        return applet;
-      });
-    } else {
-      // No applet layout defined, rely on default layout.
-      self.applets = applets;
-    }
-  };
-
+  // TODO: Not currently used - need to improve layout assignment when a new applet is dynamically created (e.g., create a new wallet).
+/*
   function findAppletPosition(appletsLayout) {
     // Walk through each row and column looking for a place it will fit.
     for (var rowIndex = 0; rowIndex < self.gridsterOpts.maxRows; ++rowIndex) {
@@ -136,6 +107,17 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     }
     throw new Error('Unable to place applet!');
   };
+*/
+  function setAppletsBackground() {
+    var catalog = appletCatalogService.getSync();
+    if (catalog.preferences.wallpaperImageUrl.length > 0) {
+      $rootScope.theme.view.sidebarRBackground = 'url(' + catalog.preferences.wallpaperImageUrl + ') top / cover no-repeat #000000';
+    }
+  };
+
+  $rootScope.$on('Local/ThemeUpdated', function(event) {
+    setAppletsBackground();
+  });
 
   this.isAppletBuiltin = function(applet) {
     return appletService.isAppletBuiltin(applet);
@@ -162,30 +144,53 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     }
   };
 
+  $rootScope.$on('$Local/GlideraUpdated', function() {
+    var glideraApplet = lodash.find(self.applets, function(applet) {
+      if (applet.header.appletId.include('glidera')) {
+        return applet;
+      }
+    });
+    glideraApplet.model.visible = configService.getSync().glidera.visible;
+  });
+
+  $rootScope.$on('$Local/CoinbaseUpdated', function() {
+    var coinbaseApplet = lodash.find(self.applets, function(applet) {
+      if (applet.header.appletId.include('coinbase')) {
+        return applet;
+      }
+    });
+    coinbaseApplet.model.visible = configService.getSync().coinbase.visible;
+  });
+
   // Applets change when the theme is changed.
   $rootScope.$on('Local/ThemeUpdated', function(event) {
     $log.debug('applet refresh - Local/ThemeUpdated');
-    publishAppletsWithLayout();
+    self.applets = appletService.getAppletsWithState();
+  });
+
+  // Applets change when the theme is changed.
+  $rootScope.$on('Local/AppletPreferencesUpdated', function(event) {
+    self.applets = appletService.getAppletsWithState();
   });
 
   // Listen for changes to wallet skins and update wallet applets.
   // TODO: manage only the change rather than refreshing the whole collection.
   $rootScope.$on('Local/SkinUpdated', function(event, skin, walletId) {
     $log.debug('applet refresh - Local/SkinUpdated ' + skin.header.name + ' for ' + walletId);
-    publishAppletsWithLayout();
+    self.applets = appletService.getAppletsWithState();
   });
 
   // Listen for new or deleted wallets.
   // TODO: manage only the change rather than refreshing the whole collection.
   $rootScope.$on('Local/NewFocusedWallet', function(event, fc) {
     $log.debug('applet refresh - Local/NewFocusedWallet');
-    publishAppletsWithLayout();
+    self.applets = appletService.getAppletsWithState();
   });
 
   // Listen for wallet name changes.
   // TODO: manage only the change rather than refreshing the whole collection.
   $rootScope.$on('Local/AliasUpdated', function(event) {
-    publishAppletsWithLayout();
+    self.applets = appletService.getAppletsWithState();
   });
 
   $rootScope.$on('Local/AppletEnter', function(event, applet, walletId) {

@@ -89,6 +89,9 @@
   right: 10px !important;
 }
 
+.applet-list-item .item {
+  font-size: 14px;
+}
 
 /* Start of Ionic modifications */
 

@@ -4,30 +4,25 @@ angular.module('copayApp.services').factory('appletDataService', function($log, 
 
   var root = {};
 
-  function getAppletKey(appletId) {
-    return 'applet-' + appletId;
-  };
-
-  function trackAppletData(appletKey) {
+  function trackAppletData(appletId) {
     var catalog = appletCatalogService.getSync();
 
-    var index = lodash.findIndex(catalog.appletData, function(data) {
-      return (data.key == appletKey);
+    var index = lodash.findIndex(catalog.appletState, function(data) {
+      return (data.appletId == appletId);
     });
 
-    if (index >= 0) {
+    if (index >= 0 && !lodash.isUndefined(catalog.appletState[index].data)) {
       // Update the existing applet data entry.
-      catalog.appletData[index].updated = new Date();
+      catalog.appletState[index].data.updated = new Date();
     } else {
       // Applet data entry not found; create a new applet data entry.
       var now = new Date();
-      var newAppletData = {
-        key: appletKey,
+      var data = {
         updated: now,
         created: now
       };
 
-      catalog.appletData.push(newAppletData);
+      catalog.appletState[index].data = data;
     }
 
     appletCatalogService.set(catalog, function(err) {
@@ -39,21 +34,19 @@ angular.module('copayApp.services').factory('appletDataService', function($log, 
   };
 
   root.getData = function(appletId, cb) {
-    var appletKey = getAppletKey(appletId);
-    storageService.getValueByKey(appletKey, function(err, data) {
+    storageService.getValueByKey(appletId, function(err, data) {
       if (data) {
         data = JSON.parse(data);
       } else {
         data = {};
       }
-      $log.debug('Applet data read (' + appletKey + '):', data);
+      $log.debug('Applet data read (' + appletId + '):', data);
       return cb(err, data);
     });
   };
 
   root.setData = function(appletId, newData, cb) {
-    var appletKey = getAppletKey(appletId);
-    storageService.getValueByKey(appletKey, function(err, oldData) {
+    storageService.getValueByKey(appletId, function(err, oldData) {
       oldData = oldData || {};
       if (lodash.isString(oldData)) {
         if (oldData.length == 0)
@@ -65,8 +58,8 @@ angular.module('copayApp.services').factory('appletDataService', function($log, 
       }
       var data = oldData;
       lodash.merge(data, newData);
-      storageService.storeValueByKey(appletKey, JSON.stringify(data), cb);
-      trackAppletData(appletKey);
+      storageService.storeValueByKey(appletId, JSON.stringify(data), cb);
+      trackAppletData(appletId);
     });
   };
 

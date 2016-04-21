@@ -184,6 +184,9 @@ if [ ! -d $PROJECT ]; then
 
   cordova plugin add cordova-plugin-screen-orientation
   checkOK
+
+  cordova plugin add cordova-plugin-camera
+  checkOK
   
 fi
 

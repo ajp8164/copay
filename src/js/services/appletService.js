@@ -37,7 +37,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 	    "header": {
         "appletId": APPLET_IDENTIFIER_WALLET_PREFIX + credentials.walletId,
         "pluginId": PLUGIN_IDENTIFIER_WALLET_PREFIX + credentials.walletId,
-	      "name": config.aliasFor[credentials.walletId] || credentials.walletName
+	      "name": config.aliasFor[credentials.walletId] || credentials.walletName,
+        "flags": Applet.FLAGS_ALL,
+        "visible": true
 	    },
 	    "model": {
 	      "isoCode": config.wallet.settings.unitName == 'bits' || config.wallet.settings.unitName == 'BTC' ? 'XBT' : config.wallet.settings.alternativeIsoCode,
@@ -62,13 +64,15 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 	    "header": {
         "appletId": APPLET_IDENTIFIER_BUILTIN_PREFIX + capability.id,
         "pluginId": PLUGIN_IDENTIFIER_BUILTIN_PREFIX + capability.id,
-	      "name": capability.name
+	      "name": capability.name,
+        "flags": capability.flags,
+        "visible": capability.visible
 	    },
 	    "model": {
-	      "uri": capability.uri,
+        "uri": capability.uri
 	    },
 	    "view": {
-	      "launchIconBackground": capability.launchIconBackground,
+	      "launchIconBackground": capability.launchIconBackground
 	    },
 	    "services" : []
 	  }
@@ -85,6 +89,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   function getBuiltinApplets() {
     var builtinApplets = [];
     var iconPath = themeService.getCurrentTheme().header.path + '/applet-icons/';
+    var config = configService.getSync();
 
     // Create wallet
     builtinApplets.push(new Applet(createBuiltinAppletSchema({
@@ -92,6 +97,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       name: 'Create Wallet',
       uri: 'create',
       launchIconBackground: 'url(' + iconPath + 'wallet-new.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL | Applet.FLAGS_MAY_NOT_HIDE,
+      visible: true
     })));
 
     // Join wallet
@@ -100,6 +107,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       name: 'Join Wallet',
       uri: 'join',
       launchIconBackground: 'url(' + iconPath + 'wallet-join.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL | Applet.FLAGS_MAY_NOT_HIDE,
+      visible: true
     })));
 
     // Import wallet
@@ -108,6 +117,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       name: 'Import Wallet',
       uri: 'import',
       launchIconBackground: 'url(' + iconPath + 'wallet-import.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL | Applet.FLAGS_MAY_NOT_HIDE,
+      visible: true
     })));
 
     // Global preferences
@@ -116,6 +127,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       name: 'Settings',
       uri: 'preferencesGlobal',
       launchIconBackground: 'url(' + iconPath + 'settings.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL | Applet.FLAGS_MAY_NOT_HIDE,
+      visible: true
     })));
 
   	// Glidera
@@ -124,6 +137,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   		name: 'Glidera',
   		uri: 'glidera',
   		launchIconBackground: 'url(' + iconPath + 'glidera.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL,
+      visible: config.glidera.visible
   	})));
 
     // Coinbase
@@ -132,6 +147,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       name: 'Coinbase',
       uri: 'coinbase',
       launchIconBackground: 'url(' + iconPath + 'coinbase.png) center / cover no-repeat rgba(0,0,0,0)',
+      flags: Applet.FLAGS_ALL,
+      visible: config.coinbase.visible
     })));
   	return builtinApplets;
   };
@@ -210,6 +227,23 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     go.path(uri);
   };
 
+  // Return the collection of all available applets.
+  function getApplets() {
+    // Wallet applets.
+    var walletApplets = getWalletsAsApplets();
+
+    // Applets available through the current theme.
+    var applets = lodash.map(themeService.getAppletSkins(), function(skin) {
+      return new Skin(skin).getApplet();
+    });
+
+    // Some built-in capabilities are exposed as applets.
+    var builtinApplets = getBuiltinApplets();
+
+    // Return a comprehensive list of all applets.
+    return builtinApplets.concat(walletApplets).concat(applets);
+  };
+
 	root.init = function(callback) {
 		if (appletCatalogService.supportsWriting()) {
       appletCatalogService.init(function() {
@@ -239,21 +273,47 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     return applet.header.appletId.includes(APPLET_IDENTIFIER_WALLET_PREFIX);
   };
 
-  // Return the collection of all available applets.
-  root.getApplets = function() {
-  	// Wallet applets.
-		var walletApplets = getWalletsAsApplets();
+  root.getAppletsWithState = function() {
+    if (!root.initialized) return;
 
-		// Applets available through the current theme.
-    var applets = lodash.map(themeService.getAppletSkins(), function(skin) {
-      return new Skin(skin).getApplet();
-    });
+    var catalog = appletCatalogService.getSync();
 
-    // Some built-in capabilities are exposed as applets.
-    var builtinApplets = getBuiltinApplets();
+    // Get all of the applets and apply the stored state, if any.
+    var applets = getApplets();
+    var appletState = catalog.appletState;
+    var decoratedApplets;
 
-    // Return a comprehensive list of all applets.
-    return builtinApplets.concat(walletApplets).concat(applets);
+    if (!lodash.isEmpty(appletState)) {
+      // Find and add the applet state to each applet object.
+      // If a layout is not defined for the applet then fit the applet into an available space.
+      decoratedApplets = lodash.map(applets, function(applet) {
+
+        var state = lodash.find(appletState, function(state) {
+          return state.appletId == applet.header.appletId;
+        });
+
+        if (!lodash.isUndefined(state)) {
+          // Apply layout.
+          // 
+          if (!lodash.isUndefined(state.layout)) {
+            // Add the applets layout to the applet.
+            applet.layout = state.layout;
+          }
+
+          // Apply preferences.
+          // 
+          if (!lodash.isUndefined(state.preferences)) {
+            applet.header.visible = state.preferences.visible;
+          }
+        }
+
+        return applet;
+      });
+    } else {
+      // No applet state defined, rely on default state.
+      decoratedApplets = applets;
+    }
+    return decoratedApplets;
   };
 
   root.doOpenApplet = function(applet) {
@@ -286,27 +346,6 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   $rootScope.$on('modal.hidden', function(event, modal) {
   	$rootScope.$emit('Local/AppletHidden', modal.session.getApplet(), modal.walletId);
   });
-
-  root.getAppletsLayout = function() {
-    if (!root.initialized) return;
-    var catalog = appletCatalogService.getSync();
-    return catalog.appletLayout;
-  };
-
-  root.saveAppletsLayout = function(layout, callback) {
-    var cat = {
-      appletLayout: {}
-    };
-
-    cat.appletLayout = layout;
-
-		appletCatalogService.set(cat, function(err) {
-      if (err) {
-        $rootScope.$emit('Local/DeviceError', err);
-        return;
-      }
-    });
-  };
 
   root.finalize = function() {
     // Close any currently running applet.

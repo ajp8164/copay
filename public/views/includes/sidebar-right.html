@@ -22,42 +22,44 @@
   <div gridster="sidebar.gridsterOpts" class="applet-launch-container">
     <ul>
       <li class="applet-icon" gridster-item="appletLayoutMap" ng-repeat="applet in sidebar.applets">
+        <div ng-if="applet.header.visible">
 
-        <!-- wallet icon -->
-        <div ng-if="sidebar.isAppletWallet(applet)"
-          class="wallet-underlay"
-          ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
-          menu-toggle="right" ng-click="applet.open()">
-          <div class="applet-clickable">
-            <div class="wallet-icon" ng-style="{'background':theme.view.walletAppletLaunchIconBackground}"></div>
-            <div class="applet-icon-wallet-bar">
-              <span class="applet-icon-wallet-info">
-                {{applet.model.isoCode}}
-                {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
-                <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
-                  class="applet-icon-wallet-testnet">
-              </span>
+          <!-- wallet icon -->
+          <div ng-if="sidebar.isAppletWallet(applet)"
+            class="wallet-underlay"
+            ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
+            menu-toggle="right" ng-click="applet.open()">
+            <div class="applet-clickable">
+              <div class="wallet-icon" ng-style="{'background':theme.view.walletAppletLaunchIconBackground}"></div>
+              <div class="applet-icon-wallet-bar">
+                <span class="applet-icon-wallet-info">
+                  {{applet.model.isoCode}}
+                  {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
+                  <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
+                    class="applet-icon-wallet-testnet">
+                </span>
+              </div>
             </div>
           </div>
+
+          <!-- builtin capability icon -->
+          <div ng-if="sidebar.isAppletBuiltin(applet)"
+            class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+            menu-toggle="right" ng-click="applet.open()">
+            <div class="applet-clickable"></div>
+          </div>
+
+          <!-- applet icon -->
+          <div ng-if="sidebar.isAppletPlugin(applet)"
+            class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
+            ng-click="applet.open()">
+            <div class="applet-clickable"></div>
+          </div>
+
+          <!-- applet name -->
+          <span class="applet-name">{{applet.header.name}}</span>
+
         </div>
-
-        <!-- builtin capability icon -->
-        <div ng-if="sidebar.isAppletBuiltin(applet)"
-          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
-          menu-toggle="right" ng-click="applet.open()">
-          <div class="applet-clickable"></div>
-        </div>
-
-        <!-- applet icon -->
-        <div ng-if="sidebar.isAppletPlugin(applet)"
-          class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
-          ng-click="applet.open()">
-          <div class="applet-clickable"></div>
-        </div>
-
-        <!-- applet name -->
-        <span class="applet-name">{{applet.header.name}}</span>
-
       </li>
     </ul>
   </div>
