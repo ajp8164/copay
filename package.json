@@ -1,8 +1,14 @@
 {
   "name": "copay",
+<<<<<<< HEAD
   "description": "A multisignature wallet.",
   "author": "BitPay, Inc.",
   "version": "1.9.0",
+=======
+  "description": "A multisignature wallet",
+  "author": "BitPay",
+  "version": "1.10.4",
+>>>>>>> d248f2d... Bug/android camera (#4106)
   "keywords": [
     "wallet",
     "copay",
