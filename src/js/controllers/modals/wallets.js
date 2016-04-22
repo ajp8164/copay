@@ -9,6 +9,7 @@ angular.module('copayApp.controllers').controller('walletsController', function(
       self.error = bwsError.msg({
         'code': 'WALLET_NOT_COMPLETE'
       }, 'Could not choose the wallet');
+      self.error = {errors: [{ message: 'The Wallet could not be selected' }]};
 	    $scope.cancel();
       return;
     }
