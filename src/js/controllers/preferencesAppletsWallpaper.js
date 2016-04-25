@@ -1,20 +1,24 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesAppletsWallpaperController',
-  function($rootScope, $timeout, $log, appletCatalogService) {
+  function($rootScope, $timeout, $log, themeService, themePreferencesService, isMobile, fileStorageService) {
 
   var self = this;
-
-  this.currentWallpaperImage = function() {
-    // Extract image url from background css
-    // E.g., url(/themes/Cosmos/sidebar-right.png) 50% 0% / contain no-repeat rgb(0, 0, 0)
-    var re = /(?:\(['|"]?)(.*?)(?:['|"]?\))/;
-    return re.exec($rootScope.theme.view.sidebarRBackground)[1];
-  };
 
   this.physicalScreenHeight = function() {
     var physicalScreenHeight = ((window.innerHeight > 0) ? window.innerHeight : screen.height);
     return physicalScreenHeight;
+  };
+
+  this.currentWallpaperImage = function() {
+    // Extract image url from background css
+    // E.g., url(/themes/Copay/sidebar-right.png) 50% 0% / contain no-repeat rgb(0, 0, 0)
+    var re = /(?:\(['|"]?)(.*?)(?:['|"]?\))/;
+    return re.exec(themeService.getPublishedTheme().view.sidebarRBackground)[1];
+  };
+
+  this.setDefaultWallpaperImage = function() {
+    themePreferencesService.removeThemePreference('view.sidebarRBackground');
   };
 
   this.openFilePicker = function() {
@@ -23,10 +27,26 @@ angular.module('copayApp.controllers').controller('preferencesAppletsWallpaperCo
 
     navigator.camera.getPicture(
       function cameraSuccess(imageUrl) {
-        saveAndSetImage(imageUrl);
+        if (isMobile.iOS()) {
+          // On iOS the returned imageUrl is in tmp storage that is deleted when the app exits.
+          // We need to move the image from tmp to permanent storage.
+          var newFilename = 'appletsWallpaper-' + new Date().getTime() + '.jpg';
+          fileStorageService.move(imageUrl, newFilename, function(error, imageUrl) {
+            if (error) {
+              $log.debug('Error: unable to obtain image, ' + error);
+            }
+
+            // Remove any old wallpaper preference image before setting the new one.
+            fileStorageService.remove(self.currentWallpaperImage(), function() {
+              saveAndApplyImagePreference(imageUrl);
+            });
+          });
+        } else {
+          saveAndApplyImagePreference(imageUrl);
+        }
     },
       function cameraError(error) {
-        $log.debug('Unable to obtain picture: ' + error);
+        $log.debug('Error: unable to obtain image, ' + error);
     },
     options);
   };
@@ -46,30 +66,13 @@ angular.module('copayApp.controllers').controller('preferencesAppletsWallpaperCo
     return options;
 	}
 
-  function saveAndSetImage(imageUrl) {
-    var cat = {
-      preferences: {
-        wallpaperImageUrl: {}
-      }
+  function saveAndApplyImagePreference(imageUrl) {
+    var preferences = {
+      'view.sidebarRBackground': 'url(' + imageUrl + ') top / cover no-repeat #000000'
     };
 
-    cat.preferences.wallpaperImageUrl = imageUrl;
-
-    appletCatalogService.set(cat, function(err) {
-      if (err) {
-        $rootScope.$emit('Local/DeviceError', err);
-        return;
-      }
-
-      var catalog = appletCatalogService.getSync();
-      setImage(catalog.preferences.wallpaperImageUrl);
-    });
-  };
-
-  function setImage(imageUrl) {
-    $rootScope.theme.view.sidebarRBackground = 'url(' + imageUrl + ') top / cover no-repeat #000000';
-    $timeout(function() {
-      $rootScope.$apply();
+    themePreferencesService.setThemePreferences(preferences, function() {
+      themePreferencesService.applyThemePreferences();
     });
   };
 

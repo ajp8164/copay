@@ -1016,6 +1016,7 @@ textarea:focus
 }
 
 .gallery-grid-text {
+  height: 25px;
   line-height: 25px;
   position: absolute;
   bottom: 0;

@@ -108,16 +108,6 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
     throw new Error('Unable to place applet!');
   };
 */
-  function setAppletsBackground() {
-    var catalog = appletCatalogService.getSync();
-    if (catalog.preferences.wallpaperImageUrl.length > 0) {
-      $rootScope.theme.view.sidebarRBackground = 'url(' + catalog.preferences.wallpaperImageUrl + ') top / cover no-repeat #000000';
-    }
-  };
-
-  $rootScope.$on('Local/ThemeUpdated', function(event) {
-    setAppletsBackground();
-  });
 
   this.isAppletBuiltin = function(applet) {
     return appletService.isAppletBuiltin(applet);

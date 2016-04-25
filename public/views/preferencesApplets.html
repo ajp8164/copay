@@ -20,12 +20,10 @@
   </div>
   <h4 ng-style="{'background':theme.view.viewBackground}"></h4>
   <ul class="no-bullet m0 ">
-    <li class="p0i applet-list-item" ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}" ng-repeat="applet in p.applets">
-      <div ng-if="p.appletMayHide(applet)">
-        <ion-toggle ng-model="applet.header.visible" ng-style="{'color':theme.view.viewPrimaryTextColor}">
-          {{applet.header.name}}
-        </ion-toggle>
-      </div>
+    <li class="p0i applet-list-item" ng-if="p.appletMayHide(applet)" ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}" ng-repeat="applet in p.applets">
+      <ion-toggle ng-model="applet.header.visible" ng-style="{'color':theme.view.viewPrimaryTextColor}">
+        {{applet.header.name}}
+      </ion-toggle>
     </li>
   </ul>
 </ion-content>

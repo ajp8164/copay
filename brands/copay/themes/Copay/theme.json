@@ -17,10 +17,6 @@
     "permissions": {
       "delete": false
     },
-    "preferences": {
-      "showAppletGalleryGridLabel": true,
-      "showSkinGalleryGridLabel": true
-    },
     "social": {
       "likes": 0,
       "iLikeThis": false
@@ -32,6 +28,10 @@
     "<theme-path>/sidebar-left.png",
     "<theme-path>/sidebar-right.png"
   ],
+  "model": {
+    "showAppletGalleryGridLabel": true,
+    "showSkinGalleryGridLabel": true
+  },
   "view": {
     "primaryColor": "#2C3E50",
     "complementaryColor": "#FFFFFF",

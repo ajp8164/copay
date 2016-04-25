@@ -11,7 +11,11 @@
     <li ng-click="p.openFilePicker()"
       ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
       <div ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Choose a New Wallpaper</div>
-    </li>    
+    </li>
+    <li ng-click="p.setDefaultWallpaperImage()"
+      ng-style="{'background':theme.view.viewListItemBackground, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
+      <div ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Use Default Wallpaper</div>
+    </li>
   </ul>
 
   <div class="applets-wallpaper-preview-container">

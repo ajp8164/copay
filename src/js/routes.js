@@ -634,7 +634,7 @@ angular
     $ionicPlatform.ready(function () {
       if (window.cordova !== undefined) {
         
-        ionic.Platform.fullscreen(true, false);
+        ionic.Platform.fullScreen(true, false);
 
         document.addEventListener("deviceReady", function () {
 

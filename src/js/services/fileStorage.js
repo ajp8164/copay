@@ -236,5 +236,53 @@ angular.module('copayApp.services')
         });
     };
 
+    root.move = function(file, newName, cb, overwrite) {
+      function resolveSuccess(fileEntry) {
+        fileEntry.moveTo(_fs.root, newName, moveSuccess, moveError);
+      };
+
+      function moveSuccess(fileEntry) {
+        cb(null, fileEntry.nativeURL);
+      };
+
+      function moveError(err) {
+        var msg = '';
+        switch (err.code) {
+          case FileError.QUOTA_EXCEEDED_ERR:
+            msg = 'QUOTA_EXCEEDED_ERR';
+            break;
+          case FileError.NOT_FOUND_ERR:
+            msg = 'NOT_FOUND_ERR';
+            break;
+          case FileError.SECURITY_ERR:
+            msg = 'SECURITY_ERR';
+            break;
+          case FileError.INVALID_MODIFICATION_ERR:
+            msg = 'INVALID_MODIFICATION_ERR';
+            break;
+          case FileError.INVALID_STATE_ERR:
+            msg = 'INVALID_STATE_ERR';
+            break;
+          default:
+            msg = err.code;
+            break;
+        };
+        $log.debug('Error: could not move file, ' + msg);
+        return cb(msg);
+      };
+
+      overwrite = overwrite || true;
+      root.init(function(err, fs, dir) {
+        if (err) return cb(err);
+        if (overwrite) {
+          root.remove(newName, function() {
+            window.resolveLocalFileSystemURL(file, resolveSuccess, moveError);
+          });          
+        } else {
+          window.resolveLocalFileSystemURL(file, resolveSuccess, moveError);
+        }
+      });
+    };
+
     return root;
   });

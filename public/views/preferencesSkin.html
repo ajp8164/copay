@@ -23,8 +23,8 @@
 	  <div class="columns large-2 medium-3 small-4 end" style="padding: 1px 1px 1px 0;" ng-repeat="s in p.skins">
       <img ng-src="{{s.header.galleryImage}}" ng-click="p.save(s.header.name)"/>
       <div class="gallery-grid-text" ng-style="{'color':skin.view.viewPrimaryTextColor}">
-        <div ng-if="theme.header.preferences.showSkinGalleryGridLabel">{{s.header.name}}</div>
-        <div ng-if="!theme.header.preferences.showSkinGalleryGridLabel">&nbsp;</div>
+        <div ng-if="theme.model.showSkinGalleryGridLabel">{{s.header.name}}</div>
+        <div ng-if="!theme.nodel.showSkinGalleryGridLabel">&nbsp;</div>
       </div>
       <div ng-click="p.preview(s.header.name)">
         <i class="fi-info gallery-grid-action-button" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="skin.header.name != s.header.name"></i>

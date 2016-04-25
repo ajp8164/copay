@@ -91,6 +91,8 @@
 
 .applet-list-item .item {
   font-size: 14px;
+  border-top: none;
+  margin-bottom: 0;
 }
 
 /* Start of Ionic modifications */
