@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <div class="row m20t" ng-show="sell.error || index.coinbaseError" ng-click="sell.error = null">
+  <div class="row m20ti" ng-show="sell.error || index.coinbaseError" ng-click="sell.error = null">
     <div class="columns">
       <div class="box-notification">
         <ul class="no-bullet m0 size-12" ng-style="{'color':theme.view.viewAlertTextColor}">
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <div class="row m20t" 
+  <div class="row m20ti" 
     ng-show="index.coinbaseAccount && !sell.sellInfo && !sell.sendInfo">
     <div class="columns">
       <form
@@ -152,7 +152,7 @@
     </div>
   </div>
 
-  <div class="m20t row" ng-show="sell.sendInfo && !sell.sellInfo && !sell.success">
+  <div class="m20ti row" ng-show="sell.sendInfo && !sell.sellInfo && !sell.success">
     <div class="columns">
       <h1 ng-style="{'color':theme.view.viewPrimaryTextColor}">Funds sent to Coinbase Account</h1>
       <p class="size-12 text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
@@ -204,7 +204,7 @@
       </div>
     </div>
   </div>
-  <div class="m20t row text-center" ng-show="sell.success">
+  <div class="m20ti row text-center" ng-show="sell.success">
     <div class="columns">
       <h1 ng-style="{'color':theme.view.viewPrimaryTextColor}">Sale initiated</h1>
       <p class="text-gray" ng-style="{'color':theme.view.viewSecondaryTextColor}">
