@@ -67,10 +67,10 @@
           ng-model="fiat" autocomplete="off" ng-disabled="buy.loading"
           ng-style="{'color':theme.view.viewSecondaryTextColor, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">
 
-          <a ng-show="!showAlternative" class="postfix button" 
-            ng-click="showAlternative = true; amount = null"><div ng-style="{'color':theme.view.viewPrimaryTextColor}">BTC</div></a>
-          <a ng-show="showAlternative" class="postfix button black" 
-            ng-click="showAlternative = false; fiat = null"><div ng-style="{'color':theme.view.viewPrimaryTextColor}">USD</div></a>
+          <a ng-show="!showAlternative" class="postfix button" ng-style="{'background-color':theme.view.primaryColor}"
+            ng-click="showAlternative = true; amount = null"><div ng-style="{'color':theme.view.complementaryColor}">BTC</div></a>
+          <a ng-show="showAlternative" class="postfix button black" ng-style="{'background-color':theme.view.primaryColor}"
+            ng-click="showAlternative = false; fiat = null"><div ng-style="{'color':theme.view.complementaryColor}">USD</div></a>
         </div>
 
         <div class="text-center text-gray size-12 m10b" ng-style="{'color':theme.view.viewSecondaryTextColor}">
