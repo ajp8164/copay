@@ -71,9 +71,7 @@ angular.module('copayApp.controllers').controller('preferencesAppletsWallpaperCo
       'view.sidebarRBackground': 'url(' + imageUrl + ') top / cover no-repeat #000000'
     };
 
-    themePreferencesService.setThemePreferences(preferences, function() {
-      themePreferencesService.applyThemePreferences();
-    });
+    themePreferencesService.setThemePreferences(preferences);
   };
 
 });

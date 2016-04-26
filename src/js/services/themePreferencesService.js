@@ -4,45 +4,6 @@ angular.module('copayApp.services').factory('themePreferencesService', function(
 
   var root = {};
 
-  // Apply any user saved preferences to the catalog theme object.
-  // If a user defined preference is not available then the initial (default) value is applied.
-  // This function does not save the catalog.
-  // 
-  root.applyThemePreferences = function(themeName) {
-    themeName = themeName || themeService.getCurrentThemeName();
-
-    var theme = themeService.getCatalogThemeByName(themeName);
-
-    if (!lodash.isEmpty(theme.preferences)) {
-      for (var property in theme.preferences.user) {
-        setToValue(theme, theme.preferences.user[property], property);
-      }
-    }
-    if (themeName == themeService.getCurrentThemeName()) {
-      themeService.publishCatalog();
-    }
-  };
-
-  // Apply any user saved preferences to the catalog skin object.
-  // If a user defined preference is not available then the initial (default) value is applied.
-  // This function does not save the catalog.
-  // 
-  root.applySkinPreferences = function(skinName, themeName) {
-    themeName = themeName || themeService.getCurrentThemeName();
-    skinName = skinName || themeService.getCurrentSkinName();
-
-    var skin = themeService.getskin(themeName, skinName);
-
-    if (!lodash.isEmpty(skin.preferences)) {
-      for (var property in skin.preferences) {
-        setToValue(skin, skin.preferences.user[property], property);
-      }
-    }
-    if (themeName == themeService.getCurrentThemeName() && skinName || themeService.getCurrentSkinName()) {
-      themeService.publishCatalog();
-    }
-  };
-
   // Get the stored preferences for the specified theme.
   // 
   root.getThemePreferences = function(themeName) {
@@ -93,7 +54,18 @@ angular.module('copayApp.services').factory('themePreferencesService', function(
       }
       
       theme.preferences = preferencesObj;
+
+      // Apply any user saved preferences to the catalog theme object.
+      if (!lodash.isEmpty(theme.preferences)) {
+        for (var property in theme.preferences.user) {
+          setToValue(theme, theme.preferences.user[property], property);
+        }
+      }
+
       themeService.saveCatalog(function() {
+        if (themeName == themeService.getCurrentThemeName()) {
+          themeService.publishCatalog();
+        }
         callback();
       });
     } else {
@@ -181,7 +153,18 @@ angular.module('copayApp.services').factory('themePreferencesService', function(
       }
       
       skin.preferences = preferencesObj;
+
+      // Apply any user saved preferences to the catalog skin object.
+      if (!lodash.isEmpty(skin.preferences)) {
+        for (var property in skin.preferences) {
+          setToValue(skin, skin.preferences.user[property], property);
+        }
+      }
+
       themeService.saveCatalog(function() {
+        if (themeName == themeService.getCurrentThemeName() && skinName || themeService.getCurrentSkinName()) {
+          themeService.publishCatalog();
+        }
         callback();
       });
     } else {
@@ -193,7 +176,7 @@ angular.module('copayApp.services').factory('themePreferencesService', function(
   // Remove the given preference from the specified skin and reapply the initial value for the preference.
   // Will publish changes if made to the current skin.
   // 
-  root.removeSkinPreference = function(preference, callback, skinName, themeName) {
+  root.removeSkinPreference = function(preferenceKey, callback, skinName, themeName) {
     callback = callback || function(){};
     skinName = skinName || themeService.getCurrentSkinName();
     themeName = themeName || themeService.getCurrentThemeName();
