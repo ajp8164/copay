@@ -109,7 +109,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
         self.loadingWallet = true;
         return;
       }
-      if (vanillaScope[k]) {
+      if (!lodash.isUndefined(vanillaScope[k])) {
         self[k] = vanillaScope[k];
         return;
       }
