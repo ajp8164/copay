@@ -45,8 +45,8 @@
 }
 
 .button-applet-close:before {
-  font-size: 53px !important;
-  line-height: 31px !important;
+  font-size: 48px !important;
+  line-height: 40px !important;
 }
 
 .popover-applet-info {
@@ -80,6 +80,8 @@
 }
 
 .footer-bar-applet .item-center {
+  height: 60px;
+  top: -5px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
