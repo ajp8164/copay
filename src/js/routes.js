@@ -421,6 +421,15 @@ angular
           },
         }
       })
+      .state('preferencesAppletPresentation', {
+        url: '/preferencesAppletPresentation',
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/preferencesAppletPresentation.html'
+          },
+        }
+      })
       .state('preferencesAppletsWallpaper', {
         url: '/preferencesAppletsWallpaper',
         needProfile: true,

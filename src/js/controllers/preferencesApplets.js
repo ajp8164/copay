@@ -1,12 +1,13 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('preferencesAppletsController', function($scope, $rootScope, lodash, configService, appletService, appletCatalogService, Applet) {
+angular.module('copayApp.controllers').controller('preferencesAppletsController', function($scope, $rootScope, lodash, configService, appletService, appletCatalogService, Applet, Constants) {
 
   var self = this;
   this.applets = [];
 
   this.init = function() {
     this.applets = appletService.getAppletsWithState();
+    this.selectedPresentation = getPresentation();
   };
 
   this.appletMayHide = function(applet) {
@@ -66,6 +67,29 @@ angular.module('copayApp.controllers').controller('preferencesAppletsController'
     if (newState.preferences.visible != oldState) {
       saveCoinbaseConfig();
       $rootScope.$emit('Local/CoinbaseUpdated');
+    }
+  };
+
+  function getPresentation() {
+    var catalog = appletCatalogService.getSync();
+
+    if (lodash.isUndefined(catalog.environment) || lodash.isUndefined(catalog.environment.presentation)) {
+      // Lazy initialization of the presentation.
+      var cat = {
+        environment: {}
+      };
+
+      cat.environment.presentation = Constants.appletPresentationDefault;
+
+      appletCatalogService.set(cat, function(err) {
+        if (err) {
+          $rootScope.$emit('Local/DeviceError', err);
+          return;
+        }
+      });
+      return Constants.appletPresentationDefault;
+    } else {
+      return catalog.environment.presentation;
     }
   };
 
