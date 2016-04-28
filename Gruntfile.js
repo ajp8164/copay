@@ -66,6 +66,20 @@ module.exports = function(grunt) {
         tasks: ['concat:js']
       }
     },
+    sass: {
+      dist: {
+        options: {
+          style: 'compact',
+          sourcemap: 'none'
+        },
+        files: [{
+          expand: true,
+          src: ['src/sass/*.scss'],
+          dest: './',
+          ext: '.css'
+        }]
+      }
+    },
     concat: {
       options: {
         sourceMap: false,
@@ -111,9 +125,7 @@ module.exports = function(grunt) {
         dest: 'public/js/copay.js'
       },
       css: {
-        src: [
-          'src/css/*.css'
-        ],
+        src: ['src/css/*.css', 'src/sass/*.css'],
         dest: 'public/css/copay.css'
       },
       foundation: {
@@ -472,6 +484,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-remove');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-contrib-sass');
 
   grunt.registerTask('buildBrand', 'Build the brand configuration.', function() {
     buildBrandConfig();
@@ -486,6 +499,7 @@ module.exports = function(grunt) {
     'buildBrand',
     'buildPluginRegistry',
     'browserify',
+    'sass',
     'concat',
     'copy:ionic_fonts',
     'remove:themes',

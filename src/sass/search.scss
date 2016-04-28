@@ -1,0 +1,48 @@
+/*////////////////////////////   SEARCH INPUT  ////////////////////////////*/
+
+.searchBar {
+  display: table;
+  padding-left: 5px;
+  padding-right: 5px;
+  max-width: none;
+  .columns {
+    display: table-cell;
+    vertical-align: middle;
+    float: none;
+  }
+  [class*="column"] + [class*="column"]:last-child {
+    float: none;
+  }
+  form {
+    margin-left: 20px;
+  }
+  input {
+    margin-bottom: auto;
+    border-bottom: 0px solid #E9EDF0;
+    padding-left: 8px;
+    padding-top: 5px;
+  }
+  i {
+    position: absolute;
+    top: 2px;
+    left: 15px;
+  }
+  .small-11 {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+  .small-1 {
+    padding-left: 2px;
+    padding-right: 8px;
+  }
+  .cancel {
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+.searchLabel {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 5px;
+  height: 30px;
+}
