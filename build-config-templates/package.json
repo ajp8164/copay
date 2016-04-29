@@ -3,6 +3,7 @@
   "description": "%APP-DESCRIPTION%",
   "author": "%APP-PUBLISHER%",
   "version": "%APP-VERSION%",
+  "androidVersionCode": "%ANDROID-VERSION-CODE%",
   "keywords": [
     "wallet",
     "copay",

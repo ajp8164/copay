@@ -535,36 +535,48 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
   this.confirmTx = function(txp) {
     var self = this;
+
+    $log.info('at .confirmTx');
     txService.prepare({}, function(err) {
+      $log.info('after .prepare:', err);
       if (err) {
+        self.setOngoingProcess();
+        $log.warn('confirmTx/Prepare error:',  err);
         return self.setSendError(err);
       }
       self.setOngoingProcess(gettextCatalog.getString('Sending transaction'));
       txService.publishTx(txp, {}, function(err, txpPublished) {
+
+        $log.info('after .publishTx:', err);
+
         if (err) {
           self.setOngoingProcess();
           self.setSendError(err);
-        } else {
-          txService.signAndBroadcast(txpPublished, {
-            reporterFn: self.setOngoingProcess.bind(self)
-          }, function(err, txp) {
-            self.resetForm();
+          return;
+        } 
 
-            if (err) {
-              self.error = err.message ? err.message : gettext('The payment was created but could not be completed. Please try again from home screen');
-              $scope.$emit('Local/TxProposalAction');
-              $timeout(function() {
-                $scope.$digest();
-              }, 1);
-            } else {
-              go.walletHome();
-              var fc = profileService.focusedClient;
-              txStatus.notify($scope, fc, txp, function() {
-                $scope.$emit('Local/TxProposalAction', txp.status == 'broadcasted');
-              });
-            }
+        txService.signAndBroadcast(txpPublished, {
+          reporterFn: self.setOngoingProcess.bind(self)
+        }, function(err, txp) {
+          $log.info('after .signAndBroadcast:', err);
+          self.resetForm();
+          self.setOngoingProcess();
+
+          if (err) {
+            self.error = err.message ? err.message : gettext('The payment was created but could not be completed. Please try again from home screen');
+            $scope.$emit('Local/TxProposalAction');
+            $timeout(function() {
+              $scope.$digest();
+            }, 1);
+            return;
+          } 
+
+          $log.info('Transaction status:', txp.status);
+          go.walletHome();
+          txStatus.notify(txp, function() {
+            $scope.$emit('Local/TxProposalAction', txp.status == 'broadcasted');
           });
-        }
+        });
       });
     });
   };

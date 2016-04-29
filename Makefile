@@ -62,9 +62,9 @@ android-prod:
 	zipalign -v 4 cordova/project/platforms/android/build/outputs/apk/android-release-signed.apk cordova/project/platforms/android/build/outputs/apk/android-release-signed-aligned.apk 
 
 android-debug:
-	cordova/build.sh ANDROID copay --dbgjs --clear
+	cordova/build.sh ANDROID --dbgjs 
 	cd cordova/project && cordova run android
 
 android-debug-fast:
-	cordova/build.sh ANDROID copay --dbgjs
-	cd cordova/project && cordova run android	
+	cordova/build.sh ANDROID --dbgjs
+	cd cordova/project && cordova run android	 --device
