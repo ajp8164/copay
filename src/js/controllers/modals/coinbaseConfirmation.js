@@ -1,14 +1,15 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('coinbaseConfirmationController', function($scope, $timeout, storageService, applicationService) {
+angular.module('copayApp.controllers').controller('coinbaseConfirmationController', function($scope, $timeout, coinbaseService, applicationService) {
 
 	var self = $scope.self;
 
   $scope.ok = function() {
-    storageService.removeCoinbaseToken($scope.network, function() {
+    coinbaseService.logout($scope.network, function() {
+
       $timeout(function() {
         applicationService.restart();
-      }, 100);
+      }, 1000);
     });
     $scope.cancel();
   };

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesCoinbaseController', 
-  function($scope, $ionicModal, $timeout, applicationService, coinbaseService, storageService, animationService) {
+  function($scope, $ionicModal) {
 
     this.revokeToken = function(testnet) {
       $scope.network = testnet ? 'testnet' : 'livenet';
