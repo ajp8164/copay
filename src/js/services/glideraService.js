@@ -8,7 +8,7 @@ angular.module('copayApp.services').factory('glideraService', function($http, $l
     if (network == 'testnet') {
       credentials.HOST = 'https://sandbox.glidera.io';
       if (isCordova) {
-        credentials.REDIRECT_URI = 'bitcoin://glidera';
+        credentials.REDIRECT_URI = 'copay://glidera';
         credentials.CLIENT_ID = "dfc56e4336e32bb8ba46dde34f3d7d6d";
         credentials.CLIENT_SECRET = "5eb679058f6c7eb81123162323d4fba5";
       }
@@ -21,7 +21,7 @@ angular.module('copayApp.services').factory('glideraService', function($http, $l
     else {
       credentials.HOST = 'https://glidera.io';
       if (isCordova) {
-        credentials.REDIRECT_URI = 'bitcoin://glidera';
+        credentials.REDIRECT_URI = 'copay://glidera';
         credentials.CLIENT_ID = brand.features.glidera.auth.cordovaClientId;
         credentials.CLIENT_SECRET = brand.features.glidera.auth.cordovaClientSecret;
       }
