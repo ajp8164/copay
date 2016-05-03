@@ -9,6 +9,13 @@
     <h4 class="title m0" ng-style="{'color':skin.view.viewSectionHeaderColor, 'background':skin.view.viewSectionHeaderBackground}" translate>Wallet Information</h4>
 
     <ul class="no-bullet m0 size-14">
+      <li class="line-b p20 oh " ng-if="androidTest">
+        <span style="color:red" translate>BETA: Android Key Derivation Test:</span>
+        <span class="right text-gray">
+          {{androidTest}}
+        </span>
+      </li>
+
       <li class="line-b p20 oh"
         ng-style="{'background':skin.view.viewListItemBackground, 'border-bottom-color':skin.view.viewListItemSeparatorColor}">
         <span ng-style="{'color':skin.view.viewPrimaryTextColor}" ranslate>Wallet Name (at creation)</span>

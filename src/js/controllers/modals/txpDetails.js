@@ -125,6 +125,8 @@ angular.module('copayApp.controllers').controller('txpDetailsController', functi
     self.setOngoingProcess(gettextCatalog.getString('Rejecting payment'));
     $scope.loading = true;
     $scope.error = null;
+
+    // TODO: This should be in txService
     $timeout(function() {
       fc.rejectTxProposal(txp, null, function(err, txpr) {
         self.setOngoingProcess();
