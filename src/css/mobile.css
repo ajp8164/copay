@@ -510,25 +510,27 @@ a.missing-copayers {
   position: relative;
   bottom: 1px;
 }
-/*
-.applet-card-container-sb {
-  position: absolute;
-  top: 50px;
-}
 
-.applet-card-container-no-sb {
-  position: absolute;
-  top: 30px;
-}
-*/
 .applet-card-container-footer {
-  height: 30px;
+/*  height: 30px; */
 }
 
 .applet-desktop-view .gridster-preview-holder {
 }
 
-.applet-card-list-view .gridster-preview-holder, .category-card-list-view .gridster-preview-holder {
+.applet-card-list-view {
+  margin-bottom: 50px;
+}
+
+.category-card-list-view {
+  margin-bottom: 50px;
+}
+
+.applet-card-list-view .gridster-preview-holder {
+  background-color: rgba(0,0,0,0);
+}
+
+.category-card-list-view .gridster-preview-holder {
   background-color: rgba(0,0,0,0);
 }
 

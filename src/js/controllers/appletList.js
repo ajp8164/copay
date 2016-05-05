@@ -180,8 +180,8 @@ angular.module('copayApp.controllers').controller('appletListController', functi
   }
 
   this.goAppletCategories = function() {
-    if (this.editing) return;
     $ionicSlideBoxDelegate.$getByHandle('appletPresentationSlideBox').slide(0);
+    this.endEdit();
 
     // Wait for animation to complete before removing the category.
     $timeout(function() {

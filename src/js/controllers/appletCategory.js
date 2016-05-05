@@ -158,7 +158,6 @@ angular.module('copayApp.controllers').controller('appletCategoryController', fu
   }
 
   this.goAppletCategoryList = function(category) {
-    if (this.editing) return;
     appletService.setActiveCategory(category);
     $ionicSlideBoxDelegate.$getByHandle('appletPresentationSlideBox').slide(1);
     this.endEdit();
