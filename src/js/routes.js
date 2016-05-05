@@ -496,6 +496,17 @@ angular
 
         }
       })
+      .state('appletCategoryListPresentation', {
+        url: '/appletCategoryListPresentation',
+        templateUrl: 'views/appletCategoryListPresentation.html',
+        walletShouldBeComplete: true,
+        needProfile: true,
+        views: {
+          'main-right': {
+            templateUrl: 'views/appletCategoryListPresentation.html'
+          },
+        }
+      })
       .state('deleteWords', {
         url: '/deleteWords',
         templateUrl: 'views/preferencesDeleteWords.html',

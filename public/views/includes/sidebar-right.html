@@ -1,4 +1,4 @@
-<ion-content scroll="false" has-bouncing="false" ng-controller="sidebarRightController as sidebar"
+<ion-content scroll="false" has-bouncing="false" ng-controller="sidebarRightController as sidebar" ng-init="sidebar.init()"
   class="sidebar-right"
   ng-style="{'background':theme.view.sidebarRBackground}">
 
@@ -18,50 +18,26 @@
     </span>
   </div>
 
-  <!-- applet grid -->
-  <div gridster="sidebar.gridsterOpts" class="applet-launch-container">
-    <ul>
-      <li class="applet-icon" gridster-item="appletLayoutMap" ng-repeat="applet in sidebar.applets">
-        <div ng-if="applet.header.visible">
+  <ion-slide-box delegate-handle='appletPresentationSlideBox' style="height: 100%">
+    <ion-slide>
 
-          <!-- wallet icon -->
-          <div ng-if="sidebar.isAppletWallet(applet)"
-            class="wallet-underlay"
-            ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}"
-            menu-toggle="right" ng-click="applet.open()">
-            <div class="applet-clickable">
-              <div class="wallet-icon" ng-style="{'background':theme.view.walletAppletLaunchIconBackground}"></div>
-              <div class="applet-icon-wallet-bar">
-                <span class="applet-icon-wallet-info">
-                  {{applet.model.isoCode}}
-                  {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
-                  <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
-                    class="applet-icon-wallet-testnet">
-                </span>
-              </div>
-            </div>
-          </div>
+      <div ng-include="'views/includes/applet-category-presentation.html'"
+        ng-if="sidebar.isCategoryPresentation()" style="height: 100%;"></div>
 
-          <!-- builtin capability icon -->
-          <div ng-if="sidebar.isAppletBuiltin(applet)"
-            class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
-            menu-toggle="right" ng-click="applet.open()">
-            <div class="applet-clickable"></div>
-          </div>
+      <div ng-include="'views/includes/applet-desktop-presentation.html'"
+        ng-if="sidebar.isDesktopPresentation()" style="height: 100%;"></div>
 
-          <!-- applet icon -->
-          <div ng-if="sidebar.isAppletPlugin(applet)"
-            class="applet-image" ng-style="{'background':applet.view.launchIconBackground}"
-            ng-click="applet.open()">
-            <div class="applet-clickable"></div>
-          </div>
+      <div ng-include="'views/includes/applet-list-presentation.html'"
+        ng-if="sidebar.isListPresentation()" style="height: 100%;"></div>
 
-          <!-- applet name -->
-          <span class="applet-name">{{applet.header.name}}</span>
+    </ion-slide>
+    <ion-slide>
 
-        </div>
-      </li>
-    </ul>
-  </div>
+      <div ng-include="'views/includes/applet-category-list-presentation.html'"
+        ng-if="sidebar.isCategoryPresentation() && sidebar.hasActiveCategory()" style="height: 100%;"></div>
+
+    </ion-slide>
+  </ion-slide-box>
   
 </ion-content>
+<div class="extra-margin-bottom"></div>

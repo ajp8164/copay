@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletCatalogService', function(storageService, lodash, $log, brand) {
+angular.module('copayApp.services').factory('appletCatalogService', function(storageService, lodash, $log, brand, Constants) {
 
   var root = {};
 
@@ -8,8 +8,12 @@ angular.module('copayApp.services').factory('appletCatalogService', function(sto
 
     metadata: {},
 
-    environment: {},
+    environment: {
+      presentation: Constants.LAYOUT_DEFAULT
+    },
 
+    categoryState: [],
+    
     appletState: []
 
   };

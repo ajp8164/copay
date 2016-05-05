@@ -8,8 +8,12 @@ angular.module('copayApp.model').factory('Constants', function () {
     return this;
   };
 
-  Constants.appletPresentationOptions = ['Categories', 'Desktop'];
-  Constants.appletPresentationDefault = Constants.appletPresentationOptions[1];
+  Constants.LAYOUT_CATEGORIES = 'Categories';
+  Constants.LAYOUT_DESKTOP = 'Desktop';
+  Constants.LAYOUT_LIST = 'List';
+  Constants.LAYOUT_DEFAULT = Constants.LAYOUT_DESKTOP;
+
+  Constants.appletPresentationOptions = [Constants.LAYOUT_CATEGORIES, Constants.LAYOUT_DESKTOP, Constants.LAYOUT_LIST];
 
   return Constants;
 });

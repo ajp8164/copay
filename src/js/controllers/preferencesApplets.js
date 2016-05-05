@@ -6,8 +6,10 @@ angular.module('copayApp.controllers').controller('preferencesAppletsController'
   this.applets = [];
 
   this.init = function() {
+    var catalog = appletCatalogService.getSync();
+
     this.applets = appletService.getAppletsWithState();
-    this.selectedPresentation = getPresentation();
+    this.selectedPresentation = catalog.environment.presentation;
   };
 
   this.appletMayHide = function(applet) {
@@ -15,119 +17,18 @@ angular.module('copayApp.controllers').controller('preferencesAppletsController'
   };
 
   this.savePreferences = function() {
-    // Create the preferences objects from each applet (store minimal data).
-    var preferences = lodash.map(self.applets, function(applet) {
-      return {
-        appletId: applet.header.appletId,
-        preferences: {
-          visible: applet.header.visible
-        }
+    // If the applet is not visible then remove its layout to force repositioning if it's made visible later.
+    for (var i = 0; i < self.applets.length; i++) {
+      if (!self.applets[i].preferences.visible) {
+        self.applets[i].layout = {position:{'0':9999,'1':9999}};
       }
-    });
+    }
 
-    var cat = {
-      appletState: []
-    };
-
-    cat.appletState = preferences;
-
-    appletCatalogService.set(cat, function(err) {
-      if (err) {
-        $rootScope.$emit('Local/DeviceError', err);
-        return;
-      }
+    appletService.updateAppletState(self.applets, {
+      layout: self.selectedPresentation,
+      invalidateCache: true
+    }, function() {
       $scope.$emit('Local/AppletPreferencesUpdated');
-      broadcastEvents();
-    });
-  };
-
-  function broadcastEvents() {
-    var catalog = appletCatalogService.getSync();
-    var config = configService.getSync();
-    var newState;
-    var oldState;
-
-    // Glidera.
-    newState = lodash.find(catalog.appletState, function(state) {
-      return state.appletId.includes('glidera');
-    });
-
-    oldState = config.glidera.visible;
-    if (newState.preferences.visible != oldState) {
-      saveGlideraConfig();
-      $rootScope.$emit('Local/GlideraUpdated');
-    }
-
-    // Coinbase.
-    newState = lodash.find(catalog.appletState, function(state) {
-      return state.appletId.includes('coinbase');
-    });
-
-    oldState = config.coinbase.visible;
-    if (newState.preferences.visible != oldState) {
-      saveCoinbaseConfig();
-      $rootScope.$emit('Local/CoinbaseUpdated');
-    }
-  };
-
-  function getPresentation() {
-    var catalog = appletCatalogService.getSync();
-
-    if (lodash.isUndefined(catalog.environment) || lodash.isUndefined(catalog.environment.presentation)) {
-      // Lazy initialization of the presentation.
-      var cat = {
-        environment: {}
-      };
-
-      cat.environment.presentation = Constants.appletPresentationDefault;
-
-      appletCatalogService.set(cat, function(err) {
-        if (err) {
-          $rootScope.$emit('Local/DeviceError', err);
-          return;
-        }
-      });
-      return Constants.appletPresentationDefault;
-    } else {
-      return catalog.environment.presentation;
-    }
-  };
-
-  // TODO: this can be removed when the config settings are removed and the catalog is used instead.
-  function saveGlideraConfig() {
-    var catalog = appletCatalogService.getSync();
-
-    var glideraState = lodash.find(catalog.appletState, function(state) {
-      return state.appletId.includes('glidera');
-    });
-
-    var opts = {
-      glidera: {
-        visible: glideraState.preferences.visible
-      },
-    };
-
-    configService.set(opts, function(err) {
-      if (err) $log.debug(err);
-    });
-  };
-
-  // TODO: this can be removed when the config settings are removed and the catalog is used instead.
-  function saveCoinbaseConfig() {
-    var catalog = appletCatalogService.getSync();
-
-    var coinbaseState = lodash.find(catalog.appletState, function(state) {
-      return state.appletId.includes('coinbase');
-    });
-
-    var opts = {
-      coinbase: {
-        visible: coinbaseState.preferences.visible
-      },
-    };
-
-    configService.set(opts, function(err) {
-      if (err) $log.debug(err);
     });
   };
 

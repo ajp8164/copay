@@ -103,7 +103,8 @@ angular.module('copayApp.api').factory('CWallet', function (configService, txFor
    * @static
    */
   CWallet.sendPayment = function(data, callback) {
-    return FocusedWallet.sendPayment(data, callback);
+    var wallet = FocusedWallet.getInstance();
+    return wallet.sendPayment(data, callback);
   };
 
   return CWallet;

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('preferencesAppletPresentationController', function($rootScope, go, Constants, appletCatalogService) {
+angular.module('copayApp.controllers').controller('preferencesAppletPresentationController', function($rootScope, $ionicSlideBoxDelegate, go, Constants, appletCatalogService, appletService) {
 
   var self = this;
 
@@ -11,20 +11,17 @@ angular.module('copayApp.controllers').controller('preferencesAppletPresentation
   };
 
   this.setPresentation = function(presentation) {
-    var catalog = appletCatalogService.getSync();
-
-    var cat = {
-      environment: {}
+    var newEnvironment = {
+      presentation: presentation
     };
 
-    cat.environment.presentation = presentation;
-
-    appletCatalogService.set(cat, function(err) {
-      if (err) {
-        $rootScope.$emit('Local/DeviceError', err);
-        return;
+    appletService.updateAppletEnvironment(newEnvironment, function() {
+      if (presentation != Constants.LAYOUT_CATEGORIES) {
+        appletService.clearActiveCategory();
+        $ionicSlideBoxDelegate.$getByHandle('appletPresentationSlideBox').slide(0);
       }
-      go.path('preferencesApplets');
+
+      go.path('preferencesApplets');      
     });
   };
 

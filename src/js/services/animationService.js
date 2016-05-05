@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('animationService', function(isCordova) {
+angular.module('copayApp.services').factory('animationService', function(isCordova, lodash) {
   var root = {};
 
   var cachedTransitionState, cachedBackPanel;
@@ -54,6 +54,7 @@ angular.module('copayApp.services').factory('animationService', function(isCordo
     preferencesHistory: 13,
     preferencesAlias: 12,
     preferencesEmail: 12,
+    appletCategoryListPresentation: 12,
     export: 13,
     paperWallet: 13,
     logs: 13,
@@ -98,6 +99,7 @@ angular.module('copayApp.services').factory('animationService', function(isCordo
 
     // Animation in progress?
     var x = document.getElementById('mainSectionDup');
+
     if (x && !cachedTransitionState) {
       console.log('Anim in progress');
       return true;
@@ -141,7 +143,6 @@ angular.module('copayApp.services').factory('animationService', function(isCordo
     }
 
     var e = document.getElementById('mainSection');
-
 
     var desiredTransitionState = (fromName || '-') + ':' + (toName || '-');
 

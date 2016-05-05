@@ -7,22 +7,25 @@ angular.module('copayApp.services').factory('appletDataService', function($log, 
   function trackAppletData(appletId) {
     var catalog = appletCatalogService.getSync();
 
-    var index = lodash.findIndex(catalog.appletState, function(data) {
-      return (data.appletId == appletId);
+    var index = lodash.findIndex(catalog.appletState, function(state) {
+      return (state.appletId == appletId);
     });
 
     if (index >= 0 && !lodash.isUndefined(catalog.appletState[index].data)) {
-      // Update the existing applet data entry.
+      // Update the existing applet state data entry.
       catalog.appletState[index].data.updated = new Date();
     } else {
-      // Applet data entry not found; create a new applet data entry.
+      // Applet state entry not found; create a new applet state entry with data.
       var now = new Date();
       var data = {
         updated: now,
         created: now
       };
 
-      catalog.appletState[index].data = data;
+      catalog.appletState.push({
+        appletId: appletId,
+        data: data
+      });
     }
 
     appletCatalogService.set(catalog, function(err) {

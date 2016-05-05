@@ -392,6 +392,10 @@ a.missing-copayers {
   width: 100%;
 }
 
+.sidebar-right .bar {
+  background: rgba(0,0,0,0);
+}
+
 .modal-content ul li a {
   font-size: 12px;
   font-weight: 300;
@@ -457,7 +461,7 @@ a.missing-copayers {
 
 .applet-icon .wallet-icon {
   height: 60px;
-  border-radius: 10px;
+/*  border-radius: 10px; */
 }
 
 .applet-icon .applet-image {
@@ -484,7 +488,7 @@ a.missing-copayers {
   height: 100%;
 }
 
-.applet-icon-wallet-bar {
+.applet-icon .applet-icon-wallet-bar {
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 0 0 10px 10px;
   height: 14px;
@@ -506,6 +510,204 @@ a.missing-copayers {
   position: relative;
   bottom: 1px;
 }
+/*
+.applet-card-container-sb {
+  position: absolute;
+  top: 50px;
+}
+
+.applet-card-container-no-sb {
+  position: absolute;
+  top: 30px;
+}
+*/
+.applet-card-container-footer {
+  height: 30px;
+}
+
+.applet-desktop-view .gridster-preview-holder {
+}
+
+.applet-card-list-view .gridster-preview-holder, .category-card-list-view .gridster-preview-holder {
+  background-color: rgba(0,0,0,0);
+}
+
+.applet-card-clickable {
+  height: 100%;
+  width: 100%;
+}
+
+.applet-card {
+  text-align: center;
+  padding-top: 10px;
+}
+
+.applet-card .wallet-underlay {
+  width: 60px;
+  height: 60px;
+  color: #FFFFFF;
+  font-size: 2.3rem;
+  font-weight: 700;
+}
+
+.applet-card .wallet-icon {
+  height: 60px;
+}
+
+.applet-card .applet-icon-wallet-bar {
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 14px;
+  position: relative;
+  top: -14px;
+}
+
+.applet-card .applet-info, .applet-card .applet-category-info {
+  position: relative;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+  height: 60px;
+  -webkit-transition: margin-left 0.25s ease-in-out;
+  -moz-transition: margin-left 0.25s ease-in-out;
+  -o-transition: margin-left 0.25s ease-in-out;
+  -ms-transition: margin-left 0.25s ease-in-out;
+  transition: margin-left 0.25s ease-in-out;
+}
+
+.applet-card .applet-info.move-over, .applet-card .applet-category-info.move-over {
+  margin-left: 40px;
+}
+
+.applet-card .applet-image, .applet-card .applet-category-image {
+  width: 60px;
+  height: 60px;
+}
+
+.applet-card .applet-category-image {
+  border-radius: 30px
+}
+
+.applet-card .applet-name, .applet-card .applet-category-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: absolute;
+  width: 60%;
+  left: 70px;
+  top: 15px;
+}
+
+.applet-card .applet-description, .applet-card .applet-category-description {
+  font-size: 12px;
+  text-align: left;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  position: absolute;
+  width: 60%;
+  left: 70px;
+  top: 35px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 15px;
+}
+
+.applet-card-item {
+  height: 100%;
+}
+
+.applet-card-accessory-left {
+  float: left;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -30px;
+  font-size: 32px;
+  -webkit-transition: left 0.25s ease-in-out;
+  -moz-transition: left 0.25s ease-in-out;
+  -o-transition: left 0.25s ease-in-out;
+  -ms-transition: left 0.25s ease-in-out;
+  transition: left 0.25s ease-in-out;
+}
+
+.applet-card-accessory-left.slide-in {
+  left: 15px;
+}
+
+.applet-card-accessory-right {
+  float: right;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  right: -10px;
+  font-size: 32px;
+}
+
+.applet-card-drag-handle {
+  font-size: 32px;
+  float: right;
+  position: relative;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  visibility: hidden;
+}
+
+.applet-card-accessory-right.fade-in, .applet-card-drag-handle.fade-in {
+  -moz-animation-name: fade-in-visible;
+  -webkit-animation-name: fade-in-visible;
+  -ms-animation-name: fade-in-visible;
+  animation-name: fade-in-visible;
+  -moz-animation-duration: 0.25s;
+  -webkit-animation-duration: 0.25s;
+  -ms-animation-duration: 0.25s;
+  animation-duration: 0.25s;
+  -moz-animation-timing-function: ease-in-out;
+  -webkit-animation-timing-function: ease-in-out;
+  -ms-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+  -moz-animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+  -ms-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;  
+}
+
+.applet-card-accessory-right.fade-out, .applet-card-drag-handle.fade-out {
+  -moz-animation-name: fade-out-hide;
+  -webkit-animation-name: fade-out-hide;
+  -ms-animation-name: fade-out-hide;
+  animation-name: fade-out-hide;
+  -moz-animation-duration: 0.25s;
+  -webkit-animation-duration: 0.25s;
+  -ms-animation-duration: 0.25s;
+  animation-duration: 0.25s;
+  -moz-animation-timing-function: ease-in-out;
+  -webkit-animation-timing-function: ease-in-out;
+  -ms-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+  -moz-animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+  -ms-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;  
+}
+
+@-moz-keyframes fade-in-visible { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
+@-webkit-keyframes fade-in-visible { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
+@-ms-keyframes fade-in-visible { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
+@-keyframes fade-in-visible { 0% { opacity: 0; visibility: hidden; } 100% { opacity: 1; visibility: visible; }}
+
+@-moz-keyframes fade-out-hide { 0% { opacity: 1; visibility: visible; }  100% { opacity: 0; visibility: hidden; }} 
+@-webkit-keyframes fade-out-hide { 0% { opacity: 1; visibility: visible; }  100% { opacity: 0; visibility: hidden; }} 
+@-ms-keyframes fade-out-hide { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; }} 
+@-keyframes fade-out-hide { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden;  }} 
 
 .wallet-bar {
   position: relative;
