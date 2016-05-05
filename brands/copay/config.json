@@ -39,7 +39,7 @@
       "auth": {}
     },
     "applets": {
-      "enabled": true
+      "enabled": false
     },
     "theme": {
       "name": "Copay",
