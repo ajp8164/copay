@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('appletCategoryController', function($scope, $rootScope, $log, $ionicSlideBoxDelegate, $ionicModal, $timeout, lodash, appletService, appletCatalogService, FocusedWallet, Constants, isMobile, isCordova, go) {
+angular.module('copayApp.controllers').controller('appletCategoryController', function($scope, $rootScope, $log, $ionicSlideBoxDelegate, $ionicSideMenuDelegate, $ionicModal, $timeout, lodash, appletService, appletCatalogService, FocusedWallet, Constants, isMobile, isCordova, go) {
 
   var self = this;
   this.categories = [];
@@ -156,6 +156,22 @@ angular.module('copayApp.controllers').controller('appletCategoryController', fu
       });
     }
   }
+
+  this.openApplet = function(applet) {
+    if (this.editing) return;
+
+    // The caller may pass a string indicating an appletId.
+    if (typeof applet === 'string' || applet instanceof String) {
+      applet = appletService.getAppletWithStateById(applet);
+      // Do nothing if the applet was not found.
+      if (lodash.isUndefined(applet)) return;
+    }
+
+    applet.open();
+    if (!appletService.isAppletPlugin(applet)) {
+      $ionicSideMenuDelegate.$getByHandle('app-side-menus').toggleRight();
+    }
+  };
 
   this.goAppletCategoryList = function(category) {
     appletService.setActiveCategory(category);

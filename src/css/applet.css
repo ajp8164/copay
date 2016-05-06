@@ -135,7 +135,7 @@
 }
 
 /*
- * Redefine needed icon-* to defect Copay definition which overrides Ionic.
+ * Redefine needed icon-* to defeat Copay definition which overrides Ionic.
  */
 .button.applet-icon-left:before {
   float: left;

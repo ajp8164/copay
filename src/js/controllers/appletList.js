@@ -158,6 +158,14 @@ angular.module('copayApp.controllers').controller('appletListController', functi
 
   this.openApplet = function(applet) {
     if (this.editing) return;
+
+    // The caller may pass a string indicating an appletId.
+    if (typeof applet === 'string' || applet instanceof String) {
+      applet = appletService.getAppletWithStateById(applet);
+      // Do nothing if the applet was not found.
+      if (lodash.isUndefined(applet)) return;
+    }
+
     applet.open();
     if (!appletService.isAppletPlugin(applet)) {
       $ionicSideMenuDelegate.$getByHandle('app-side-menus').toggleRight();

@@ -166,7 +166,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
     // Global preferences
     builtinApplets.push(new Applet(createBuiltinAppletSchema({
-      id: 'prefs-global',
+      id: 'settings',
       name: 'Settings',
       description: 'Global preferences.',
       category: {
@@ -348,6 +348,13 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     return applet.header.appletId.includes(APPLET_IDENTIFIER_WALLET_PREFIX);
   };
 
+  root.getAppletWithStateById = function(appletId) {
+    var applets = root.getAppletsWithState({
+      appletId: appletId
+    });
+    return applets[0];
+  };
+
   // Return applets after applying persistent state. Result may be filtered.
   // filter: {
   //   category: category object,
@@ -368,6 +375,19 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 
     // Get all of the applets.
     var applets = getApplets();
+
+    // Apply pre-filters.
+    if (!lodash.isEmpty(filter)) {
+
+      // Applet id filter - choose only the applet with the specified id.
+      var appletIdFilter = filter.appletId || {};
+
+      if (!lodash.isEmpty(appletIdFilter)) {
+        applets = lodash.filter(applets, function(applet) {
+          return appletIdFilter == applet.header.appletId;
+        });
+      }
+    }
 
     // Find and add the applet layout and preferences to each applet object.
     decoratedApplets = lodash.map(applets, function(applet) {
@@ -421,7 +441,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       return applet;
     });
 
-    // Apply filters.
+    // Apply post-filters.
     if (!lodash.isEmpty(filter)) {
 
       // Category filter - if there is a active category then remove applets not in the category.
