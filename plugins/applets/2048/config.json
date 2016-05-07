@@ -1,0 +1,10 @@
+{
+  "type": "applet",
+  "pluginId": "com.bitpay.copay.plugin.applet.2048",
+  "name": "2048 Game",
+  "description": "2048 Game",
+  "author": "BitPay, Inc.",
+  "date": "5/5/2016",
+  "version": "1.0.0",
+  "mainViewUri": "index.html"
+}
