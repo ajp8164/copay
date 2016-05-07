@@ -463,8 +463,10 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
       }
     }
 
-    // Cache the result.
-    cacheAppletsWithState(applets);
+    // Cache the result only when there is no filter.
+    if (lodash.isEmpty(filter)) {
+      cacheAppletsWithState(applets);
+    }
 
     return decoratedApplets;
   };
