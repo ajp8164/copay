@@ -84,7 +84,18 @@
     "progressBackground": "#2C3E50",
     "progressTextColor": "#FFFFFF",
     "contentBoxShadow": "rgb(41,41,41) -1px 0px 6px 0px !important",
-    "iconBackground": "#2C3E50"
+    "iconBackground": "#2C3E50",
+    "appletCardListNavBarTitleColor": "#FFFFFF",
+    "appletCardListNavBarButtonTextColor": "#FFFFFF",
+    "appletCardListNavBarButtonIconColor": "#FFFFFF",
+    "appletCardListNavBarBackground": "rgba(255,255,255,0.35)",
+    "appletCardListNavBarBorderBottom": "none",
+    "appletCardBackground": "rgba(255,255,255,0.35)",
+    "appletCardPaddingTop": "10px",
+    "appletCardWidth": "95%",
+    "appletCardPrimaryTextColor": "#FFFFFF",
+    "appletCardSecondaryTextColor": "#033551",
+    "appletCardAccessoryColor": "#033551"
   },
   "skins": []
 }

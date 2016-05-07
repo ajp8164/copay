@@ -223,23 +223,34 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
         // 
         root.appletModal = $ionicModal.fromTemplate('\
           <ion-modal-view class="applet-modal">\
-            <ion-footer-bar class="footer-bar-applet" ng-style="{\'background\': applet.view.footerBarBackground, \'border-top\': applet.view.footerBarTopBorder}">\
+            <ion-footer-bar class="footer-bar-applet" ng-style="{\'background\':applet.view.footerBarBackground, \'border-top\':applet.view.footerBarBorderTop}">\
               <button class="footer-bar-item item-center button button-clear button-icon ion-ios-circle-filled button-applet-close"\
-              ng-style="{\'background\': applet.view.footerBarBackground, \'color\': applet.view.footerBarButtonColor}" ng-click="applet.close(\'' + session.id + '\')"></button>\
+              ng-style="{\'color\':applet.view.footerBarButtonColor}" ng-click="applet.close(\'' + session.id + '\')"></button>\
               <button class="footer-bar-item item-right button button-clear button-icon ion-more"\
-              ng-style="{\'background\': applet.view.footerBarBackground, \'color\': applet.view.footerBarButtonColor}" ng-click="appletInfoPopover.show($event)"></button>\
+              ng-style="{\'color\':applet.view.footerBarButtonColor}" ng-click="appletInfoPopover.show($event)"></button>\
             </ion-footer-bar>\
             <script id="templates/appletInfoPopover.html" type="text/ng-template">\
-              <ion-popover-view class="popover-applet-info">\
-                <ion-content>\
+              <ion-popover-view class="popover-applet" ng-style="{\'background\':applet.view.popupInfoBackground, \'color\':applet.view.popupInfoColor}">\
+                <ion-content scroll="false" class="m0i">\
                   <div class="card">\
-                    <div class="item item-divider">\
-                      <span class="section">' + (wallet.getInfo().client.alias || wallet.getInfo().client.credentials.walletName || "---") + '</span>\
+                    <div class="item item-divider card-section" ng-style="{\'background\':applet.view.popupInfoCardHeaderBackground, \'color\':applet.view.popupInfoCardHeaderColor}">\
+                      <span class="left">' + (wallet.getInfo().client.alias || wallet.getInfo().client.credentials.walletName || "---") + '</span>\
+                      <span class="" ng-if="' + (wallet.getInfo().client.credentials.n >= 1) + '">&nbsp;(' + wallet.getInfo().client.credentials.m + '/' + wallet.getInfo().client.credentials.n + ')' + '</span>\
+                      <span class="right">' + (wallet.getBalanceAsString('totalAmount', false) || '--- ' + wallet.getInfo().config.settings.unitName) + '\
+                        <img ng-show="' + (wallet.getInfo().client.credentials.network == 'testnet') + '" src="img/icon-testnet-white.svg">\
+                      </span>\
                     </div>\
-                    <div class="item item-text-wrap">\
-                      <span class="text">' + (wallet.getBalanceAsString('totalAmount', false) || '--- ' + wallet.getInfo().config.settings.unitName) + '</span><br>\
-                      <span class="text">' + (wallet.getBalanceAsString('totalAmount', true) || '--- ' +  wallet.getInfo().config.settings.alternativeIsoCode) + '</span>\
+                    <div class="item item-text-wrap card-content" ng-style="{\'background\':applet.view.popupInfoCardBodyBackground, \'border-top\':applet.view.popupInfoCardBodyBorderTop, \'color\':applet.view.popupInfoCardBodyColor}">\
+                      <span class="alt-balance">' + (wallet.getBalanceAsString('totalAmount', true) || '--- ' +  wallet.getInfo().config.settings.alternativeIsoCode) + '</span>\
+                      <br>\
+                      <span class="notice">This wallet is the currently selected wallet and will be used for all transactions initiated while using this applet.</span>\
                     </div>\
+                  </div>\
+                  <div class="info">\
+                    <span class="name">' + applet.header.name + '</span><br>\
+                    <span class="author">By: ' + applet.skin.header.author + '</span><br>\
+                    <span class="version">Version: ' + applet.skin.header.version + ', ' + applet.skin.header.date + '</span><br>\
+                    <span class="description">' + applet.header.description + '</span><br>\
                   </div>\
                 </ion-content>\
               </ion-popover-view>\
