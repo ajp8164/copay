@@ -122,7 +122,7 @@
             </div>
 
             <div>
-              <label><span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Wallet Seed</span>
+              <label><span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Wallet Recovery Phrase</span>
               <select class="m10t" ng-model="create.seedSource"
                 ng-options="seed as seed.label for seed in create.seedOptions"
                 ng-change="create.setSeedSource()"
@@ -142,13 +142,13 @@
               <span class="size-14" ng-style="{'color':theme.view.viewAlertTextColor}">
                 <i class="fi-alert"></i>
                 <span translate>
-                <i class="fi-alert"></i>&nbsp;WARNING: Passphrase cannot be recovered. <b>Be sure to write it down</b>. The wallet can not be restored without the passphrase.
+                <i class="fi-alert"></i>&nbsp;WARNING: The password cannot be recovered. <b>Be sure to write it down</b>. The wallet can not be restored without the passphrase.
                 </span>
               </span>
             </div>
 
             <div ng-show="create.seedSourceId=='new' ">
-              <label for="createPassphrase"  ><span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Add a Seed Passphrase</span>  <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>Add an optional passphrase to secure the seed</small>
+              <label for="createPassphrase"  ><span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Add a Password</span>  <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>Add an optional password to secure the recovery phrase</small>
                 <div class="input">
                   <input type="text" class="form-control" autocapitalize="off"
                   name="createPassphrase" ng-model="create.createPassphrase"
@@ -159,8 +159,8 @@
 
             <div ng-show="create.seedSourceId=='set'">
               <label for="ext-master">
-                <span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Wallet Seed</span>
-                <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>Enter the seed words (BIP39)</small>
+                <span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Wallet Recovery Phrase</span>
+                <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>Enter the recovery phrase words (BIP39)</small>
                 <input id="ext-master"
                 autocapitalize="off"
                 type="text"
@@ -170,7 +170,7 @@
             </div>
 
             <div ng-show="create.seedSourceId=='set'">
-              <label for="passphrase"> <span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Seed Passphrase</span>  <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>The seed could require a passphrase to be imported</small>
+              <label for="passphrase"> <span ng-style="{'color':theme.view.viewPrimaryTextColor}" translate>Password</span>  <small ng-style="{'color':theme.view.viewSecondaryTextColor}" translate>The recovery phrase could require a password to be imported</small>
                 <div class="input">
                   <input type="text" autocapitalize="off" class="form-control" name="passphrase" ng-model="create.passphrase"
                     ng-style="{'color':theme.view.viewSecondaryTextColor, 'border-bottom-color':theme.view.viewListItemSeparatorColor}">

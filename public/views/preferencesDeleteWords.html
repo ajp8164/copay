@@ -1,7 +1,7 @@
 <div
   class="topbar-container"
   ng-include="'views/includes/topbar.html'"
-  ng-init="titleSection='Delete Seed Words'; goBackToState = 'preferences'">
+  ng-init="titleSection='Delete Recovery Phrase'; goBackToState = 'preferences'">
 </div>
 
 
@@ -14,7 +14,7 @@
         {{preferences.error|translate}}
       </div>
       <div class="size-18 m10b" ng-style="{'color':skin.view.viewAlertTextColor}" translate><i class="fi-alert"></i>&nbsp;WARNING</div>
-      <div class="columns m20b" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="!index.needsBackup" translate>Once you have copied your wallet seed down, it is recommended to delete it from this device.</div>
+      <div class="columns m20b" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="!index.needsBackup" translate>Once you have copied your wallet recovery phrase down, it is recommended to delete it from this device.</div>
       <div class="m20b" ng-style="{'color':skin.view.viewSecondaryTextColor}" ng-show="index.needsBackup" translate>You must backup your wallet first.</div>
     </div>
     <ul class="no-bullet m0" ng-show="!index.needsBackup">
@@ -23,14 +23,14 @@
         <div class="right text-gray" ng-style="{'color':skin.view.viewSecondaryTextColor}">
           {{index.walletName}} <span ng-show="index.alias">({{index.alias}})</span>
         </div>
-        <div ng-style="{'color':skin.view.viewPrimaryTextColor}" translate>Delete words</div>
+        <div ng-style="{'color':skin.view.viewPrimaryTextColor}" translate>Delete Recovery Phrase</div>
       </li>
     </ul>
   </div>
 
   <div class="row m20t" ng-show="preferences.deleted">
     <div class="columns size-14 text-gray text-center" ng-style="{'color':skin.view.viewSecondaryTextColor}" translate>
-      Wallet seed not available. You can still export it from Advanced &gt; Export.
+      Wallet recovery phrase not available. You can still export it from Advanced &gt; Export.
     </div>
   </div>
 
