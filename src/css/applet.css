@@ -4,6 +4,10 @@
  *
  */
 
+.applet-status-bar {
+  top: 21px !important;
+}
+
 .applet-content {
   position: absolute;
 	top: 0;
@@ -45,7 +49,7 @@
 }
 
 .button-applet-close:before {
-  font-size: 48px !important;
+  font-size: 34px !important;
   line-height: 40px !important;
 }
 
@@ -146,7 +150,7 @@
 }
 
 .footer-bar-item {
-  background: rgba(0, 0, 0, 0);
+  background: rgba(0, 0, 0, 0) !important;
 }
 
 .applet-list-item .item {

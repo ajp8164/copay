@@ -1,10 +1,10 @@
 'use strict';
 angular.module('copayApp.plugins').factory('GameManager', function (Grid, Tile) {
 
-  function GameManager(size, InputManager, Actuator) {
+  function GameManager(size, InputManager, Actuator, $scope) {
     this.size         = size; // Size of the grid
     this.inputManager = new InputManager;
-    this.actuator     = new Actuator;
+    this.actuator     = new Actuator($scope);
 
     this.startTiles   = 2;
 

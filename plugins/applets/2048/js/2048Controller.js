@@ -20,7 +20,7 @@ angular.module('copayApp.plugins').controller('2048Controller', function($rootSc
     this.readPreferences();
 
     $timeout(function() {
-      var manager = new GameManager(4, KeyboardInputManager, HTMLActuator);
+      var manager = new GameManager(4, KeyboardInputManager, HTMLActuator, $rootScope);
     }, 1000);
   };
 
@@ -31,12 +31,24 @@ angular.module('copayApp.plugins').controller('2048Controller', function($rootSc
     _prefs = _session.get(SESSION_KEY_PREFS) || {};
   };
 
+  // Update the session with applet data and write the session data to persistent storage.
+  this.savePreferences = function() {
+    _session.set(SESSION_KEY_PREFS, _prefs);
+    _session.flush();
+  };
+
   // Event 'Local/AppletLeave' is fired after the user clicks to close this applet but before this applet controller
   // is destroyed.  When this event is received we update our session data. Before the applet session is destroyed
   // the session will write it's data to persistent storage.  Here we update session data with our applet preferences
   // so they are available next time this applet runs.
   $rootScope.$on('Local/AppletLeave', function(event, applet, wallet) {
-    _session.set(SESSION_KEY_PREFS, _prefs);
+    self.savePreferences();
+  });
+
+  $rootScope.$on('2048/GameOver', function(event, score) {
+    _prefs = {
+      score: score
+    }
   });
 
 });

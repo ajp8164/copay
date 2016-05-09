@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, PluginRegistry, profileService, configService, appletCatalogService, appletSessionService, themeService, Wallet, FocusedWallet, Constants, go) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, PluginRegistry, profileService, configService, appletCatalogService, appletSessionService, themeService, Wallet, FocusedWallet, Constants, go, isMobile, isCordova) {
 
   var APPLET_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.applet.wallet.';
   var PLUGIN_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.plugin.wallet.';
@@ -11,6 +11,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   // 
   var DEFAULT_APPLET_PREFS_VISIBLE = true;
   var DEFAULT_APPLET_PREFS_CATEGORY = 'Unknown';
+
+  var useViewManagedStatusBar = isMobile.iOS() && isCordova; // TODO: use global value
 
 	var root = {};
   root.initialized = false;
@@ -224,7 +226,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
         root.appletModal = $ionicModal.fromTemplate('\
           <ion-modal-view class="applet-modal">\
             <ion-footer-bar class="footer-bar-applet" ng-style="{\'background\':applet.view.footerBarBackground, \'border-top\':applet.view.footerBarBorderTop}">\
-              <button class="footer-bar-item item-center button button-clear button-icon ion-ios-circle-filled button-applet-close"\
+              <button class="footer-bar-item item-center button button-clear button-icon ion-log-out button-applet-close"\
               ng-style="{\'color\':applet.view.footerBarButtonColor}" ng-click="applet.close(\'' + session.id + '\')"></button>\
               <button class="footer-bar-item item-right button button-clear button-icon ion-more"\
               ng-style="{\'color\':applet.view.footerBarButtonColor}" ng-click="appletInfoPopover.show($event)"></button>\
@@ -235,7 +237,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
                   <div class="card">\
                     <div class="item item-divider card-section" ng-style="{\'background\':applet.view.popupInfoCardHeaderBackground, \'color\':applet.view.popupInfoCardHeaderColor}">\
                       <span class="left">' + (wallet.getInfo().client.alias || wallet.getInfo().client.credentials.walletName || "---") + '</span>\
-                      <span class="" ng-if="' + (wallet.getInfo().client.credentials.n >= 1) + '">&nbsp;(' + wallet.getInfo().client.credentials.m + '/' + wallet.getInfo().client.credentials.n + ')' + '</span>\
+                      <span class="" ng-if="' + (wallet.getInfo().client.credentials.n > 1) + '">&nbsp;(' + wallet.getInfo().client.credentials.m + '/' + wallet.getInfo().client.credentials.n + ')' + '</span>\
                       <span class="right">' + (wallet.getBalanceAsString('totalAmount', false) || '--- ' + wallet.getInfo().config.settings.unitName) + '\
                         <img ng-show="' + (wallet.getInfo().client.credentials.network == 'testnet') + '" src="img/icon-testnet-white.svg">\
                       </span>\
@@ -256,7 +258,10 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
               </ion-popover-view>\
             </script>\
             <ion-pane ng-style="{\'background\': applet.view.background}">\
-              <div ng-include="\'' + applet.mainViewUrl() + '\'" ng-init="sessionId=\'' + session.id + '\'">\
+              <div ng-class="{\'status-bar\':' + useViewManagedStatusBar + '}"\
+                ng-style="{\'background\':applet.view.statusBarBackground, \'border-bottom\':applet.view.statusBarBorderBottom}"></div>\
+              <div ng-include="\'' + applet.mainViewUrl() + '\'" ng-init="sessionId=\'' + session.id + '\'"\
+                class="applet-content" ng-class="{\'applet-status-bar\':' + useViewManagedStatusBar + '}">\
             </ion-pane>\
           </ion-modal-view>\
           ', {

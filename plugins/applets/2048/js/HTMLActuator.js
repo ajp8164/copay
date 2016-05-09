@@ -1,7 +1,8 @@
 'use strict';
 angular.module('copayApp.plugins').factory('HTMLActuator', function () {
 
-  function HTMLActuator() {
+  function HTMLActuator($scope) {
+    this.scope = $scope;
     this.tileContainer    = document.getElementsByClassName("tile-container")[0];
     this.scoreContainer   = document.getElementsByClassName("score-container")[0];
     this.messageContainer = document.getElementsByClassName("game-message")[0];
@@ -110,6 +111,7 @@ angular.module('copayApp.plugins').factory('HTMLActuator', function () {
     var type    = won ? "game-won" : "game-over";
     var message = won ? "You win!" : "Game over!"
 
+    this.scope.$emit('2048/GameOver', this.score);
     // if (ga) ga("send", "event", "game", "end", type, this.score);
 
     this.messageContainer.classList.add(type);

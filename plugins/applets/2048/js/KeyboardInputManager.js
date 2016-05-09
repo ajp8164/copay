@@ -3,7 +3,6 @@ angular.module('copayApp.plugins').factory('KeyboardInputManager', function ($io
 
   function KeyboardInputManager() {
     this.events = {};
-
     this.listen();
   }
 
@@ -27,22 +26,26 @@ angular.module('copayApp.plugins').factory('KeyboardInputManager', function ($io
     var self = this;
 		var gameContainer = angular.element(document.querySelector('#gameContainer'));
 		var retryButton = angular.element(document.querySelector('#retryButton'));
+    var options = {
+      threshold: 10,
+      velocity: 0.3
+    };
 
 		$ionicGesture.on('swipeup', function(){
 			self.emit("move", 0);
-		}, gameContainer);
+		}, gameContainer, options);
 
 		$ionicGesture.on('swiperight', function(){
 			self.emit("move", 1);
-		}, gameContainer);
+		}, gameContainer, options);
 
 		$ionicGesture.on('swipedown', function(){
 			self.emit("move", 2);
-		}, gameContainer);
+		}, gameContainer, options);
 
 		$ionicGesture.on('swipeleft', function(){
 			self.emit("move", 3);
-		}, gameContainer);
+		}, gameContainer, options);
 
 		$ionicGesture.on('tap', function(){
 			self.emit("restart");

@@ -1,5 +1,5 @@
 
-<div class="applet-content" ng-controller="2048Controller as c" ng-init="c.init(sessionId)">
+<div ng-controller="2048Controller as c" ng-init="c.init(sessionId)">
 	<ion-content scroll="false" ng-style="{'background':applet.view.background}">
 
 		<div class="container">
@@ -48,10 +48,6 @@
 
 		    </div>
 		  </div>
-
-		  <p class="game-explanation">
-		    <strong class="important">How to play:</strong> Swipe to move the tiles. When two tiles with the same number touch, they merge into one!
-		  </p>
 		</div>
 
 	</ion-content>
