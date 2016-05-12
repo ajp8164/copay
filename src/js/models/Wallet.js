@@ -59,39 +59,51 @@ angular.module('copayApp.model').factory('Wallet', function ($rootScope, $log, $
           availableBalanceSat = this.status.balance.availableAmount;
         }
         var availableBalanceAlternative = rateService.toFiat(availableBalanceSat, config.settings.alternativeIsoCode);
-        availableBalanceAlternative = $filter('noFractionNumber')(availableBalanceAlternative, 2);
-
-        return {
-          native: availableBalanceSat,
-          alternative: parseInt(availableBalanceAlternative)
-        };
+        if (availableBalanceAlternative != null) {
+          availableBalanceAlternative = $filter('noFractionNumber')(availableBalanceAlternative, 2);          
+          return {
+            native: availableBalanceSat,
+            alternative: parseInt(availableBalanceAlternative)
+          };
+        } else {
+          return null;
+        }
         break;
+
       case ('lockedAmount'):
         var lockedBalanceSat = this.status.balance.lockedConfirmedAmount;
         if (config.spendUnconfirmed) {
           lockedBalanceSat = this.status.balance.lockedAmount;
         }
         var lockedBalanceAlternative = rateService.toFiat(lockedBalanceSat, config.settings.alternativeIsoCode);
-        lockedBalanceAlternative = $filter('noFractionNumber')(lockedBalanceAlternative, 2);
-
-        return {
-          native: lockedBalanceSat,
-          alternative: parseInt(lockedBalanceAlternative)
-        };
+        if (lockedBalanceAlternative != null) {
+          lockedBalanceAlternative = $filter('noFractionNumber')(lockedBalanceAlternative, 2);
+          return {
+            native: lockedBalanceSat,
+            alternative: parseInt(lockedBalanceAlternative)
+          };
+        } else {
+          return null;
+        }
         break;
+
       case ('totalAmount'):
         var totalBalanceSat = this.status.balance.totalConfirmedAmount;
         if (config.spendUnconfirmed) {
           totalBalanceSat = this.status.balance.totalAmount;
         }
         var totalBalanceAlternative = rateService.toFiat(totalBalanceSat, config.settings.alternativeIsoCode);
-        totalBalanceAlternative = $filter('noFractionNumber')(totalBalanceAlternative, 2);
-
-        return {
-          native: totalBalanceSat,
-          alternative: parseInt(totalBalanceAlternative)
-        };
+        if (totalBalanceAlternative != null) {
+          totalBalanceAlternative = $filter('noFractionNumber')(totalBalanceAlternative, 2);
+          return {
+            native: totalBalanceSat,
+            alternative: parseInt(totalBalanceAlternative)
+          };
+        } else {
+          return null;
+        }
         break;
+
       default:
         throw ('Error: unknown balance kind - ' + kind);
     };
