@@ -7,6 +7,12 @@ src/js/translations.js
 brands/**/keys.json
 src/js/brand.js
 src/js/plugins.js
+plugins-packaged/applets/css/
+plugins-packaged/applets/js/
+plugins-packaged/**/build/*
+plugins-packaged/**/dist/*
+plugins-packaged/**/public/css/*
+plugins-packaged/**/public/js/*
 
 # package.json
 package.json
