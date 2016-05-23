@@ -1,7 +1,8 @@
 'use strict';
-angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $injector, $css, lodash, PluginRegistry) {
+angular.module('copayApp.model').factory('Applet', function ($rootScope, $timeout, $log, $injector, lodash, PluginRegistry, ServiceDelegate) {
 
   var self = this;
+  var _serviceDelegates = {};
   var _publishedKeys = [];
 
   // Reserved applet properties should not be overwritten by the applet plugin.
@@ -15,12 +16,20 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
   Applet.FLAGS_ALL = 0;
   Applet.FLAGS_MAY_NOT_HIDE = 1;
 
+  // Default applet configuration.
+  var defaultLaunchConfig = {
+    showSplash: true
+  };
+
+  var defaultConfig = defaultLaunchConfig;
+
   // Constructor (See https://medium.com/opinionated-angularjs/angular-model-objects-with-javascript-classes-2e6a067c73bc#.970bxmciz)
   // 
   function Applet(obj, skin) {
     lodash.assign(this, obj);
     this.skin = skin;
     this.flags = Applet.FLAGS_ALL;
+    this.config = lodash.cloneDeep(defaultConfig);
     return this;
   };
 
@@ -30,7 +39,16 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
     return Applet.reservedProperties.includes(key);
   };
 
-  function publishAppletProperties(applet) {
+  function publishConfig(config) {
+    $rootScope.applet.config = $rootScope.applet.config || {};
+    lodash.merge($rootScope.applet.config, config);
+
+    $timeout(function() {
+      $rootScope.$apply();
+    });
+  };
+
+  function publishProperties(applet) {
     $rootScope.applet.header = applet.header;
     $rootScope.applet.model = applet.model;
     $rootScope.applet.view = applet.view;
@@ -41,15 +59,13 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
   // Public methods
   //
   Applet.prototype.initEnvironment = function() {
-    publishAppletProperties(this);
+    publishConfig(defaultLaunchConfig);
+    publishProperties(this);
+  };
 
-    // Bind stylesheet(s) for this applet.
-    var stylesheets = PluginRegistry.getEntry(this.header.pluginId).stylesheets;
-    stylesheets.forEach(function(stylesheet) {
-      $css.bind({ 
-        href: stylesheet
-      }, $rootScope);
-    });
+  Applet.prototype.setConfig = function(config) {
+    lodash.merge(this.config, config);
+    publishConfig(this.config);
   };
 
   Applet.prototype.mainViewUrl = function() {
@@ -66,7 +82,7 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
     return $rootScope.applet[key];
   };
 
-  Applet.prototype.getService = function(pluginId) {
+  Applet.prototype.initService = function(pluginId) {
     var serviceIndex = lodash.findIndex(this.services, function(service) {
       return service.pluginId == pluginId;
     });
@@ -80,7 +96,13 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
     // to declare dependencies on dynamically defined (plugin) service classes (factory's).
     var serviceApi = PluginRegistry.getServiceApi(pluginId);
     var service = $injector.get(serviceApi);
-    return eval(new service(this.services[serviceIndex]));
+//    return eval(new service(this.services[serviceIndex]));
+    var service = eval(new service(this.services[serviceIndex]));
+    _serviceDelegates[pluginId] = new ServiceDelegate(service);
+  };
+
+  Applet.prototype.getServiceDelegate = function(pluginId) {
+    return _serviceDelegates[pluginId];
   };
 
   Applet.prototype.open = function() {
@@ -94,13 +116,14 @@ angular.module('copayApp.model').factory('Applet', function ($rootScope, $log, $
   };
 
   Applet.prototype.finalize = function(callback) {
-    // Remove applet stylesheets.
-    $css.removeAll();
-
     // Delete published properties.
     for (var i = 0; i < _publishedKeys.length; i++) {
       delete $rootScope.applet[_publishedKeys[i]];
     }
+
+    // Delete the published applet.
+    delete $rootScope.applet;
+
     callback();
   };
 

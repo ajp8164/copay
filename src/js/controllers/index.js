@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, latestReleaseService, bwcService, pushNotificationsService, lodash, go, profileService, configService, isCordova, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, nodeWebkit, addonManager, isChromeApp, bwsError, txFormatService, uxLanguage, $state, glideraService, coinbaseService, isMobile, addressbookService, themeService, brand, txHistoryService) {
+angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, latestReleaseService, bwcService, pushNotificationsService, lodash, go, profileService, configService, isCordova, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, nodeWebkit, addonManager, isChromeApp, bwsError, txFormatService, uxLanguage, $state, glideraService, coinbaseService, isMobile, addressbookService, themeService, brand, plugins, txHistoryService) {
   var self = this;
   var errors = bwcService.getErrors();
 
@@ -15,6 +15,9 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   features += (brand.features.pushNotification.enabled ? 'Push Notification,' : '');
   $log.info('Application branding: ' + brand.shortName);
   $log.info('Enabled features: ' + features.substring(0, features.length-1));
+  $log.info('Included plugins: ' + lodash.map(plugins, function(plugin) {
+    return plugin.pluginId;
+  }));
 
   var ret = {};
   ret.isCordova = isCordova;

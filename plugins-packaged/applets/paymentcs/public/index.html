@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" type="text/css" href="../../css/copay-plugin-client.bundle.css">
+  <link rel="stylesheet" type="text/css" href="css/paymentcs.lib.css">
+  <link rel="stylesheet" type="text/css" href="css/paymentcs.css">
+  <title>PaymentCS</title>
+</head>
+<body ng-app="paymentCSApp" ng-controller="paymentCSController as c">
+
+	<!-- Status bar -->
+	<div ng-class="{'show-status-bar': env.hasStatusBar}"
+		ng-style="{'background':applet.view.statusBarBackground, 'border-bottom':applet.view.statusBarBorderBottom}"></div>
+
+	<!-- Content -->
+	<ion-content>
+		<div class="my-slider">
+			<style type="text/css" scoped>
+				.rs-control .rs-range-color {
+				  background: {{applet.view.csRangeBackground}};
+				}
+				.rs-control .rs-path-color {
+				  background: {{applet.view.csPathBackground}};
+				}
+				.rs-control .rs-handle {
+				  background: {{applet.view.csHandleBackground}};
+				  border: {{applet.view.csHandleBorder}};
+				}
+				.rs-control .rs-border.rs-inner {
+				  border: {{applet.view.csInnerBorder}};
+				}
+				.rs-control .rs-border.rs-outer {
+				  border: {{applet.view.csOuterBorder}};
+				}
+				.rs-control .rs-start .rs-seperator {
+				  border: {{applet.view.csStartBorder}};
+				}
+				.rs-control .rs-end .rs-seperator {
+				  border: {{applet.view.csEndBorder}};
+				}
+				.rs-control .rs-bg-color {
+				  background: {{applet.view.csBackground}};
+				}
+			</style>
+			<div id="round-slider" class="center-slider"></div>
+
+			<div style="position: absolute; float: right; right: 50%;" ng-click="c.setCurrency()">
+				<div style="position: relative; float: right; right: -50%; top: -150px; z-index: 3; font-size: 32px;"
+					ng-style="{'color': applet.view.csValueColor}">
+				  {{c.displayAmount}}
+				</div>
+			</div>
+			<div style="position: absolute; float: right; right: 50%;" ng-click="c.setCurrency()">
+				<div style="position: relative; float: right; right: -50%; top: -115px; z-index: 3; font-size: 16px;"
+					ng-style="{'color': applet.view.csValueUnitColor}">
+				  {{c.currency}}
+				</div>
+			</div>
+		</div>
+
+		<div class="text-center" style="position: absolute; width: 100%; bottom: 10px">
+	    <button class="button outline round tiny" style="margin-bottom: 0" ng-click="c.pay()"
+	    	ng-style="{'background': applet.view.payButtonBackground, 'border': applet.view.payButtonBorder, 'color': applet.view.payButtonColor}">
+	      <span translate>{{applet.view.payButtonText}}</span>
+	    </button>
+		</div>
+
+	</ion-content>
+
+  <script src="../../js/copay-plugin-client.bundle.js"></script>
+	<script src="js/paymentcs.lib.js"></script>
+	<script src="js/paymentcs.js"></script>
+	</body>
+</html>

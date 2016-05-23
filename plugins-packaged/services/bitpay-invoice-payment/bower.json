@@ -1,0 +1,11 @@
+{
+  "name": "bitpayInvoicePayment",
+  "keywords": [
+    "copay",
+    "wallet",
+    "multisignature",
+    "bitcore"
+  ],
+  "dependencies": {
+  }
+}

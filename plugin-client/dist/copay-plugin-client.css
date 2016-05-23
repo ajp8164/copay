@@ -1,0 +1,16 @@
+/*
+ * Main css for Copay applet plugin client.
+ */
+
+body {
+	font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.show-status-bar {
+	position:	relative;
+	height: 20px;
+}
+
+.has-status-bar-and-header {
+	top: 64px;
+}

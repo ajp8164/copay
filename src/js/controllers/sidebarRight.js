@@ -44,7 +44,7 @@ angular.module('copayApp.controllers').controller('sidebarRightController', func
   this.currentWallet = function() {
     // Map only the information we need for the ui.
     var wallet = FocusedWallet.getInstance();
-    if (!wallet.isValid()) return;
+    if (lodash.isEmpty(wallet) || !wallet.isValid()) return;
     var info = wallet.getInfo();
     return {
       name: info.client.alias || info.client.credentials.walletName || '---',

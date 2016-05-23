@@ -40,7 +40,7 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
 
     // Delete published values.
     for (var i = 0; i < session.publishedKeys.length; i++) {
-      delete $rootScope.applet[key];
+      delete $rootScope.applet[i];
     }
     setState(~STATE_VALID);
   };
@@ -73,26 +73,26 @@ angular.module('copayApp.model').factory('AppletSession', function ($rootScope, 
     });
   };
 
-  AppletSession.prototype.get = function(key) {
+  AppletSession.prototype.get = function(name) {
     checkStateIsValid(this);
-    if (!key) {
-      throw new Error('Error getting session data, no key specified');
+    if (!name) {
+      throw new Error('Error getting session data, no name specified');
     }
-    return _userData[key] || null;
+    return _userData[name] || null;
   };
 
-  AppletSession.prototype.set = function(key, value, publish) {
+  AppletSession.prototype.set = function(name, value, publish) {
     checkStateIsValid(this);
-    if (!key) {
-      throw new Error('Error setting session data, no key specified');
+    if (!name) {
+      throw new Error('Error setting session data, no name specified');
     }
-    _userData[key] = value || null;
+    _userData[name] = value || null;
 
     // Optionally publish the value to root scope.
     if (publish) {
       $rootScope.applet.session = $rootScope.applet.session || {};
-      $rootScope.applet.session[key] = value;
-      _publishedKeys.push(key);
+      $rootScope.applet.session[name] = value;
+      _publishedKeys.push(name);
     }
   };
 

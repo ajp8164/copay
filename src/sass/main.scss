@@ -2146,10 +2146,16 @@ a.missing-copayers {
   top: -32px;
 }
 
-.applet-icon-wallet-testnet {
+.applet-icon-wallet-bar .applet-icon-wallet-testnet {
   height: 9px;
   position: relative;
   bottom: 1px;
+}
+
+.applet-wallet-balance .applet-icon-wallet-testnet {
+  height: 16px;
+  position: relative;
+  bottom: 3px;
 }
 
 .applet-card-container-footer {
@@ -2191,10 +2197,14 @@ a.missing-copayers {
   color: #FFFFFF;
   font-size: 2.3rem;
   font-weight: 700;
+  border-radius: 30px;
+  box-shadow: 10px 10px 24px -7px rgba(0, 0, 0, 0.5);
 }
 
 .applet-card .wallet-icon {
   height: 60px;
+  position: relative;
+  top: 5px;
 }
 
 .applet-card .applet-icon-wallet-bar {
@@ -2225,6 +2235,8 @@ a.missing-copayers {
 .applet-card .applet-image, .applet-card .applet-category-image {
   width: 60px;
   height: 60px;
+  border-radius: 30px;
+  box-shadow: 10px 10px 24px -7px rgba(0, 0, 0, 0.5);
 }
 
 .applet-card .applet-category-image {
@@ -2232,7 +2244,7 @@ a.missing-copayers {
 }
 
 .applet-card .applet-name, .applet-card .applet-category-name {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   text-align: left;
   display: block;
@@ -2242,7 +2254,7 @@ a.missing-copayers {
   position: absolute;
   width: 60%;
   left: 70px;
-  top: 15px;
+  top: 12px;
 }
 
 .applet-card .applet-description, .applet-card .applet-category-description {
@@ -2262,8 +2274,41 @@ a.missing-copayers {
   line-height: 15px;
 }
 
+.applet-card .applet-wallet-balance {
+  float: right;
+  position: absolute;
+  top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: white;
+  right: 30px;
+}
+
+.applet-card .applet-wallet-altbalance {
+  float: right;
+  position: absolute;
+  top: 35px;
+  font-size: 12px;
+  font-weight: normal;
+  text-align: right;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: white;
+  right: 30px;
+  line-height: 15px;
+}
+
 .applet-card-item {
   height: 100%;
+  border-radius: 5px;
+  box-shadow: 10px 10px 24px -7px rgba(0, 0, 0, 0.5);
 }
 
 .applet-card-accessory-left {

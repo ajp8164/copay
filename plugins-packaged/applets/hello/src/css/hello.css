@@ -1,0 +1,88 @@
+/*
+ * Hello CSS.
+ */
+
+.applet-content {
+}
+
+/*
+ * Allow the ion-content div to fill the space vertically.
+ * See https://forum.ionicframework.com/t/fill-content-container/605/11
+ */
+.applet-content.scroll-content > .scroll {
+  height: 100%;
+}
+
+.applet-slide-box {
+	width: 100%;
+	height: 100%;
+}
+
+/*
+ * Override Ionic pager style.
+ */
+.applet-slide-box .slider-pager {
+  bottom: 12px !important;
+}
+
+.applet-slide-box .slider-pager-page {
+  font-size: 10px;
+  width: 10px !important;
+  color: #172B54 !important;
+}
+
+/*
+ * Navigation bar.
+ */
+.applet-navbar {
+	background: #172B54;
+	border-bottom: 1px solid #6D6E70;
+}
+
+.applet-navbar-title {
+  font-size: 14px !important;
+	color: #FFFFFF;
+}
+
+.applet-navbar-button {
+	color: #FFFFFF !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  text-transform: none !important;
+  background-color: transparent !important;
+}
+
+.applet-navbar-button .icon:before,
+.applet-navbar-button.icon:before {
+  font-size: 20px !important;
+}
+
+.button.applet-icon-left:before,
+.button.applet-icon-right:before {
+  display: inline-block;
+  padding-bottom: 1px;
+  vertical-align: inherit;
+  font-size: 24px;
+  line-height: 33px;
+  pointer-events: none;
+}
+
+.button.applet-icon-left:before {
+  float: left;
+  padding-right: .2em !important;
+  padding-left: 0 !important;
+}
+
+.button.applet-icon-right:before {
+  float: right;
+  padding-left: .2em !important;
+  padding-right: 0 !important;
+}
+
+/*
+ * Don't dim when the button is clicked.
+ */
+.button-clear.activated,
+.button-clear.active {
+  opacity: 1.0 !important;
+}

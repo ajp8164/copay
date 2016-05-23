@@ -14,16 +14,17 @@ module.exports = function(grunt) {
   // grunt --target=mtb
   // 
 
-  var fs = require('fs');
+  var fs = require('fs-extra');
   var p = require('path');
   var shell = require('shelljs');
   var brandId = grunt.option('target') || 'copay';
+  var brandPath = './brands/' + brandId + '/';
 
   console.log('INFO: Configuring for brand \'' + brandId + '\'');
 
   // Brand Configuration
-  var brandConfig = grunt.file.readJSON('./brands/' + brandId + '/config.json');
-  var brandKeys = grunt.file.readJSON('./brands/' + brandId + '/keys.json');
+  var brandConfig = grunt.file.readJSON(brandPath + 'config.json');
+  var brandKeys = grunt.file.readJSON(brandPath + 'keys.json');
 
   // Project Configuration
   grunt.initConfig({
@@ -98,9 +99,9 @@ module.exports = function(grunt) {
           'bower_components/angular-gettext/dist/angular-gettext.js',
           'bower_components/angular-touch/angular-touch.js',
           'bower_components/angular-css/angular-css.min.js',
-          'bower_components/angular-sanitize/angular-sanitize.js',
           'bower_components/ng-csv/build/ng-csv.js',
-          'angular-bitcore-wallet-client/angular-bitcore-wallet-client.js'
+          'angular-bitcore-wallet-client/angular-bitcore-wallet-client.js',
+          'angular-path-to-regexp/angular-path-to-regexp.js',
         ],
         dest: 'public/lib/angular.lib.js'
       },
@@ -112,7 +113,7 @@ module.exports = function(grunt) {
           'src/js/filters/*.js',
           'src/js/models/*.js',
           'src/js/services/*.js',
-          'src/js/pluginApi/*.js',
+          'src/js/api/**/*.js',
           'src/js/controllers/**/*.js',
           'src/js/translations.js',
           'src/js/brand.js',
@@ -127,6 +128,20 @@ module.exports = function(grunt) {
       css: {
         src: ['src/css/*.css', 'src/sass/*.css'],
         dest: 'public/css/copay.css'
+      },
+      plugin_client_js: {
+        src: [
+          'plugin-client/src/js/app.js',
+          'plugin-client/src/js/impl/*.js',
+          'plugin-client/src/js/api/*.js'
+        ],
+        dest: 'plugin-client/dist/copay-plugin-client.js'
+      },
+      plugin_client_css: {
+        src: [
+          'plugin-client/src/css/**/*.css'
+        ],
+        dest: 'plugin-client/dist/copay-plugin-client.css'
       },
       foundation: {
         src: [
@@ -163,6 +178,21 @@ module.exports = function(grunt) {
           'bower_components/angular-gridster/dist/angular-gridster.min.css'
         ],
         dest: 'public/css/ui-components.css',
+      },
+      copay_plugin_client_bundle_js: {
+        src: [
+          'bower_components/ionic/release/js/ionic.bundle.min.js',
+          'bower_components/ng-lodash/build/ng-lodash.js',
+          'plugin-client/dist/copay-plugin-client.js'
+        ],
+        dest: 'public/js/copay-plugin-client.bundle.js',
+      },
+      copay_plugin_client_bundle_css: {
+        src: [
+          'bower_components/ionic/release/css/ionic.css',
+          'plugin-client/dist/copay-plugin-client.css'
+        ],
+        dest: 'public/css/copay-plugin-client.bundle.css',
       },
     },
     uglify: {
@@ -242,7 +272,7 @@ module.exports = function(grunt) {
       themes: {
         files: [{
           expand: true,
-          cwd: 'brands/' + brandId + '/themes/',
+          cwd: brandPath + 'themes/',
           src: ['**'],
           dest: 'public/themes/'
         }]
@@ -251,7 +281,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: 'plugins/applets/',
-          src: ['**/public/css/**', '**/public/img/**', '**/public/views/**'],
+          src: ['**/public/index.html', '**/public/css/**', '**/public/img/**', '**/public/js/**', '**/public/views/**'],
           dest: 'public/applets/',
           rename: function(dest, src) {
             return dest + src.replace(/public\//g, '');
@@ -302,7 +332,8 @@ module.exports = function(grunt) {
     browserify: {
       dist: {
         files: {
-          'angular-bitcore-wallet-client/angular-bitcore-wallet-client.js': ['angular-bitcore-wallet-client/index.js']
+          'angular-bitcore-wallet-client/angular-bitcore-wallet-client.js': ['angular-bitcore-wallet-client/index.js'],
+          'angular-path-to-regexp/angular-path-to-regexp.js': ['angular-path-to-regexp/index.js']
         },
       }
     },
@@ -387,26 +418,78 @@ module.exports = function(grunt) {
 
   cleanAppletPath = function(path) {
     return (path.replace(/plugins\//g, '')).replace(/public\//g, '');
-  }
+  };
 
   cleanJSONQuotesOnKeys = function(json) {
     return json.replace(/"(\w+)"\s*:/g, '$1:');
-  }
+  };
 
+  cleanBrandSkinsPath = function() {
+    // Identify skin source and destination paths for publishing the applet skin.
+    var skinDestPath = brandPath + 'themes/' + brandConfig.features.theme.name + '/skins/';
+
+    // Clean the brand theme skins directory of applet plugin skins.
+    var skinFolders = getAllFoldersFromFolder(skinDestPath);
+    for (var i=0; i < skinFolders.length; i++) {
+      var skin = grunt.file.readJSON(skinDestPath + skinFolders[i] + '/skin.json');
+      if (skin.header.kind === 'applet') {
+        try {
+          fs.removeSync(skinDestPath + skinFolders[i]);
+        } catch (ex) {
+          throw new Error('Failed to remove applet plugin skin \'' + skinDestPath + skinFolders[i] + '\': ' + ex.message);
+        };
+      }
+    }
+  };
+
+  publishSkins = function(pluginConfig) {
+    // Identify skin source and destination paths for publishing the applet skin.
+    var skinSrcPath = './plugins/' + pluginConfig.path + 'skins/';
+    var skinDestPath = brandPath + 'themes/' + brandConfig.features.theme.name + '/skins/';
+
+    // Publish applet skin(s) to the brand theme directory.
+    for (var i = 0; i < pluginConfig.skins.length; i++) {
+      var srcPath = skinSrcPath + pluginConfig.skins[i];
+      var destPath = skinDestPath + pluginConfig.skins[i]; 
+
+      try {
+        fs.copySync(srcPath, destPath);
+      } catch (ex) {
+         throw new Error('Failed to publish applet skin \'' + pluginConfig.skins[i] + '\': ' + err);
+      }
+    }
+  };
+
+  // Build src/js/brand.js.
+  // 
   buildBrandConfig = function() {
+    console.log('Skins included in this theme \'' + brandConfig.features.theme.name + '\'');
+
     brandConfig.commitHash = getCommitHash();
 
     // Build the default theme definition using the directory structure to find available skins.
     brandConfig.features.theme.definition = {};
     brandConfig.features.theme.definition.theme = brandConfig.features.theme.name;
-    brandConfig.features.theme.definition.skins = getAllFoldersFromFolder('./brands/' + brandId + '/themes/' + brandConfig.features.theme.definition.theme + '/skins/');
+    brandConfig.features.theme.definition.skins = [];
     delete brandConfig.features.theme.name;
 
+    var skinsDir = brandPath + 'themes/' + brandConfig.features.theme.definition.theme + '/skins/';
+    var skinFolders = getAllFoldersFromFolder(skinsDir);
+
+    for (var i=0; i < skinFolders.length; i++) {
+      var skinFile = skinFolders[i] + '/skin.json';
+      var skin = grunt.file.readJSON(skinsDir + skinFile);
+      brandConfig.features.theme.definition.skins.push(skin.header.name);
+      console.log('> [' + skin.header.kind + '] \'' + skin.header.name + '\'');
+    }
+
     // Transfer api keys to the brand configuration.
+    // Glidera.
     brandConfig.features.glidera.auth.clientId = brandKeys.glidera.clientId;
     brandConfig.features.glidera.auth.clientSecret = brandKeys.glidera.clientSecret;
     brandConfig.features.glidera.auth.cordovaClientId = brandKeys.glidera.cordovaClientId;
     brandConfig.features.glidera.auth.cordovaClientSecret = brandKeys.glidera.cordovaClientSecret;
+    // Coinbase.
     brandConfig.features.coinbase.auth.clientId = brandKeys.coinbase.clientId;
     brandConfig.features.coinbase.auth.clientSecret = brandKeys.coinbase.clientSecret;
 
@@ -420,7 +503,14 @@ module.exports = function(grunt) {
     fs.writeFileSync("./src/js/brand.js", content);
   };
 
+  // Build src/js/plugins.js.
+  // Publish plugin skins to the brand theme directory.
+  // 
   buildPluginRegistry = function() {
+    console.log('Plugins included in this build:');
+
+    cleanBrandSkinsPath();
+
     var content = '';
     content += '\'use strict\';\n\n';
     content += '// Do not edit, this file is auto-generated by grunt.\n\n';
@@ -435,35 +525,58 @@ module.exports = function(grunt) {
       }
 
       var filePath = filelist[i].replace(/config.json/g, '');
-      var data = grunt.file.readJSON(filelist[i]);
+      var pluginConfig = grunt.file.readJSON(filelist[i]);
 
-      if (data.type == 'applet') {
-        // Add the applet root directory.
-        data.path = cleanAppletPath(filePath);
+      // Path to the applet top level directory.
+      pluginConfig.path = cleanAppletPath(filePath);
 
-        // Complete the main view URI.
-        if (data.mainViewUri.indexOf('/') >= 0) {
-          throw new Error('Applet in \'' + filelist[i] + '\' should not include a path in \'mainViewUri\'. Use only the view name; e.g., \'index.html\'.');
-        }
-        data.mainViewUri = data.path + 'views/' + data.mainViewUri;
+      // APPLET
+      // 
+      switch (pluginConfig.type) {
+        case 'applet':
 
-        // Add stylesheets.
-        data.stylesheets = [];
-        var stylesheets = getAllFilesByExpr('^.*\.(css|CSS)$', filePath + 'public/css/');
-        stylesheets.forEach(function (path) {
-          data.stylesheets.push(cleanAppletPath(path));
-        });
+          // Complete the main view URI.
+          if (pluginConfig.mainViewUri.indexOf('/') >= 0) {
+            throw new Error('Applet in \'' + filelist[i] + '\' should not include a path in \'mainViewUri\'. Use only the view name; e.g., \'index.html\'.');
+          }
+          pluginConfig.mainViewUri = pluginConfig.path + pluginConfig.mainViewUri;
+
+          publishSkins(pluginConfig);
+
+          var skinsMessage;
+          if (pluginConfig.skins === undefined) {
+            skinsMessage = 'WARNING - no skins provided, check plugin config.json';
+          } else if (pluginConfig.skins.length == 0) {
+            skinsMessage = 'No skins specified for this plugin';
+          } else {
+            skinsMessage = 'skins=' + pluginConfig.skins;
+          }
+
+          console.log('> [' + pluginConfig.type + '] \'' + pluginConfig.name + '\', id=' + pluginConfig.pluginId + ', ' + skinsMessage);
+          console.log('  dependencies=' + Object.keys(pluginConfig.dependencies));
+          break;
+
+        case 'applet-skin':
+          publishSkins(pluginConfig);
+          console.log('> [' + pluginConfig.type + '] \'' + pluginConfig.name + '\', id=' + pluginConfig.pluginId);
+          console.log('  dependencies=' + Object.keys(pluginConfig.dependencies));
+          break;
+
+        case 'service':
+          // Nothing to do.
+          console.log('> [' + pluginConfig.type + '] \'' + pluginConfig.name + '\', id=' + pluginConfig.pluginId);
+          console.log('  dependencies=' + Object.keys(pluginConfig.dependencies));
+          break;
       }
 
       // Detect and fail if duplicate plugin id exists.
-      if (pluginIds.indexOf(data.pluginId) < 0) {
-        pluginIds.push(data.pluginId);
+      if (pluginIds.indexOf(pluginConfig.pluginId) < 0) {
+        pluginIds.push(pluginConfig.pluginId);
       } else {
-        throw new Error('Duplicate plugin id detected: \'' + data.pluginId + '\'');
+        throw new Error('Duplicate plugin id detected: \'' + pluginConfig.pluginId + '\'');
       }
 
-      console.log('> [' + data.type + '] \'' + data.name + '\', id=' + data.pluginId);
-      content += cleanJSONQuotesOnKeys(JSON.stringify(data, null, 2));
+      content += cleanJSONQuotesOnKeys(JSON.stringify(pluginConfig, null, 2));
     }
 
     content += ']\n';
@@ -496,8 +609,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'nggettext_compile',
-    'buildBrand',
     'buildPluginRegistry',
+    'buildBrand',
     'browserify',
     'sass',
     'concat',

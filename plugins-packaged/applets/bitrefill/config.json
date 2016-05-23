@@ -1,0 +1,11 @@
+{
+  "type": "applet",
+  "pluginId": "com.bitpay.copay.plugin.applet.bitrefill",
+  "name": "Bitrefill",
+  "description": "Top up prepaid mobile phones with bitcoin.",
+  "author": "Bitrefill",
+  "date": "1/20/2016",
+  "version": "1.0.0",
+  "mainViewUri": "index.html",
+  "dependencies": {}
+}

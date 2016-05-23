@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $css, $ionicModal, $ionicPopover, lodash, Applet, Skin, PluginRegistry, profileService, configService, appletCatalogService, appletSessionService, themeService, Wallet, FocusedWallet, Constants, go, isMobile, isCordova) {
+angular.module('copayApp.services').factory('appletService', function($rootScope, $log, $timeout, $ionicModal, $ionicPopover, lodash, Applet, Skin, PluginRegistry, profileService, configService, appletCatalogService, apiService, appletSessionService, themeService, Wallet, FocusedWallet, Constants, go, isMobile, isCordova) {
 
   var APPLET_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.applet.wallet.';
   var PLUGIN_IDENTIFIER_WALLET_PREFIX = 'com.bitpay.copay.plugin.wallet.';
@@ -20,7 +20,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   root.appletsWithStateCacheValid = false;
   root.activeCategory = {};
 
-  function publishAppletFunctions() {
+  function publishAppletServices() {
     $rootScope.applet = $rootScope.applet || {};
 		$rootScope.applet.close = function(sessionId) { return root.doCloseApplet(sessionId); };
 		$rootScope.applet.open = function(applet) { return root.doOpenApplet(applet); };
@@ -64,7 +64,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 	      "n": credentials.n,
 	      "network": credentials.network,
 	      "walletId": credentials.walletId,
-        "balance": (wallet.status ? wallet.getBalanceAsString('totalAmount') + ' (' + wallet.getBalanceAsString('totalAmount', true) + ')': '---')
+        "balance": (wallet.status ? wallet.getBalanceAsString('totalAmount') : '---'),
+        "altBalance": (wallet.status ? wallet.getBalanceAsString('totalAmount', true) : '---')
 	    },
 	    "view": {
         "avatarColor": walletSkin.view.avatarColor,
@@ -101,6 +102,7 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   };
 
   function getWalletsAsApplets() {
+    if (!profileService.profile) return [];
 		var credentials = lodash.filter(profileService.profile.credentials, 'walletName');
     var walletApplets = lodash.map(credentials, function(c) {
       // Get the wallet status for balance etc. information.
@@ -211,8 +213,8 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
   };
 
   function openApplet(applet) {
-  	// Create a session id for the applet.
-  	appletSessionService.createSession(applet, function(session) {
+    // Create a session id for the applet.
+    appletSessionService.createSession(applet, function(session) {
 
       var wallet = FocusedWallet.getInstance();
       $rootScope.$emit('Local/AppletEnter', applet, wallet.getWalletId());
@@ -258,10 +260,9 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
               </ion-popover-view>\
             </script>\
             <ion-pane ng-style="{\'background\': applet.view.background}">\
-              <div ng-class="{\'status-bar\':' + useViewManagedStatusBar + '}"\
-                ng-style="{\'background\':applet.view.statusBarBackground, \'border-bottom\':applet.view.statusBarBorderBottom}"></div>\
-              <div ng-include="\'' + applet.mainViewUrl() + '\'" ng-init="sessionId=\'' + session.id + '\'"\
-                class="applet-content" ng-class="{\'applet-status-bar\':' + useViewManagedStatusBar + '}">\
+              <div class="applet-splash fade-splash" ng-style="{\'background\':applet.view.splashBackground}"\
+                ng-hide="!applet.config.showSplash" ng-if="applet.view.splashBackground.length > 0"></div>\
+              <iframe class="applet-frame" src="' + applet.mainViewUrl() + '?sessionId=' + session.id + '"></iframe>\
             </ion-pane>\
           </ion-modal-view>\
           ', {
@@ -337,13 +338,15 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
 	root.init = function(callback) {
 		if (appletCatalogService.supportsWriting()) {
       appletCatalogService.init(function() {
+        apiService.init(function() {
 
-				publishAppletFunctions();
-        root.getAppletsWithState();
-        root.initialized = true;
-        $log.debug('Applet service initialized');
-				callback();
+          publishAppletServices();
+          root.getAppletsWithState();
+          root.initialized = true;
+          $log.debug('Applet service initialized');
+          callback();
 
+        });
       });
     } else {
       var err = 'Fatal: Applet service initilization - device does not provide storage for applets';
@@ -762,7 +765,11 @@ angular.module('copayApp.services').factory('appletService', function($rootScope
     $rootScope.$emit('Local/AppletLeave', applet, wallet.getWalletId());
     hideApplet(session);
     applet.finalize(function() {
+      delete $rootScope.appletInfoPopover;
       appletSessionService.destroySession(session.id);
+
+      // Reset applet services.
+      publishAppletServices();
     });
   };
 

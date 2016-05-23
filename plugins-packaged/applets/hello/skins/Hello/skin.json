@@ -1,0 +1,62 @@
+{
+  "header": {
+    "version": "1.0",
+    "kind": "applet",
+    "name": "Hello",
+    "description": "A sample applet",
+    "author": "BitPay, Inc.",
+    "date": "4/14/2016",
+    "url": {
+      "marketing": "https://copay.io/",
+      "support": "https://github.com/bitpay/copay/issues/new",
+      "privacy": "https://copay.io/disclaimer"
+    },
+    "category": {
+      "primary": "Entertainment",
+      "secondary": "Lifestyle"
+    },
+    "keywords": "hello",
+    "rating": "4+",
+    "galleryImage": "<resource-1>",
+    "previewImage": "<resource-2>",
+    "product": {
+      "id": "0",
+      "price": "$0.00"
+    },
+    "permissions": {
+      "delete": false
+    },
+    "social": {
+      "likes": 0,
+      "iLikeThis": false
+    }
+  },
+  "resources": [
+    "<skin-path>/icon.png",
+    "<skin-path>/gallery.png",
+    "<skin-path>/preview.png",
+    "<skin-path>/splash.png",
+    "<skin-path>/applet-background.png"
+  ],
+  "applet": {
+    "header": {
+      "appletId": "com.bitpay.copay.applet.hello",
+      "pluginId": "com.bitpay.copay.plugin.applet.hello",
+      "name": "Hello",
+      "description": "A sample applet"
+    },
+    "model": {
+    },
+    "view": {
+      "launchIconBackground": "url(<resource-0>) top center / cover no-repeat",
+      "splashBackground": "url(<resource-3>) top center / cover no-repeat, #000000",
+      "statusBarBackground": "#172B54",
+      "statusBarBorderBottom": "none",
+      "background": "url(<resource-4>) top center / contain no-repeat, #FFFFFF",
+      "footerBarBackground": "#172B54",
+      "footerBarBorderTop": "1px solid #6D6E70",
+      "footerBarButtonColor": "#FFFFFF"
+    },
+    "services" : []
+  }
+}

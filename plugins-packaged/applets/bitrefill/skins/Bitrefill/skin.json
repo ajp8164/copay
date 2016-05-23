@@ -1,0 +1,90 @@
+{
+  "header": {
+    "version": "1.0",
+    "name": "Bitrefill",
+    "kind": "applet",
+    "description": "Top up your prepaid phone online or quickly send money to your loved ones. We support over 140 countries for international mobile recharge.",
+    "author": "Bitrefill",
+    "date": "11/1/2015",
+    "url": {
+      "marketing": "https://www.bitrefill.com/",
+      "support": "https://www.bitrefill.com/contact/",
+      "privacy": "https://www.bitrefill.com/privacy/"
+    },
+    "category": {
+      "primary": "Finance",
+      "secondary": ""
+    },
+    "keywords": "prepaid,top up",
+    "rating": "4+",
+    "galleryImage": "<resource-1>",
+    "previewImage": "<resource-2>",
+    "product": {
+      "id": "0",
+      "price": "$0.00"
+    },
+    "permissions": {
+      "delete": false
+    },
+    "social": {
+      "likes": 0,
+      "iLikeThis": false
+    }
+  },
+  "resources": [
+    "<skin-path>/icon.png",
+    "<skin-path>/gallery.png",
+    "<skin-path>/preview.png"
+  ],
+  "applet": {
+    "header": {
+      "appletId": "com.bitpay.copay.applet.bitrefill",
+      "pluginId": "com.bitpay.copay.plugin.applet.bitrefill",
+      "name": "Bitrefill",
+      "description": "Top up your prepaid phone online or quickly send money to your loved ones. We support over 140 countries for international mobile recharge."
+    },
+    "model": {
+    },
+    "view": {
+      "launchIconBackground": "url(<resource-0>) top center / cover no-repeat",
+      "statusBarBackground": "#172B54",
+      "statusBarBorderBottom": "none",
+      "background": "#F7F7F7",
+      "footerBarBackground": "#172B54",
+      "footerBarBorderTop": "1px solid #6D6E70",
+      "footerBarButtonColor": "#FFFFFF",
+      "payButtonBackground": "none",
+      "payButtonBorder": "1px solid #A5B2BF",
+      "payButtonColor": "#8597A7",
+      "payButtonText": "Donate now"
+    },
+    "services" : [{
+      "pluginId": "com.bitpay.copay.plugin.service.bitrefill",
+      "api": {
+        "url": "https://api.bitrefill.com/v1",
+        "auth": {
+          "apiKey": "71O95FNWO433KELENKA1VL4FS",
+          "secretKey": "Tombd6r5Ye2AAsLN6BmbQf6ttTIkobSsN4zpdifx6Vg"
+        }
+      }
+    },
+    {
+      "pluginId": "com.bitpay.copay.plugin.service.invoice-payment",
+      "memo": "Bitrefill.",
+      "api": {
+        "url": "https://test.bitpay.com",
+        "auth": {
+          "token": "F3mNhfiGT3TCBcBFp6egxzPVjxtDPNMjKA3ru9TdFqaX"
+        },
+        "transactionSpeed": "high",
+        "notificationEmail": "",
+        "notificationURL": ""
+      },
+      "required": {
+        "buyer": {
+          "fields": "name,email,phone,address1,locality,region,postalCode"
+        }
+      }
+    }]
+  }
+}

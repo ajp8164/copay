@@ -18,17 +18,17 @@
             <div class="wallet-underlay"
               ng-style="{'color':applet.view.avatarColor, 'background':applet.view.avatarBackground, 'border':applet.view.avatarBorder}">
               <div class="wallet-icon" ng-style="{'background':applet.view.launchIconBackground}"></div>
-              <div class="applet-icon-wallet-bar">
-                <span class="applet-icon-wallet-info">
-                  {{applet.model.isoCode}}
-                  {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
-                  <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
-                    class="applet-icon-wallet-testnet">
-                </span>
-              </div>
             </div>
             <span class="applet-name" ng-style="{'color':theme.view.appletCardPrimaryTextColor}">{{applet.header.name}}</span>
-            <span class="applet-description" ng-style="{'color':theme.view.appletCardSecondaryTextColor}">{{applet.model.balance}}</span>
+            <span class="applet-description" ng-style="{'color':theme.view.appletCardSecondaryTextColor}">
+              {{applet.model.isoCode}}
+              {{applet.model.n > 1 ? applet.model.m + '/' + applet.model.n : ''}}
+            </span>
+            <span class="applet-wallet-balance" ng-show="!c.isEditing()">{{applet.model.balance}}
+                <img src="img/icon-testnet-white.svg" ng-show="applet.model.network == 'testnet'"
+                  class="applet-icon-wallet-testnet">
+            </span>
+            <span class="applet-wallet-altbalance" ng-show="!c.isEditing()">{{applet.model.altBalance}}</span>
           </div>
         </div>
 

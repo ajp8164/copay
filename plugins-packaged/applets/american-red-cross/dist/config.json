@@ -1,0 +1,15 @@
+{
+  "type": "applet-skin",
+  "pluginId": "com.bitpay.copay.plugin.applet-skin.redcross",
+  "name": "American Red Cross",
+  "description": "Donate to the American Red Cross",
+  "author": "BitPay, Inc.",
+  "date": "5/19/2016",
+  "version": "1.0.0",
+  "skins": [
+    "American Red Cross"
+  ],
+  "dependencies": {
+    "com.bitpay.copay.plugin.applet.paymentcs": "1.0.0"
+  }
+}
