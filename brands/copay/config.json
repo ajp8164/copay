@@ -1,7 +1,7 @@
 {
-  "version": "1.12.13",
+  "version": "1.12.14",
   "commitHash": "<calculated>",
-  "androidVersionCode": "103",
+  "androidVersionCode": "104",
   "shortName": "Copay",
   "longName": "Copay Bitcoin Wallet",
   "description": "A multisignature wallet.",
