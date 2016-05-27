@@ -5,6 +5,7 @@ src/js/translations.js
 
 # brand and plugins
 brands/**/keys.json
+plugins/*
 src/js/brand.js
 src/js/plugins.js
 plugins-packaged/applets/css/
