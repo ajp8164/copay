@@ -7,6 +7,7 @@ angular.module('copayApp.controllers').controller('preferencesGlobalController',
     this.init = function() {
       var config = configService.getSync();
       this.unitName = config.wallet.settings.unitName;
+      this.user = config.user;
       this.currentLanguageName = uxLanguage.getCurrentLanguageName();
       this.selectedAlternative = {
         name: config.wallet.settings.alternativeName,

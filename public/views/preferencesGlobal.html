@@ -9,6 +9,16 @@
 <div class="content preferences" ng-controller="preferencesGlobalController as prefGlobal" ng-init="prefGlobal.init()">
   <h4></h4>
   <ul class="no-bullet m0 ">
+    <li ng-click="$root.go('preferencesUser')">
+      <div class="right text-gray">
+        {{prefGlobal.user.id}}
+        <i class="icon-arrow-right3 size-24"></i>
+      </div>
+      <div translate>User Profile</div>
+    </li>
+  </ul>
+  <h4></h4>
+  <ul class="no-bullet m0 ">
     <li ng-click="$root.go('preferencesLanguage')">
       <div class="right text-gray">
         {{prefGlobal.currentLanguageName|translate}}

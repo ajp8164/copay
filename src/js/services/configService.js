@@ -4,6 +4,11 @@ angular.module('copayApp.services').factory('configService', function(storageSer
   var root = {};
 
   var defaultConfig = {
+    // Application user profile
+    user: {
+      id: ''
+    },
+
     // wallet limits
     limits: {
       totalCopayers: 6,

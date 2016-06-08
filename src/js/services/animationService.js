@@ -37,6 +37,7 @@ angular.module('copayApp.services').factory('animationService', function(platfor
     preferencesCoinbase: 12,
     about: 12,
     delete: 13,
+    preferencesUser: 12,
     preferencesLanguage: 12,
     preferencesUnit: 12,
     preferencesFee: 12,

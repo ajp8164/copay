@@ -193,6 +193,15 @@ angular
           },
         }
       })
+      .state('preferencesUser', {
+        url: '/preferencesUser',
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/preferencesUser.html'
+          },
+        }
+      })
       .state('preferencesLanguage', {
         url: '/preferencesLanguage',
         needProfile: true,

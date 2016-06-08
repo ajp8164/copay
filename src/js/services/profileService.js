@@ -1,6 +1,6 @@
 'use strict';
 angular.module('copayApp.services')
-  .factory('profileService', function profileServiceFactory($rootScope, $timeout, $filter, $log, sjcl, lodash, storageService, bwcService, configService, notificationService, pushNotificationsService, gettext, gettextCatalog, bwsError, uxLanguage, bitcore, platformInfo) {
+  .factory('profileService', function profileServiceFactory($rootScope, $timeout, $filter, $log, sjcl, lodash, storageService, bwcService, configService, notificationService, pushNotificationsService, gettext, gettextCatalog, bwsError, uxLanguage, bitcore, platformInfo, posPaymentService) {
 
 
     var isChromeApp = platformInfo.isChromeApp;
@@ -184,6 +184,12 @@ angular.module('copayApp.services')
             root.setAndStoreFocus(walletFound.id, function() {});
           }, 100);
         }
+
+        if (data.additionalData.posPayment) {
+          // Handle a point-of-sale payment notification.
+          posPaymentService.handlePaymentNotice(data);
+        }
+
       });
     };
 

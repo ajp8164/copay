@@ -1,0 +1,21 @@
+<div 
+  class="topbar-container" 
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='User Profile'; goBackToState = 'preferencesGlobal'; noColor = true">
+</div>
+
+<div class="content preferences" ng-controller="preferencesUserController as prefUser">
+  <h4></h4>
+  <form name="settingsIdForm" ng-submit="prefUser.save()" class="columns">
+    <div class="box-notification m20b" ng-show="prefUser.error ">
+      <span class="text-warning">
+        {{prefUser.error|translate}}
+      </span>
+    </div>
+    <label><span translate>User ID</span></label>
+    <input type="text" id="userId" type="text" name="userId" ng-model="prefUser.user.id" placeholder="{{'!John'|translate}}">
+    <input type="submit" class="button expand black round" value="{{'Save'|translate}}"
+    ng-style="{'background-color':index.backgroundColor}">
+  </form>
+</div>
+<div class="extra-margin-bottom"></div>
