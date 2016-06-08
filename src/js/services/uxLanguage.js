@@ -28,6 +28,10 @@ angular.module('copayApp.services')
       isoCode: 'ja',
       useIdeograms: true,
     }, {
+      name: '中国（简体）',
+      isoCode: 'zh',
+      useIdeograms: true,
+    }, {
       name: 'Polski',
       isoCode: 'pl',
     }, {
@@ -68,8 +72,9 @@ angular.module('copayApp.services')
     root._set = function(lang) {
       $log.debug('Setting default language: ' + lang);
       gettextCatalog.setCurrentLanguage(lang);
+      root.currentLanguage = lang; 
+      if (lang == 'zh') lang = lang + '-CN'; // Fix for Chinese Simplified
       amMoment.changeLocale(lang);
-      root.currentLanguage = lang;
     };
 
     root.getCurrentLanguage = function() {

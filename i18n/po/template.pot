@@ -25,6 +25,10 @@ msgstr ""
 msgid "{{feeRateStr}} of the transaction"
 msgstr ""
 
+#: public/views/walletHome.html
+msgid "{{index.completeHistory.length - index.txHistory.length}} more"
+msgstr ""
+
 #: public/views/copayers.html
 #: public/views/includes/walletInfo.html
 msgid "{{index.m}}-of-{{index.n}}"
@@ -97,10 +101,6 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
-#: public/views/modals/tx-details.html
-msgid "Add a comment"
-msgstr ""
-
 #: public/views/modals/addressbook.html
 msgid "Add a new entry"
 msgstr ""
@@ -113,6 +113,11 @@ msgstr ""
 #: public/views/create.html
 #: public/views/join.html
 msgid "Add an optional password to secure the recovery phrase"
+msgstr ""
+
+#: public/views/includes/note.html
+#: public/views/modals/tx-details.html
+msgid "Add comment"
 msgstr ""
 
 #: public/views/includes/sidebar.html
@@ -177,6 +182,10 @@ msgstr ""
 #: src/js/controllers/copayers.js
 #: src/js/controllers/preferencesDelete.js
 msgid "Are you sure you want to delete this wallet?"
+msgstr ""
+
+#: public/views/includes/walletInfo.html
+msgid "Auditable"
 msgstr ""
 
 #: public/views/includes/available-balance.html
@@ -266,6 +275,8 @@ msgid "Calculating fee"
 msgstr ""
 
 #: public/views/includes/confirm-tx.html
+#: public/views/includes/note.html
+#: public/views/includes/password.html
 #: public/views/modals/addressbook.html
 #: public/views/modals/confirmation.html
 #: public/views/walletHome.html
@@ -274,11 +285,6 @@ msgstr ""
 #: src/js/controllers/preferencesDelete.js
 #: src/js/controllers/walletHome.js
 msgid "Cancel"
-msgstr ""
-
-#: public/views/includes/note.html
-#: public/views/includes/password.html
-msgid "CANCEL"
 msgstr ""
 
 #: public/views/copayers.html
@@ -407,6 +413,14 @@ msgstr ""
 msgid "Copy to clipboard"
 msgstr ""
 
+#: public/views/import.html
+msgid "Could not access the wallet at the server. Please check:"
+msgstr ""
+
+#: src/js/services/profileService.js
+msgid "Could not access wallet"
+msgstr ""
+
 #: src/js/controllers/index.js
 msgid "Could not access Wallet Service: Not found"
 msgstr ""
@@ -444,7 +458,7 @@ msgid "Could not decrypt"
 msgstr ""
 
 #: src/js/controllers/import.js
-msgid "Could not decrypt file, check your spending password"
+msgid "Could not decrypt file, check your password"
 msgstr ""
 
 #: src/js/controllers/modals/txpDetails.js
@@ -647,10 +661,6 @@ msgstr ""
 
 #: src/js/controllers/export.js
 msgid "Encrypted export file saved"
-msgstr ""
-
-#: public/views/includes/note.html
-msgid "Enter a new comment"
 msgstr ""
 
 #: public/views/create.html
@@ -1002,10 +1012,6 @@ msgstr ""
 msgid "Missing private keys to sign"
 msgstr ""
 
-#: public/views/walletHome.html
-msgid "more"
-msgstr ""
-
 #: public/views/modals/search.html
 #: public/views/modals/tx-details.html
 #: public/views/walletHome.html
@@ -1090,6 +1096,10 @@ msgstr ""
 
 #: src/js/controllers/walletHome.js
 msgid "Note: a total of {{amountBelowFeeStr}} were excluded. These funds come from UTXOs smaller than the network fee provided."
+msgstr ""
+
+#: public/views/import.html
+msgid "NOTE: To import a wallet from a 3rd party software, please go to Add Wallet &gt; Create Wallet, and specify the Recovery Phrase there."
 msgstr ""
 
 #: public/views/disclaimer.html
@@ -1380,15 +1390,12 @@ msgstr ""
 msgid "Russian"
 msgstr ""
 
+#: public/views/includes/note.html
 #: public/views/modals/addressbook.html
 #: public/views/preferencesAlias.html
 #: public/views/preferencesBwsUrl.html
 #: public/views/preferencesEmail.html
 msgid "Save"
-msgstr ""
-
-#: public/views/includes/note.html
-msgid "SAVE"
 msgstr ""
 
 #: public/views/preferencesEmail.html
@@ -1547,6 +1554,10 @@ msgid "Share this invitation with your copayers"
 msgstr ""
 
 #: public/views/walletHome.html
+msgid "Share this wallet address to receive payments"
+msgstr ""
+
+#: public/views/walletHome.html
 msgid "Share this wallet address to receive payments. To protect your privacy, new addresses are generated automatically once you use them."
 msgstr ""
 
@@ -1574,7 +1585,7 @@ msgid "Signing transaction"
 msgstr ""
 
 #: public/views/create.html
-msgid "Single Wallet Address"
+msgid "Single Address Wallet"
 msgstr ""
 
 #: public/views/translators.html
@@ -1638,8 +1649,16 @@ msgstr ""
 msgid "The authors of the software, employees and affiliates of Bitpay, copyright holders, and BitPay, Inc. cannot retrieve your private keys or passwords if you lose or forget them and cannot guarantee transaction confirmation as they do not have control over the Bitcoin network."
 msgstr ""
 
+#: public/views/import.html
+msgid "The derivation path"
+msgstr ""
+
 #: src/js/services/ledger.js
 msgid "The Ledger Chrome application is not installed"
+msgstr ""
+
+#: public/views/import.html
+msgid "The password of the recovery phrase (if set)"
 msgstr ""
 
 #: src/js/controllers/walletHome.js
@@ -1678,6 +1697,10 @@ msgstr ""
 
 #: public/views/import.html
 msgid "The Wallet Recovery Phrase could require a password to be imported"
+msgstr ""
+
+#: public/views/import.html
+msgid "The wallet service URL"
 msgstr ""
 
 #: public/views/paymentUri.html
