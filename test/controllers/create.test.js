@@ -1,6 +1,9 @@
 describe('createController', function() {
   var fixtures = {
 
+    // Store prefs
+    '1eda3e702196b8d5d82fae129249bc79f0d5be2f5309a4e39855e7eb4ad31428': {},
+    '31f5deeef4cf7fd8fc67297179232e8e4590532960454ad958009132fef3daae': {},
     // createWallet 1-1
     '56db6f58f2c212591afb4d508d03e5fb40bb786f23dc56c43b98bde42dc513e5': {
       "walletId": "267bfa75-5575-4af7-8aa3-f5186bc99262"
@@ -96,12 +99,12 @@ describe('createController', function() {
     },
   }; // TODO: Read from file
 
-  beforeEach(function(done){
+  beforeEach(function(done) {
     mocks.init(fixtures, 'createController', {}, done);
   })
 
 
-  afterEach(function(done){
+  afterEach(function(done) {
     mocks.clear({}, done);
   });
 
@@ -122,6 +125,7 @@ describe('createController', function() {
     scope.walletName = 'A test wallet';
     scope.isTestnet = false;
     scope.bwsurl = null;
+    scope.isSingleAddress = false;
     scope.privateKey = 'legal winner thank year wave sausage worth useful legal winner thank yellow';
     scope._walletPrivKey = 'Kz4CFSTgLzoYfMkt97BTBotUbZYXjMts6Ej9HbVfCf5oLmun1BXy';
 
