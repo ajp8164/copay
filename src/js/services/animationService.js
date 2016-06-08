@@ -22,6 +22,7 @@ angular.module('copayApp.services').factory('animationService', function(platfor
     payment: -1,
     uriglidera: -1,
 
+    posPayment: 11,
     preferences: 11,
     preferencesGlobal: 11,
     glidera: 11,

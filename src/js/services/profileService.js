@@ -1,6 +1,6 @@
 'use strict';
 angular.module('copayApp.services')
-  .factory('profileService', function profileServiceFactory($rootScope, $timeout, $filter, $log, sjcl, lodash, storageService, bwcService, configService, notificationService, pushNotificationsService, gettext, gettextCatalog, bwsError, uxLanguage, bitcore, platformInfo, walletService, posPaymentService) {
+  .factory('profileService', function profileServiceFactory($rootScope, $timeout, $filter, $log, sjcl, lodash, storageService, bwcService, configService, notificationService, pushNotificationsService, gettext, gettextCatalog, bwsError, uxLanguage, bitcore, platformInfo, walletService) {
 
     var isChromeApp = platformInfo.isChromeApp;
     var isCordova = platformInfo.isCordova;
@@ -199,7 +199,7 @@ angular.module('copayApp.services')
 
         if (data.additionalData.posPayment) {
           // Handle a point-of-sale payment notification.
-          posPaymentService.handlePaymentNotice(data);
+          $rootScope.$emit('Local/PosPaymentNotification', data);
         }
 
       });

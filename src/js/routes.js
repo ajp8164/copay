@@ -174,6 +174,17 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
           },
         }
       })
+      .state('posPayment', {
+        url: '/posPayment',
+        templateUrl: 'views/posPayment.html',
+        walletShouldBeComplete: true,
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/posPayment.html',
+          },
+        }
+      })
       .state('preferences', {
         url: '/preferences',
         templateUrl: 'views/preferences.html',
