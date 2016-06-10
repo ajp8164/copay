@@ -197,11 +197,10 @@ angular.module('copayApp.services')
           }, 100);
         }
 
+        // Handle a point-of-sale payment notification.
         if (data.additionalData.posPayment) {
-          // Handle a point-of-sale payment notification.
           $rootScope.$emit('Local/PosPaymentNotification', data);
         }
-
       });
     };
 

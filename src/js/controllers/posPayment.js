@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('posPaymentController',
-  function($log, lodash, configService, profileService, posPaymentService, gettextCatalog) {
+  function($scope, $rootScope, $log, $timeout, lodash, configService, profileService, posPaymentService, gettextCatalog) {
 
     var self = this;
     var config = configService.getSync();
@@ -39,14 +39,15 @@ angular.module('copayApp.controllers').controller('posPaymentController',
         } else {
           $log.debug('POS payment - paying with ' + client.credentials.walletName);
 
-          setOngoingProcess(gettextCatalog.getString('Sending payment'));
           posPaymentService.makePayment(client, self.paymentUri, function(err) {
-            setOngoingProcess();
             
             if (err) {
-              self.error = err;
+              self.error = err.message;
+              $timeout(function() {
+                $scope.$apply();
+              });
             }
-          });
+          }, setOngoingProcess);
         }
       });
     };

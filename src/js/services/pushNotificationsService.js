@@ -10,6 +10,7 @@ angular.module('copayApp.services')
     var usePushNotifications = isCordova && !isWP;
 
     root.init = function(walletsClients) {
+      if (root.push) return;
       var defaults = configService.getDefaults();
       var push = PushNotification.init(defaults.pushNotifications.config);
 
@@ -21,6 +22,7 @@ angular.module('copayApp.services')
         if (config.pushNotifications.enabled) root.enableNotifications(walletsClients);
       });
 
+      root.push = push;
       return push;
     }
 

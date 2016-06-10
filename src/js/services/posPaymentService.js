@@ -1,63 +1,56 @@
 'use strict';
-angular.module('copayApp.services').factory('posPaymentService', function($rootScope, $state, configService, walletService, txStatus, fingerprintService) {
+angular.module('copayApp.services').factory('posPaymentService', function($rootScope, $state, $timeout, $interval, $log, configService, walletService, txStatus, fingerprintService, bitcore, gettextCatalog) {
 
     var root = {};
-
-    var _config = configService.getSync();
-    var _unitToSatoshi = _config.wallet.settings.unitToSatoshi;
-    var _unitDecimals = _config.wallet.settings.unitDecimals;
-    var _satToUnit = 1 / _unitToSatoshi;
 
     var _countDown;
     var _paymentExpired = false;
     var _paypro = null;
     var _remainingTimeStr = '';
 
-    // Handle a POS payment notification (a push service request).
-    $rootScope.$on('Local/PosPaymentNotification', function(event, data) {
-
-      // Simplest way to get the payment uri into send form.
-      // 
-      // data.additionalData.paymentUri is a BIP73 payment URI
-      // Example: https://bitpay.com/i/Eq46exwzTfDd1kaUdWqgL7
-      // 
-      // iOS data payload example for Node Push Server:
-      /*
-        {
-           "badge": 1,
-           "alert": {
-             "title": "Payment Request",
-             "body": "Amazon checkout for $542.17",
-             "action-loc-key": "Pay"
-           },
-           "sound": "soundName",
-           "payload": {
-             "posPayment": true,
-             "paymentUri": "https://bitpay.com/i/Eq46exwzTfDd1kaUdWqgL7"
-           }
+    // 
+    // data.additionalData.paymentUri is a BIP73 payment URI
+    // Example: https://bitpay.com/i/Eq46exwzTfDd1kaUdWqgL7
+    // 
+    // iOS data payload example for Node Push Server:
+    /*
+      {
+         "badge": 1,
+         "alert": {
+           "title": "Payment Request",
+           "body": "Amazon checkout for $542.17",
+           "action-loc-key": "Pay"
+         },
+         "sound": "soundName",
+         "payload": {
+           "posPayment": true,
+           "paymentUri": "bitcoin:?r=https://bitpay.com/i/Eq46exwzTfDd1kaUdWqgL7"
          }
-      */
-      // 
-
-///      $rootScope.$emit('dataScanned', data.additionalData.paymentUri);
-
+       }
+    */
+    // 
+    // Handle a POS payment notification (a push service request).
+    root.handlePosPaymentNotification = function(data) {
       // TODO: getting payment uri from the notification is temporary, need to get it from a service.
       root.message = data.message;
       root.paymentUri = data.additionalData.paymentUri;
 
       // Can't use go(), creates a circular dependency.
       $state.transitionTo('posPayment');
-    });
+    };
 
-    root.makePayment = function(client, uri, cb) {
+    root.makePayment = function(client, uri, cb, sayStatus) {
+      sayStatus(gettextCatalog.getString('Fetching payment information'));
       _getFromUri(client, uri, function(err, addr, amount, message) {
         if (err) {
           cb(err);
         }
+        sayStatus(gettextCatalog.getString('Sending payment'));
         _makePayment(client, addr, amount, message, function(err) {
           if (err) {
             cb(err);
           }
+          sayStatus();
           cb();
         });
       });
@@ -65,6 +58,11 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
     };
     
     function _getFromUri(client, uri, cb) {
+      var config = configService.getSync();
+      var unitToSatoshi = config.wallet.settings.unitToSatoshi;
+      var unitDecimals = config.wallet.settings.unitDecimals;
+      var satToUnit = 1 / unitToSatoshi;
+
       function sanitizeUri(uri) {
         // Fixes when a region uses comma to separate decimals
         var regex = /[\?\&]amount=(\d+([\,\.]\d+)?)/i;
@@ -85,6 +83,7 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
             return cb(err);
           }
           _paypro = paypro;
+          return cb(null, paypro.toAddress, (paypro.amount * satToUnit).toFixed(unitDecimals), paypro.memo);
         });
       } else {
         uri = sanitizeUri(uri);
@@ -96,7 +95,7 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
         var parsed = new bitcore.URI(uri);
         var addr = parsed.address ? parsed.address.toString() : '';
         var message = parsed.message;
-        var amount = parsed.amount ? (parsed.amount.toFixed(0) * _satToUnit).toFixed(_unitDecimals) : 0;
+        var amount = parsed.amount ? (parsed.amount.toFixed(0) * satToUnit).toFixed(unitDecimals) : 0;
 
         if (parsed.r) {
           _getPayPro(client, parsed.r, function(err, paypro) {
@@ -104,7 +103,7 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
               return cb(null, addr, amount, message);
             }
             _paypro = paypro;
-            return cb(null, paypro.toAddress, (paypro.amount * _satToUnit).toFixed(_unitDecimals), paypro.memo);
+            return cb(null, paypro.toAddress, (paypro.amount * satToUnit).toFixed(unitDecimals), paypro.memo);
           });
         } else {
           return cb(null, addr, amount, message);
@@ -170,8 +169,13 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
       };
     };
 
-    function _makePayment(client, addr, amount, message, cb) {
+    function _makePayment(client, address, amount, message, cb) {
+      var config = configService.getSync();
+      var unitToSatoshi = config.wallet.settings.unitToSatoshi;
 
+      amount = parseInt((amount * unitToSatoshi).toFixed(0));
+
+      var outputs = [];
       outputs.push({
         'toAddress': address,
         'amount': amount,
@@ -184,8 +188,8 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
       txp.outputs = outputs;
       txp.message = message;
       txp.payProUrl = _paypro ? _paypro.url : null;
-      txp.excludeUnconfirmedUtxos = _config.wallet.spendUnconfirmed ? false : true;
-      txp.feeLevel = _config.wallet.settings.feeLevel || 'normal';
+      txp.excludeUnconfirmedUtxos = config.wallet.spendUnconfirmed ? false : true;
+      txp.feeLevel = config.wallet.settings.feeLevel || 'normal';
 
       walletService.createTx(client, txp, function(err, createdTxp) {
         if (err) {
@@ -232,7 +236,7 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
             walletService.signTx(client, publishedTxp, function(err, signedTxp) {
               walletService.lock(client);
               if (err) {
-                $scope.$emit('Local/TxProposalAction');
+                $rootScope.$emit('Local/TxProposalAction');
                 return cb(err.message ? err.message : gettext('The payment was created but could not be completed. Please try again from home screen'));
               }
 
@@ -242,7 +246,7 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
                     return cb(err);
                   }
                   txStatus.notify(broadcastedTxp, function() {
-                    $scope.$emit('Local/TxProposalAction', broadcastedTxp.status == 'broadcasted');
+                    $rootScope.$emit('Local/TxProposalAction', broadcastedTxp.status == 'broadcasted');
                   });
                 });
               } else {
