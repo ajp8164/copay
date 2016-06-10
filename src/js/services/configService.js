@@ -130,6 +130,8 @@ angular.module('copayApp.services').factory('configService', function(storageSer
   root.set = function(newOpts, cb) {
     var config = lodash.cloneDeep(defaultConfig);
     storageService.getConfig(function(err, oldOpts) {
+      oldOpts = oldOpts || {};
+
       if (lodash.isString(oldOpts)) {
         oldOpts = JSON.parse(oldOpts);
       }
@@ -139,6 +141,7 @@ angular.module('copayApp.services').factory('configService', function(storageSer
       if (lodash.isString(newOpts)) {
         newOpts = JSON.parse(newOpts);
       }
+
       lodash.merge(config, oldOpts, newOpts);
       configCache = config;
 

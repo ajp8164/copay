@@ -5,6 +5,7 @@ angular.module('copayApp.controllers').controller('backupController',
 
     var self = this;
     var fc = profileService.focusedClient;
+    self.loading = false;
     self.customWords = [];
     self.walletName = fc.credentials.walletName;
 
@@ -44,14 +45,32 @@ angular.module('copayApp.controllers').controller('backupController',
     };
 
     self.goToStep = function(n) {
-      self.step = n;
-      if (self.step == 1)
+      if (n == 1)
         init();
-      if (self.step == 3 && !self.mnemonicHasPassphrase)
-        self.step++;
-      if (self.step == 4) {
-        confirm();
+      if (n == 2)
+        self.step = 2;
+      if (n == 3) {
+        if (!self.mnemonicHasPassphrase)
+          finalStep();
+        else
+          self.step = 3;
       }
+      if (n == 4)
+        finalStep();
+
+      function finalStep() {
+        self.loading = true;
+        confirm(function(err) {
+          self.loading = false;
+          if (err) {
+            backupError(err);
+          }
+          $timeout(function() {
+            self.step = 4;
+            return;
+          }, 1);
+        });
+      };
     };
 
     function initWords() {
@@ -125,6 +144,7 @@ angular.module('copayApp.controllers').controller('backupController',
     };
 
     $scope.removeButton = function(index, item) {
+      if (self.loading) return;
       self.customWords.splice(index, 1);
       self.shuffledMnemonicWords[item.prevIndex].selected = false;
       self.shouldContinue();
@@ -137,32 +157,44 @@ angular.module('copayApp.controllers').controller('backupController',
         self.selectComplete = false;
     };
 
-    function confirm() {
+    function confirm(cb) {
       self.backupError = false;
 
-      var walletClient = bwcService.getClient();
-      var separator = self.useIdeograms ? '\u3000' : ' ';
-      var customSentence = lodash.pluck(self.customWords, 'word').join(separator);
-      var passphrase = $scope.passphrase || '';
+      var customWordList = lodash.pluck(self.customWords, 'word');
 
-      try {
-        walletClient.seedFromMnemonic(customSentence, {
-          network: fc.credentials.network,
-          passphrase: passphrase,
-          account: fc.credentials.account
-        })
-      } catch (err) {
-        return backupError(err);
+      if (!lodash.isEqual(self.mnemonicWords, customWordList)) {
+        return cb('Mnemonic string mismatch');
       }
 
-      if (walletClient.credentials.xPrivKey != self.xPrivKey) {
-        return backupError('Private key mismatch');
-      }
+      $timeout(function() {
+        if (self.mnemonicHasPassphrase) {
+          var walletClient = bwcService.getClient();
+          var separator = self.useIdeograms ? '\u3000' : ' ';
+          var customSentence = customWordList.join(separator);
+          var passphrase = $scope.passphrase || '';
 
-      $rootScope.$emit('Local/BackupDone');
+          try {
+            walletClient.seedFromMnemonic(customSentence, {
+              network: fc.credentials.network,
+              passphrase: passphrase,
+              account: fc.credentials.account
+            });
+          } catch (err) {
+            return cb(err);
+          }
+
+          if (walletClient.credentials.xPrivKey != self.xPrivKey) {
+            return cb('Private key mismatch');
+          }
+        }
+
+        $rootScope.$emit('Local/BackupDone');
+        return cb();
+      }, 1);
     };
 
     function backupError(err) {
+      self.loading = false;
       $log.debug('Failed to verify backup: ', err);
       self.backupError = true;
 
