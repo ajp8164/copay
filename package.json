@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "bitcore-wallet-client": "git://github.com/ajp8164/bitcore-wallet-client.git#feat-push-notification",
+    "bitpay-public-client": "git://github.com/ajp8164/bitpay-public-client.git#master",
     "express": "^4.11.2",
     "fs": "0.0.2",
     "grunt": "^0.4.5",
