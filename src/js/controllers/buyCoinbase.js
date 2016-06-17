@@ -1,37 +1,20 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('buyCoinbaseController', 
-  function($scope, $modal, $log, $timeout, lodash, profileService, coinbaseService, animationService, bwsError, addressService) {
-    
-    window.ignoreMobilePause = true;
+angular.module('copayApp.controllers').controller('buyCoinbaseController',
+  function($scope, $modal, $log, $ionicModal, $timeout, lodash, profileService, coinbaseService, bwsError, addressService, ongoingProcess) {
     var self = this;
-    var fc;
-
-    var otherWallets = function(testnet) {
-      var network = testnet ? 'testnet' : 'livenet';
-      return lodash.filter(profileService.getWallets(network), function(w) {
-        return w.network == network;
-      });
-    };
 
     this.init = function(testnet) {
-      self.otherWallets = otherWallets(testnet);
-      // Choose focused wallet
-      try {
-        var currentWalletId = profileService.focusedClient.credentials.walletId;
-        lodash.find(self.otherWallets, function(w) {
-          if (w.id == currentWalletId) {
-            $timeout(function() {
-              self.selectedWalletId = w.id;
-              self.selectedWalletName = w.name;
-              fc = profileService.getClient(w.id);
-              $scope.$apply();
-            }, 100);
-          }
-        });
-      } catch (e) {
-        $log.debug(e);
-      }; 
+      self.allWallets = profileService.getWallets(testnet ? 'testnet' : 'livenet', 1)
+
+      var client = profileService.focusedClient;
+      if (client) { 
+        $timeout(function() {
+          self.selectedWalletId = client.credentials.walletId;
+          self.selectedWalletName = client.credentials.walletName;
+          $scope.$apply();
+        }, 100);
+      }
     };
 
     this.getPaymentMethods = function(token) {
@@ -62,48 +45,20 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
 
     $scope.openWalletsModal = function(wallets) {
       self.error = null;
-      var ModalInstanceCtrl = function($scope, $modalInstance) {
-        $scope.type = 'BUY';
-        $scope.wallets = wallets;
-        $scope.noColor = true;
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-        };
+      self.selectedWalletId = null;
+      self.selectedWalletName = null;
 
-        $scope.selectWallet = function(walletId, walletName) {
-          var client = profileService.getClient(walletId);
-          profileService.isReady(client, function(err) {
-            if (err) {
-              self.error = {errors: [{ message: err }]};
-              $modalInstance.dismiss('cancel');
-            } else {
-              $modalInstance.close({
-                'walletId': walletId,
-                'walletName': walletName,
-              });
-            }
-          });
-        };
-      };
+      $scope.type = 'BUY';
+      $scope.wallets = wallets;
+      $scope.noColor = true;
+      $scope.self = self;
 
-      var modalInstance = $modal.open({
-        templateUrl: 'views/modals/wallets.html',
-        windowClass: animationService.modalAnimated.slideUp,
-        controller: ModalInstanceCtrl,
-      });
-
-      modalInstance.result.finally(function() {
-        var m = angular.element(document.getElementsByClassName('reveal-modal'));
-        m.addClass(animationService.modalAnimated.slideOutDown);
-      });
-
-      modalInstance.result.then(function(obj) {
-        $timeout(function() {
-          self.selectedWalletId = obj.walletId;
-          self.selectedWalletName = obj.walletName;
-          fc = profileService.getClient(obj.walletId);
-          $scope.$apply();
-        }, 100);
+      $ionicModal.fromTemplateUrl('views/modals/wallets.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        $scope.walletsModal = modal;
+        $scope.walletsModal.show();
       });
     };
 
@@ -118,9 +73,9 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
         currency: currency,
         payment_method: $scope.selectedPaymentMethod.id || null
       };
-      this.loading = 'Sending request...';
+      ongoingProcess.set('Sending request...', true);
       coinbaseService.buyRequest(token, accountId, dataSrc, function(err, data) {
-        self.loading = null;
+        ongoingProcess.set('Sending request...', false);
         if (err) {
           self.error = err;
           return;
@@ -133,9 +88,9 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
       self.error = null;
       var accountId = account.id;
       var buyId = buy.id;
-      this.loading = 'Buying bitcoin...';
+      ongoingProcess.set('Buying Bitcoin...', true);
       coinbaseService.buyCommit(token, accountId, buyId, function(err, b) {
-        self.loading = null;
+        ongoingProcess.set('Buying Bitcoin...', false);
         if (err) {
           self.error = err;
           return;
@@ -143,18 +98,21 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
           var tx = b.data.transaction;
           if (!tx) return;
 
-          self.loading = 'Getting transaction...';
+          ongoingProcess.set('Fetching transaction...', true);
           coinbaseService.getTransaction(token, accountId, tx.id, function(err, updatedTx) {
+            ongoingProcess.set('Fetching transaction...', false);
             if (err) $log.debug(err);
             addressService.getAddress(self.selectedWalletId, false, function(err, addr) {
-              if (err) { 
-                self.loading = null;
-                self.error = {errors: [{ message: 'Could not create address' }]};
+              if (err) {
+                self.error = {
+                  errors: [{
+                    message: 'Could not create address'
+                  }]
+                };
                 return;
               }
               updatedTx.data['toAddr'] = addr;
               coinbaseService.savePendingTransaction(updatedTx.data, {}, function(err) {
-                self.loading = null;
                 if (err) $log.debug(err);
                 if (updatedTx.data.status == 'completed') {
                   self.sendToCopay(token, account, updatedTx.data);
@@ -175,7 +133,7 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
       self.error = null;
       var accountId = account.id;
 
-      self.loading = 'Sending funds to Copay...';
+      ongoingProcess.set('Sending funds to Copay...', true);
       var data = {
         to: tx.toAddr,
         amount: tx.amount.amount,
@@ -183,14 +141,16 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController',
         description: 'Copay Wallet: ' + self.selectedWalletName
       };
       coinbaseService.sendTo(token, accountId, data, function(err, res) {
-        self.loading = null;
+        ongoingProcess.set('Sending funds to Copay...', false);
         if (err) {
           self.error = err;
         } else {
           self.receiveInfo = res.data;
           if (!res.data.id) return;
           coinbaseService.getTransaction(token, accountId, res.data.id, function(err, sendTx) {
-            coinbaseService.savePendingTransaction(tx, {remove: true}, function(err) {
+            coinbaseService.savePendingTransaction(tx, {
+              remove: true
+            }, function(err) {
               coinbaseService.savePendingTransaction(sendTx.data, {}, function(err) {
                 $timeout(function() {
                   $scope.$emit('Local/CoinbaseTx');

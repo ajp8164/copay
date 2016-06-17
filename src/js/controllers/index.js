@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, $ionicScrollDelegate, $ionicPopup, latestReleaseService, feeService, bwcService, pushNotificationsService, lodash, go, profileService, configService, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, addonManager, bwsError, txFormatService, uxLanguage, glideraService, coinbaseService, platformInfo, addressbookService, posPaymentService) {
+angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, $ionicScrollDelegate, $ionicPopup, latestReleaseService, feeService, bwcService, pushNotificationsService, lodash, go, profileService, configService, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, addonManager, bwsError, txFormatService, uxLanguage, glideraService, coinbaseService, platformInfo, addressbookService, openURLService, ongoingProcess, posPaymentService) {
   var self = this;
   var SOFT_CONFIRMATION_LIMIT = 12;
   var errors = bwcService.getErrors();
@@ -14,7 +14,6 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   ret.isChromeApp = isChromeApp;
   ret.isSafari = platformInfo.isSafari;
   ret.isWindowsPhoneApp = platformInfo.isWP;
-  ret.onGoingProcess = {};
   ret.historyShowLimit = 10;
   ret.historyShowMoreLimit = 10;
   ret.isSearching = false;
@@ -81,23 +80,9 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     storageService.setHideBalanceFlag(self.walletId, self.shouldHideBalance, function() {});
   }
 
-  self.setOngoingProcess = function(processName, isOn) {
-    $log.debug('onGoingProcess', processName, isOn);
-    self[processName] = isOn;
-    self.onGoingProcess[processName] = isOn;
-
-    var name;
-    self.anyOnGoingProcess = lodash.any(self.onGoingProcess, function(isOn, processName) {
-      if (isOn)
-        name = name || processName;
-      return isOn;
-    });
-    // The first one
-    self.onGoingProcessName = name;
-    $timeout(function() {
-      $rootScope.$apply();
-    });
-  };
+  self.setWalletPreferencesTitle = function() {
+    return gettext("Wallet Preferences");
+  }
 
   self.cleanInstance = function() {
     $log.debug('Cleaning Index Instance');
@@ -125,16 +110,18 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     var fc = profileService.focusedClient;
     if (!fc) return;
 
+    ongoingProcess.clear();
     self.cleanInstance();
     self.loadingWallet = true;
     self.setSpendUnconfirmed();
 
     $timeout(function() {
       $rootScope.$apply();
+
       self.hasProfile = true;
       self.isSingleAddress = false;
       self.noFocusedWallet = false;
-      self.onGoingProcess = {};
+      self.updating = false;
 
       // Credentials Shortcuts
       self.m = fc.credentials.m;
@@ -152,7 +139,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
       self.isPrivKeyEncrypted = fc.isPrivKeyEncrypted();
       self.externalSource = fc.getPrivKeyExternalSourceName();
       self.account = fc.credentials.account;
-      self.incorrectDerivation = fc.incorrectDerivation;
+      self.incorrectDerivation = fc.keyDerivationOk === false;
 
       if (self.externalSource == 'trezor')
         self.account++;
@@ -289,6 +276,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
       initStatusHash = _walletStatusHash();
       $log.debug('Updating status until it changes. initStatusHash:' + initStatusHash)
     }
+
     var get = function(cb) {
       if (opts.walletStatus)
         return cb(null, opts.walletStatus);
@@ -302,7 +290,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
           } else {
             self.isSingleAddress = !!ret.wallet.singleAddress;
             if (!opts.quiet)
-              self.setOngoingProcess('scanning', ret.wallet.scanStatus == 'running');
+              self.updating = ret.wallet.scanStatus == 'running';
           }
           return cb(err, ret);
         });
@@ -319,7 +307,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     $timeout(function() {
 
       if (!opts.quiet)
-        self.setOngoingProcess('updatingStatus', true);
+        self.updating = true;
 
       $log.debug('Updating Status:', fc.credentials.walletName, tries);
       get(function(err, walletStatus) {
@@ -339,9 +327,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
         if (walletId != profileService.focusedClient.credentials.walletId)
           return;
 
-        if (!opts.quiet)
-          self.setOngoingProcess('updatingStatus', false);
-
+        self.updating = false;
 
         if (err) {
           self.handleError(err);
@@ -351,6 +337,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
         self.setPendingTxps(walletStatus.pendingTxps);
 
         // Status Shortcuts
+        self.lastUpdate = Date.now();
         self.walletName = walletStatus.wallet.name;
         self.walletSecret = walletStatus.wallet.secret;
         self.walletStatus = walletStatus.wallet.status;
@@ -387,10 +374,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   self.updateBalance = function() {
     var fc = profileService.focusedClient;
     $timeout(function() {
-      self.setOngoingProcess('updatingBalance', true);
+      ongoingProcess.set('updatingBalance', true);
       $log.debug('Updating Balance');
       fc.getBalance(function(err, balance) {
-        self.setOngoingProcess('updatingBalance', false);
+        ongoingProcess.set('updatingBalance', false);
         if (err) {
           self.handleError(err);
           return;
@@ -404,10 +391,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   self.updatePendingTxps = function() {
     var fc = profileService.focusedClient;
     $timeout(function() {
-      self.setOngoingProcess('updatingPendingTxps', true);
+      self.updating = true;
       $log.debug('Updating PendingTxps');
       fc.getTxProposals({}, function(err, txps) {
-        self.setOngoingProcess('updatingPendingTxps', false);
+        self.updating = false;
         if (err) {
           self.handleError(err);
         } else {
@@ -443,10 +430,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     var fc = profileService.focusedClient;
     $timeout(function() {
       $rootScope.$apply();
-      self.setOngoingProcess('openingWallet', true);
+      self.updating = true;
       self.updateError = false;
       fc.openWallet(function(err, walletStatus) {
-        self.setOngoingProcess('openingWallet', false);
+        self.updating = false;
         if (err) {
           self.updateError = true;
           self.handleError(err);
@@ -995,10 +982,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
 
   self.recreate = function(cb) {
     var fc = profileService.focusedClient;
-    self.setOngoingProcess('recreating', true);
+    ongoingProcess.set('recreating', true);
     fc.recreateWallet(function(err) {
       self.notAuthorized = false;
-      self.setOngoingProcess('recreating', false);
+      ongoingProcess.set('recreating', false);
 
       if (err) {
         self.handleError(err);
@@ -1032,19 +1019,18 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     if (!c.isComplete()) return;
 
     if (self.walletId == walletId)
-      self.setOngoingProcess('scanning', true);
+      self.updating = true;
 
     c.startScan({
       includeCopayerBranches: true,
     }, function(err) {
       if (err && self.walletId == walletId) {
-        self.setOngoingProcess('scanning', false);
+        self.updating = false;
         self.handleError(err);
         $rootScope.$apply();
       }
     });
   };
-
 
   self.initGlidera = function(accessToken) {
     self.glideraEnabled = configService.getSync().glidera.enabled;
@@ -1074,9 +1060,9 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     getToken(function(err, accessToken) {
       if (err || !accessToken) return;
       else {
-        self.glideraLoading = 'Connecting to Glidera...';
+        ongoingProcess.set('connectingGlidera', true);
         glideraService.getAccessTokenPermissions(accessToken, function(err, p) {
-          self.glideraLoading = null;
+          ongoingProcess.set('connectingGlidera', false);
           if (err) {
             self.glideraError = err;
           } else {
@@ -1107,24 +1093,24 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     });
 
     if (permissions.transaction_history) {
-      self.glideraLoadingHistory = 'Getting Glidera transactions...';
+      ongoingProcess.set('Fetching Glidera Transactions', true);
       glideraService.getTransactions(accessToken, function(err, data) {
-        self.glideraLoadingHistory = null;
+        ongoingProcess.set('Fetching Glidera Transactions', false);
         self.glideraTxs = data;
       });
     }
 
     if (permissions.view_email_address && opts.fullUpdate) {
-      self.glideraLoadingEmail = 'Getting Glidera Email...';
+      ongoingProcess.set('connectingGlidera', true);
       glideraService.getEmail(accessToken, function(err, data) {
-        self.glideraLoadingEmail = null;
+        ongoingProcess.set('connectingGlidera', false);
         self.glideraEmail = data.email;
       });
     }
     if (permissions.personal_info && opts.fullUpdate) {
-      self.glideraLoadingPersonalInfo = 'Getting Glidera Personal Information...';
+      ongoingProcess.set('connectingGlidera', true);
       glideraService.getPersonalInfo(accessToken, function(err, data) {
-        self.glideraLoadingPersonalInfo = null;
+        ongoingProcess.set('connectingGlidera', false);
         self.glideraPersonalInfo = data;
       });
     }
@@ -1159,9 +1145,9 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     getToken(function(err, accessToken) {
       if (err || !accessToken) return;
       else {
-        self.coinbaseLoading = 'Getting primary account...';
+        ongoingProcess.set('Getting primary account...', true);
         coinbaseService.getAccounts(accessToken, function(err, a) {
-          self.coinbaseLoading = null;
+          ongoingProcess.set('Getting primary account...', false);
           if (err) {
             self.coinbaseError = err;
             if (err.errors[0] && err.errors[0].id == 'expired_token') {
@@ -1405,6 +1391,11 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     });
   };
 
+  self.isInFocus = function(walletId) {
+    var fc = profileService.focusedClient;
+    return fc && fc.credentials.walletId == walletId;
+  };
+
   self.setAddressbook = function(ab) {
     if (ab) {
       self.addressbook = ab;
@@ -1423,6 +1414,19 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   $rootScope.$on('$stateChangeSuccess', function(ev, to, toParams, from, fromParams) {
     self.prevState = from.name || 'walletHome';
     self.tab = 'walletHome';
+  });
+
+  $rootScope.$on('Local/ValidatingWallet', function(ev, walletId) {
+    if (self.isInFocus(walletId)) {
+      ongoingProcess.set('validatingWallet', true);
+    }
+  });
+
+  $rootScope.$on('Local/ValidatingWalletEnded', function(ev, walletId, isOK) {
+    if (self.isInFocus(walletId)) {
+      ongoingProcess.set('validatingWallet', false);
+      self.incorrectDerivation = isOK === false;
+    }
   });
 
   $rootScope.$on('Local/ClearHistory', function(event) {
@@ -1484,23 +1488,24 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   });
 
   $rootScope.$on('Local/WalletCompleted', function(event, walletId) {
-    var fc = profileService.focusedClient;
-    if (fc && fc.credentials.walletId == walletId) {
+    if (self.isInFocus(walletId)) {
       // reset main wallet variables
       self.setFocusedWallet();
       go.walletHome();
     }
   });
 
-  self.debouncedUpdate = lodash.throttle(function() {
-    self.updateAll({
-      quiet: true
-    });
-    self.debounceUpdateHistory();
-  }, 2000, {
-    leading: false,
-    trailing: true
-  });
+  self.debouncedUpdate = function() {
+    var now = Date.now();
+    var oneHr = 1000 * 60 * 60;
+
+    if (!self.lastUpdate || (now - self.lastUpdate) > oneHr) {
+      self.updateAll({
+        quiet: true,
+        triggerTxUpdate: true
+      });
+    }
+  };
 
   $rootScope.$on('Local/Resume', function(event) {
     $log.debug('### Resume event');
@@ -1635,7 +1640,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   lodash.each(['TxProposalRejectedBy', 'TxProposalAcceptedBy'], function(eventName) {
     $rootScope.$on(eventName, function() {
       var f = function() {
-        if (self.updatingStatus) {
+        if (self.updating) {
           return $timeout(f, 200);
         };
         self.updatePendingTxps();
@@ -1795,4 +1800,5 @@ angular.module('copayApp.controllers').controller('indexController', function($r
 
   /* Start setup */
   lodash.assign(self, vanillaScope);
+  openURLService.init();
 });

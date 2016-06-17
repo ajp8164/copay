@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('importController',
-  function($scope, $rootScope, $ionicScrollDelegate, $timeout, $log, profileService, configService, notification, go, sjcl, gettext, lodash, ledger, trezor, derivationPathHelper, platformInfo, bwsError, bwcService) {
+  function($scope, $rootScope, $timeout, $log, profileService, configService, notification, go, sjcl, gettext, lodash, ledger, trezor, derivationPathHelper, platformInfo, bwsError, bwcService, ongoingProcess) {
 
     var isChromeApp = platformInfo.isChromeApp;
     var isDevel = platformInfo.isDevel;
@@ -14,14 +14,6 @@ angular.module('copayApp.controllers').controller('importController',
     $scope.derivationPath = derivationPathHelper.default;
     $scope.account = 1;
     self.importErr = false;
-
-    window.ignoreMobilePause = true;
-    $scope.$on('$destroy', function() {
-      $timeout(function() {
-        window.ignoreMobilePause = false;
-      }, 100);
-    });
-
 
     var updateSeedSourceSelect = function() {
       self.seedOptions = [];
@@ -61,23 +53,21 @@ angular.module('copayApp.controllers').controller('importController',
 
       if (err) {
         self.error = err;
-        $ionicScrollDelegate.scrollTop();
         $timeout(function() {
           $rootScope.$apply();
         });
         return;
       }
 
-      self.loading = true;
+      ongoingProcess.set('importingWallet', true);
       opts.compressed = null;
       opts.password = null;
 
       $timeout(function() {
         profileService.importWallet(str2, opts, function(err, walletId) {
-          self.loading = false;
+          ongoingProcess.set('importingWallet', false);
           if (err) {
             self.error = err;
-            $ionicScrollDelegate.scrollTop();
           } else {
             $rootScope.$emit('Local/WalletImported', walletId);
             notification.success(gettext('Success'), gettext('Your wallet has been imported correctly'));
@@ -88,18 +78,16 @@ angular.module('copayApp.controllers').controller('importController',
     };
 
     var _importExtendedPrivateKey = function(xPrivKey, opts) {
-      self.loading = true;
-
+      ongoingProcess.set('importingWallet', true);
       $timeout(function() {
         profileService.importExtendedPrivateKey(xPrivKey, opts, function(err, walletId) {
-          self.loading = false;
+          ongoingProcess.set('importingWallet', false);
           if (err) {
             if (err instanceof errors.NOT_AUTHORIZED) {
               self.importErr = true;
             } else {
               self.error = err;
             }
-            $ionicScrollDelegate.scrollTop();
             return $timeout(function() {
               $scope.$apply();
             });
@@ -113,11 +101,11 @@ angular.module('copayApp.controllers').controller('importController',
     };
 
     var _importMnemonic = function(words, opts) {
-      self.loading = true;
+      ongoingProcess.set('importingWallet', true);
 
       $timeout(function() {
         profileService.importMnemonic(words, opts, function(err, walletId) {
-          self.loading = false;
+          ongoingProcess.set('importingWallet', false);
 
           if (err) {
             if (err instanceof errors.NOT_AUTHORIZED) {
@@ -125,7 +113,6 @@ angular.module('copayApp.controllers').controller('importController',
             } else {
               self.error = err;
             }
-            $ionicScrollDelegate.scrollTop();
             return $timeout(function() {
               $scope.$apply();
             });
@@ -137,6 +124,13 @@ angular.module('copayApp.controllers').controller('importController',
         });
       }, 100);
     };
+
+    $scope.setDerivationPath = function() {
+      if ($scope.testnetEnabled)
+        $scope.derivationPath = derivationPathHelper.defaultTestnet;
+      else
+        $scope.derivationPath = derivationPathHelper.default;
+    }
 
     $scope.getFile = function() {
       // If we use onloadend, we need to check the readyState.
@@ -152,7 +146,6 @@ angular.module('copayApp.controllers').controller('importController',
     this.importBlob = function(form) {
       if (form.$invalid) {
         this.error = gettext('There is an error in the form');
-        $ionicScrollDelegate.scrollTop();
         $timeout(function() {
           $scope.$apply();
         });
@@ -165,7 +158,6 @@ angular.module('copayApp.controllers').controller('importController',
 
       if (!backupFile && !backupText) {
         this.error = gettext('Please, select your backup file');
-        $ionicScrollDelegate.scrollTop();
         $timeout(function() {
           $scope.$apply();
         });
@@ -185,7 +177,6 @@ angular.module('copayApp.controllers').controller('importController',
     this.importMnemonic = function(form) {
       if (form.$invalid) {
         this.error = gettext('There is an error in the form');
-        $ionicScrollDelegate.scrollTop();
         $timeout(function() {
           $scope.$apply();
         });
@@ -200,7 +191,6 @@ angular.module('copayApp.controllers').controller('importController',
       var pathData = derivationPathHelper.parse($scope.derivationPath);
       if (!pathData) {
         this.error = gettext('Invalid derivation path');
-        $ionicScrollDelegate.scrollTop();
         return;
       }
       opts.account = pathData.account;
@@ -212,7 +202,6 @@ angular.module('copayApp.controllers').controller('importController',
 
       if (!words) {
         this.error = gettext('Please enter the recovery phrase');
-        $ionicScrollDelegate.scrollTop();
       } else if (words.indexOf('xprv') == 0 || words.indexOf('tprv') == 0) {
         return _importExtendedPrivateKey(words, opts);
       } else {
@@ -220,7 +209,6 @@ angular.module('copayApp.controllers').controller('importController',
 
         if ((wordList.length % 3) != 0) {
           this.error = gettext('Wrong number of recovery words:') + wordList.length;
-          $ionicScrollDelegate.scrollTop();
         }
       }
 
@@ -240,24 +228,22 @@ angular.module('copayApp.controllers').controller('importController',
     this.importTrezor = function(account, isMultisig) {
       var self = this;
       trezor.getInfoForNewWallet(isMultisig, account, function(err, lopts) {
-        self.hwWallet = false;
+        ongoingProcess.clear();
         if (err) {
           self.error = err;
-          $ionicScrollDelegate.scrollTop();
           $scope.$apply();
           return;
         }
 
         lopts.externalSource = 'trezor';
         lopts.bwsurl = $scope.bwsurl;
-        self.loading = true;
+        ongoingProcess.set('importingWallet', true);
         $log.debug('Import opts', lopts);
 
         profileService.importExtendedPublicKey(lopts, function(err, walletId) {
-          self.loading = false;
+          ongoingProcess.set('importingWallet', false);
           if (err) {
             self.error = err;
-            $ionicScrollDelegate.scrollTop();
             return $timeout(function() {
               $scope.$apply();
             });
@@ -272,7 +258,6 @@ angular.module('copayApp.controllers').controller('importController',
     this.importHW = function(form) {
       if (form.$invalid || $scope.account < 0) {
         this.error = gettext('There is an error in the form');
-        $ionicScrollDelegate.scrollTop();
         $timeout(function() {
           $scope.$apply();
         });
@@ -286,7 +271,6 @@ angular.module('copayApp.controllers').controller('importController',
       if (self.seedSourceId == 'trezor') {
         if (account < 1) {
           this.error = gettext('Invalid account number');
-          $ionicScrollDelegate.scrollTop();
           return;
         }
         account = account - 1;
@@ -295,11 +279,11 @@ angular.module('copayApp.controllers').controller('importController',
 
       switch (self.seedSourceId) {
         case ('ledger'):
-          self.hwWallet = 'Ledger';
+          ongoingProcess.set('connectingledger', true);
           self.importLedger(account);
           break;
         case ('trezor'):
-          self.hwWallet = 'Trezor';
+          ongoingProcess.set('connectingtrezor', true);
           self.importTrezor(account, isMultisig);
           break;
         default:
@@ -319,24 +303,22 @@ angular.module('copayApp.controllers').controller('importController',
     this.importLedger = function(account) {
       var self = this;
       ledger.getInfoForNewWallet(true, account, function(err, lopts) {
-        self.hwWallet = false;
+        ongoingProcess.clear();
         if (err) {
           self.error = err;
-          $ionicScrollDelegate.scrollTop();
           $scope.$apply();
           return;
         }
 
         lopts.externalSource = 'ledger';
         lopts.bwsurl = $scope.bwsurl;
-        self.loading = true;
+        ongoingProcess.set('importingWallet', true);
         $log.debug('Import opts', lopts);
 
         profileService.importExtendedPublicKey(lopts, function(err, walletId) {
-          self.loading = false;
+          ongoingProcess.set('importingWallet', false);
           if (err) {
             self.error = err;
-            $ionicScrollDelegate.scrollTop();
             return $timeout(function() {
               $scope.$apply();
             });

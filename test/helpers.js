@@ -42,6 +42,10 @@ mocks.$timeout = function(cb) {
 };
 
 mocks.modal = function() {};
+mocks.ongoingProcess = {
+  set: sinon.stub(),
+  clear: sinon.stub(),
+};
 
 
 mocks.setProfile = function(profile) {};
@@ -192,6 +196,7 @@ mocks.init = function(fixtures, controllerName, opts, done) {
         ctrl = $controller(controllerName, {
           $scope: scope,
           $modal: mocks.modal,
+          ongoingProcess: mocks.ongoingProcess,
           notification: mocks.notification,
           configService: _configService_,
           profileService: _profileService_,
@@ -221,7 +226,6 @@ mocks.init = function(fixtures, controllerName, opts, done) {
           done();
         });
       } else {
-
         _profileService_.create({
           noWallet: true
         }, function(err) {

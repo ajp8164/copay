@@ -7,13 +7,6 @@
 
 <div class="content glidera" ng-controller="buyGlideraController as buy">
 
-  <div class="onGoingProcess" ng-show="buy.loading">
-    <div class="onGoingProcess-content" ng-style="{'background-color':index.backgroundColor}">
-    <ion-spinner class="spinner-stable" icon="lines"></ion-spinner>
-    <span>{{buy.loading}}</span>
-    </div>
-  </div>
-
   <div ng-show="index.glideraLimits  && !buy.show2faCodeInput && !buy.success">
     <h4 class="title m0 text-left">
       <span class="text-light">Daily buy limit</span>:
@@ -42,7 +35,7 @@
 
           <div ng-if="index.glideraToken"
             ng-init="buy.init(index.glideraTestnet)"
-            ng-click="openWalletsModal(buy.otherWallets)">
+            ng-click="openWalletsModal(buy.allWallets)">
             <label>Wallet</label>
             <div class="input">
               <input type="text" id="address" name="address" ng-disabled="buy.selectedWalletId"
@@ -122,10 +115,7 @@
         A transfer has been initiated from your bank account. Your bitcoins should arrive to your wallet in 2-4 business days.
         </p>
 
-        <button class="outline dark-gray round expand"
-          ng-click="$root.go('glidera')">
-          OK
-        </button>
+        <button class="outline dark-gray round expand" href ui-sref="glidera">OK</button>
       </div>
     </div>
   </div>

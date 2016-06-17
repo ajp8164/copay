@@ -1,9 +1,9 @@
 {
   "name": "copay",
-  "description": "A multisignature wallet",
+  "description": "A multisignature bitcoin wallet",
   "author": "BitPay",
-  "version": "2.0.0",
-  "androidVersionCode": "105",
+  "version": "2.0.1",
+  "androidVersionCode": "107",
   "keywords": [
     "wallet",
     "copay",
@@ -13,7 +13,7 @@
   ],
   "main": "public/index.html",
   "window": {
-    "title": "Copay - A multisignature wallet",
+    "title": "Copay - A multisignature bitcoin wallet",
     "icon": "./public/img/icons/icon-256.png",
     "toolbar": false,
     "show": true,
@@ -44,6 +44,7 @@
   "dependencies": {
     "bitcore-wallet-client": "git://github.com/ajp8164/bitcore-wallet-client.git#feat-push-notification",
     "bitpay-public-client": "git://github.com/ajp8164/bitpay-public-client.git#master",
+    "coveralls": "^2.11.9",
     "express": "^4.11.2",
     "fs": "0.0.2",
     "grunt": "^0.4.5",
@@ -92,7 +93,6 @@
     "load-grunt-tasks": "^3.5.0",
     "mocha": "^2.4.5",
     "phantomjs-prebuilt": "^2.1.7",
-    "ionic": "^1.7.14",
     "xcode": "^0.8.2"
   }
 }

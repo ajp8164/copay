@@ -7,13 +7,6 @@
 
 <div class="content coinbase" ng-controller="buyCoinbaseController as buy">
 
-  <div class="onGoingProcess" ng-show="buy.loading">
-    <div class="onGoingProcess-content" ng-style="{'background-color': '#2b71b1'}">
-    <ion-spinner class="spinner-stable" icon="lines"></ion-spinner>
-    <span>{{buy.loading}}</span>
-    </div>
-  </div>
-
   <div class="row m20t" ng-show="buy.error || index.coinbaseError" ng-click="buy.error = null">
     <div class="columns">
       <div class="box-notification">
@@ -24,7 +17,7 @@
     </div>
   </div>
 
-  <div class="row m20t"
+  <div class="row m20ti"
     ng-show="index.coinbaseAccount && !buy.buyInfo && !buy.receiveInfo">
     <div class="columns">
 
@@ -84,7 +77,7 @@
         <div
           ng-if="index.coinbaseToken"
           ng-init="buy.init(index.coinbaseTestnet)"
-          ng-click="openWalletsModal(buy.otherWallets)">
+          ng-click="openWalletsModal(buy.allWallets)">
           <label>Copay Wallet</label>
           <div class="input">
             <input type="text" id="address" name="address" ng-disabled="buy.selectedWalletId"
@@ -105,7 +98,7 @@
     </div>
   </div>
 
-  <div class="m20t row" ng-show="buy.receiveInfo && !buy.sellInfo && !buy.success">
+  <div class="m20ti row" ng-show="buy.receiveInfo && !buy.sellInfo && !buy.success">
     <div class="columns">
       <h1>Funds sent to Copay Wallet</h1>
       <p class="size-12 text-gray">
@@ -113,7 +106,7 @@
       </p>
       <button class="m20t outline black round expand"
               ng-style="{'background-color': '#2b71b1'}"
-              ng-click="$root.go('coinbase')">OK</button>
+              href ui-sref="coinbase">OK</button>
     </div>
   </div>
 
@@ -168,8 +161,7 @@
         Bitcoin purchase completed. Coinbase has queued the transfer to your selected Copay wallet.
       </p>
 
-      <button class="outline dark-gray round expand"
-              ng-click="$root.go('coinbase')">OK</button>
+      <button class="outline dark-gray round expand" href ui-sref="coinbase">OK</button>
     </div>
   </div>
 

@@ -3,28 +3,31 @@
 angular.module('copayApp.controllers').controller('preferencesController',
   function($scope, $rootScope, $timeout, $log, configService, profileService, fingerprintService, walletService) {
 
-    var self = this;
     var fc;
     var config = configService.getSync();
 
     var disableFocusListener = $rootScope.$on('Local/NewFocusedWalletReady', function() {
-     self.init();
+      $scope.init();
     });
 
     $scope.$on('$destroy', function() {
       disableFocusListener();
     });
 
-    this.init = function() {
+    $scope.init = function() {
+      $scope.externalSource = null;
+
       fc = profileService.focusedClient;
       if (fc) {
         $scope.encryptEnabled = walletService.isEncrypted(fc);
-        this.externalSource = fc.getPrivKeyExternalSourceName() == 'ledger' ? "Ledger" : null;
+        if (fc.isPrivKeyExternal)
+          $scope.externalSource = fc.getPrivKeyExternalSourceName() == 'ledger' ? 'Ledger' : 'Trezor';
+
         // TODO externalAccount
         //this.externalIndex = fc.getExternalIndex();
       }
 
-      this.touchidAvailable = fingerprintService.isAvailable();
+      $scope.touchidAvailable = fingerprintService.isAvailable();
       $scope.touchidEnabled = config.touchIdFor ? config.touchIdFor[fc.credentials.walletId] : null;
 
       $scope.deleted = false;
@@ -41,7 +44,6 @@ angular.module('copayApp.controllers').controller('preferencesController',
     };
 
     $scope.encryptChange = function() {
-      var self = this;
       if (!fc) return;
       var val = $scope.encryptEnabled;
 
@@ -50,7 +52,7 @@ angular.module('copayApp.controllers').controller('preferencesController',
 
         fc.setPrivateKeyEncryption(password);
         fc.lock();
-        profileService.updateCredentials(fc.export(), function() {
+        profileService.updateCredentials(JSON.parse(fc.export()), function() {
           $log.debug('Wallet encrypted');
           return cb();
         });
@@ -64,7 +66,7 @@ angular.module('copayApp.controllers').controller('preferencesController',
         } catch (e) {
           return cb(e);
         }
-        profileService.updateCredentials(fc.export(), function() {
+        profileService.updateCredentials(JSON.parse(fc.export()), function() {
           $log.debug('Wallet encryption disabled');
           return cb();
         });

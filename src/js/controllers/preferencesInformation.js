@@ -6,7 +6,7 @@ angular.module('copayApp.controllers').controller('preferencesInformation',
     var fc = profileService.focusedClient;
     var c = fc.credentials;
 
-    this.init = function() {
+    $scope.init = function() {
       var basePath = c.getBaseAddressDerivationPath();
 
       $scope.walletName = c.walletName;
@@ -43,15 +43,7 @@ angular.module('copayApp.controllers').controller('preferencesInformation',
       });
     };
 
-    this.sendAddrs = function() {
-      var self = this;
-
-      if (platformInfo.isAndroid || platformInfo.isWP) {
-        window.ignoreMobilePause = true;
-      }
-
-      self.loading = true;
-
+    $scope.sendAddrs = function() {
       function formatDate(ts) {
         var dateObj = new Date(ts * 1000);
         if (!dateObj) {
@@ -68,7 +60,6 @@ angular.module('copayApp.controllers').controller('preferencesInformation',
         fc.getMainAddresses({
           doNotVerify: true
         }, function(err, addrs) {
-          self.loading = false;
           if (err) {
             $log.warn(err);
             return;

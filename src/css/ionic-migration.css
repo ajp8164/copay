@@ -20,6 +20,25 @@
 	z-index: -1;
 }
 
+.bar {
+ border-bottom: none;
+}
+
+.ng-hide.ng-hide-animate {
+	display: none !important;
+}
+
+.bar .title {
+	font-size: 14px;
+	line-height: 48px;
+}
+
+.radio-label {
+	text-transform: none;
+	font-weight: 400;
+	font-size: 14px;
+}
+
 .item-radio .radio-icon {
 	font-size: 16px;
 }
@@ -88,6 +107,10 @@ button, .button {
 /* Defeat Ionic .row+.row in backup failed view */
 .backup .row {
   margin-top: 10px;
+  padding: 0;
+}
+
+.create-tab .row {
   padding: 0;
 }
 

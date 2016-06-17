@@ -112,19 +112,23 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
           }
         }
       })
-      .state('payment', {
-        url: '/uri-payment/:data',
+      .state('uri', {
+        url: '/uri/:url',
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/uri.html'
+          }
+        }
+      })
+      .state('uripayment', {
+        url: '/uri-payment/:url',
         templateUrl: 'views/paymentUri.html',
         views: {
           'main': {
             templateUrl: 'views/paymentUri.html',
           },
         },
-        needProfile: true
-      })
-      .state('selectWalletForPayment', {
-        url: '/selectWalletForPayment',
-        controller: 'walletForPaymentController',
         needProfile: true
       })
       .state('join', {
@@ -144,16 +148,6 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
             templateUrl: 'views/import.html'
           },
         }
-      })
-      .state('importLegacy', {
-        url: '/importLegacy',
-        needProfile: true,
-        views: {
-          'main': {
-            templateUrl: 'views/importLegacy.html',
-          },
-        }
-
       })
       .state('create', {
         url: '/create',
@@ -235,7 +229,7 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
         }
       })
       .state('uriglidera', {
-        url: '/uri-glidera?code',
+        url: '/uri-glidera/:url',
         needProfile: true,
         views: {
           'main': {
@@ -304,7 +298,7 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
         }
       })
       .state('uricoinbase', {
-        url: '/uri-coinbase?code',
+        url: '/uri-coinbase/:url',
         needProfile: true,
         views: {
           'main': {
@@ -524,12 +518,6 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
           },
         }
       })
-      .state('warning', {
-        url: '/warning',
-        controller: 'warningController',
-        templateUrl: 'views/warning.html',
-        needProfile: false
-      })
       .state('add', {
         url: '/add',
         needProfile: true,
@@ -540,7 +528,7 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
         }
       });
   })
-  .run(function($rootScope, $state, $log, $timeout, $ionicPlatform, uriHandler, platformInfo, profileService, uxLanguage, animationService, go, gettextCatalog) {
+  .run(function($rootScope, $state, $location, $log, $timeout, $ionicPlatform, platformInfo, profileService, uxLanguage, go, gettextCatalog) {
 
     $ionicPlatform.ready(function() {
       if (platformInfo.isCordova) {
@@ -559,14 +547,7 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
         });
 
         $ionicPlatform.on('resume', function() {
-          if (!window.ignoreMobilePause) {
-            $rootScope.$emit('Local/Resume');
-          }
-          setTimeout(function() {
-            var loc = window.location;
-            var ignoreMobilePause = loc.toString().match(/(buy|sell|buycoinbase|sellcoinbase)/) ? true : false;
-            window.ignoreMobilePause = ignoreMobilePause;
-          }, 100);
+          $rootScope.$emit('Local/Resume');
         });
 
         $ionicPlatform.on('backbutton', function(event) {
@@ -595,10 +576,6 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
           }, 100);
 
           go.walletHome();
-
-          setTimeout(function() {
-            window.ignoreMobilePause = false;
-          }, 100);
         });
 
         $ionicPlatform.on('menubutton', function() {
@@ -612,11 +589,6 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
     });
 
     uxLanguage.init();
-
-    // Register URI handler, not for mobileApp
-    if (!platformInfo.isMobile) {
-      uriHandler.register();
-    }
 
     if (platformInfo.isNW) {
       var gui = require('nw.gui');
@@ -634,6 +606,8 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
 
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
       $log.debug('Route change from:', fromState.name || '-', ' to:', toState.name);
+      $log.debug('            toParams:' + JSON.stringify(toParams || {}));
+      $log.debug('            fromParams:' + JSON.stringify(fromParams || {}));
 
       if (!profileService.profile && toState.needProfile) {
 
@@ -661,16 +635,7 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
         if (profileService.focusedClient && !profileService.focusedClient.isComplete() && toState.walletShouldBeComplete) {
 
           $state.transitionTo('copayers');
-          event.preventDefault();
         }
-      }
-
-      if (!animationService.transitionAnimated(fromState, toState)) {
-        event.preventDefault();
-        // Time for the backpane to render
-        setTimeout(function() {
-          $state.transitionTo(toState);
-        }, 50);
       }
     });
   });
