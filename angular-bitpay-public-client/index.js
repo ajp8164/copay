@@ -1,9 +1,9 @@
-var bwcModule = angular.module('bpcModule', []);
+var bpcModule = angular.module('bpcModule', []);
 var Client = require('../node_modules/bitpay-public-client');
 
-bwcModule.constant('MODULE_VERSION', '1.0.0');
+bpcModule.constant('MODULE_VERSION', '1.0.0');
 
-bwcModule.provider("bpcService", function() {
+bpcModule.provider("bpcService", function() {
   var provider = {};
 
   provider.$get = function() {
@@ -19,13 +19,9 @@ bwcModule.provider("bpcService", function() {
       return Client.Utils;
     };
 
-    service.getClient = function(opts) {
-      opts = opts || {};
-
-      //note opts use `bpcurl` all lowercase;
-      var bwc = new Client({
-        baseUrl: opts.bpcurl || 'https://bitpay.com',
-        verbose: opts.verbose
+    service.getClient = function() {
+      var bpc = new Client({
+        baseUrl: 'https://andy.bp:8088' //'https://bitpay.com'
       });
       return bpc;
     };

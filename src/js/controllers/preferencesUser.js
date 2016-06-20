@@ -1,81 +1,113 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('preferencesUserController', function($scope, $timeout, $log, configService, profileService, pushNotificationsService, go, lodash, platformInfo) {
+angular.module('copayApp.controllers').controller('preferencesUserController', function($scope, $timeout, $log, configService, profileService, pushNotificationsService, go, lodash, platformInfo, bpcService) {
 
+    var self = this;
     var isIOS = platformInfo.isIOS;
     var isAndroid = platformInfo.isAndroid;
+    var supportsPushNotifications = isIOS || isAndroid;
     var config = configService.getSync();
     this.user = lodash.clone(config.user);
+    this.bitpay = bpcService.getClient();
 
-    function subscribeToNotifications(user, cb) {
+    this._subscribeToNotifications = function(user, cb) {
       if (lodash.isEmpty(user)) {
         return cb('You must provide an ID');
       }
 
       var opts = {
-        type: isIOS ? "ios" : isAndroid ? "android" : null,
-        user: user,
-        token: pushNotificationsService.token
+        subscriberId: user,
+        deviceToken: pushNotificationsService.token,
+        deviceType: isIOS ? 'ios' : isAndroid ? 'android' : 'unsuppported'
       };
 
-      // Using focusedClient only to gain access to the BWC API for setting the subscription.
-      pushNotificationsService.subscribe(opts, profileService.focusedClient, function(err, response) {
-        if (err) $log.warn('Subscription error: ' + err.message + ': ' + JSON.stringify(opts));
-        else $log.debug('Subscribed to push notifications service: (' + user + ')' + JSON.stringify(response));
+      self.bitpay.subscribeToNotifications(opts, function(err, response) {
+        if (err) {
+          $log.error('Subscribe error: ' + err.message);
+          return cb('Could not subscribe for notifications.');
+        }
+        $log.debug('Subscribed to push notifications service');
         return cb();
       });
     };
 
-    function unsubscribeFromNotifications(user, cb) {
-      if (lodash.isEmpty(user)) {
-        return cb();
-      }
-
+    this._unsubscribeFromNotifications = function(cb) {
       var opts = {
-        user: user
+        deviceToken: pushNotificationsService.token
       };
 
-      // Using focusedClient only to gain access to the BWC API for setting the subscription.
-      pushNotificationsService.unsubscribe(opts, profileService.focusedClient, function(err, response) {
-        if (err) $log.warn('Unsubscribe error: ' + err.message + ': ' + JSON.stringify(opts));
-        else $log.debug('Unsubscribed from push notifications service: (' + user + ')' + JSON.stringify(response));
-        return cb();
+      self.bitpay.unsubscribeFromNotifications(opts, function(err, response) {
+        if (err) {
+          $log.error('Unsubscribe error: ' + err.message);
+          return cb('Could not unsubscribe from notifications.');
+        }
+        $log.debug('Unsubscribed from push notifications service');
+        return cb(err);
+      });
+    };
+
+    this._subscribe = function(callback) {
+      // Unsubscribe prior user id, subscribe new user id, and save configuration.
+      self._unsubscribeFromNotifications(function(err) {
+        if (err) {
+          self.error = err.message;
+          return callback(err);
+        }
+
+        self._subscribeToNotifications(self.user.id, function(err) {
+          if (err) {
+            self.error = err.message;
+            return callback(err);
+          }
+
+          callback();
+        });
+      });
+    };
+
+    this._save = function(callback) {
+      var opts = {
+        user: {
+          id: self.user.id
+        }
+      };
+
+      configService.set(opts, function(err) {
+        if (err) {
+          $scope.$emit('Local/DeviceError', err);
+          return callback(err);
+        }
+        callback();
       });
     };
 
     this.save = function() {
-      var self = this;
-      var opts = {
-        user: {
-          id: {}
-        }
-      };
-      opts.user.id = self.user.id;
-
-      // Unsubscribe from prior user id, subscribe to new user id, and save configuration.
-      unsubscribeFromNotifications(config.user.id, function(err) {
-        if (err) {
-          self.error = err;
-          return;
-        }
-
-        subscribeToNotifications(opts.user.id, function(err) {
-          if (err) {
-            self.error = err;
-            return;
-          }
-
-          configService.set(opts, function(err) {
-            if (err) {
-              $scope.$emit('Local/DeviceError', err);
-              return;
-            }
+      self._save(function(err) {
+        if (!err) {
+          if (supportsPushNotifications) {
+            self._subscribe(function(err) {
+              if (!err) {
+                $scope.$emit('Local/UserUpdated');
+                $timeout(function(){
+                  go.path('preferencesGlobal');
+                }, 50);
+              } else {
+                $timeout(function(){
+                  $scope.$apply();
+                });
+              }
+            });
+          } else {
             $scope.$emit('Local/UserUpdated');
             $timeout(function(){
               go.path('preferencesGlobal');
             }, 50);
+          }
+        } else {
+          $timeout(function(){
+            $scope.$apply();
           });
-        });
+        }
       });
     };
 

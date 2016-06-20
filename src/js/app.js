@@ -10,6 +10,7 @@ var modules = [
   'ngLodash',
   'ngSanitize',
   'ngCsv',
+  'bpcModule',
   'bwcModule',
   'copayApp.filters',
   'copayApp.services',
