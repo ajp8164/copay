@@ -237,9 +237,15 @@ angular.module('copayApp.services')
           }, 100);
         }
 
-        // Handle a point-of-sale payment notification.
-        if (data.additionalData.posPayment) {
-          $rootScope.$emit('Local/PosPaymentNotification', data);
+        // Generate an event for the type of notification.
+        if (data.additionalData && data.additionalData.notificationType) {
+          switch (data.additionalData.notificationType) {
+            case 'pos-payment':
+              $rootScope.$emit('Local/PosPaymentNotification', data);
+              break;
+            default:
+              break;
+          }
         }
       });
     };

@@ -23,8 +23,8 @@ angular.module('copayApp.controllers').controller('posPaymentController',
     };
 
     this.init = function() {
-      self.message = posPaymentService.message;
-      self.paymentUri = posPaymentService.paymentUri;
+      self.error = posPaymentService.getError();
+      self.pendingPayments = posPaymentService.getPendingPayments();
       self.wallets = getWallets(false);
     };
 
@@ -39,7 +39,7 @@ angular.module('copayApp.controllers').controller('posPaymentController',
         } else {
           $log.debug('POS payment - paying with ' + client.credentials.walletName);
 
-          posPaymentService.makePayment(client, self.paymentUri, function(err) {
+          posPaymentService.makePayment(client, self.selectedPendingPayment, function(err) {
             
             if (err) {
               self.error = err.message;

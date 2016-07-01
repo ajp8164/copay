@@ -1,12 +1,13 @@
 'use strict';
-angular.module('copayApp.services').factory('posPaymentService', function($rootScope, $state, $timeout, $interval, $log, configService, walletService, txStatus, fingerprintService, bitcore, gettextCatalog) {
+angular.module('copayApp.services').factory('posPaymentService', function($rootScope, $state, $timeout, $interval, $log, $q, lodash, configService, walletService, txStatus, fingerprintService, bitcore, bwcService, bpcService, pushNotificationsService, gettextCatalog) {
 
     var root = {};
 
-    var _countDown;
-    var _paymentExpired = false;
-    var _paypro = null;
-    var _remainingTimeStr = '';
+    var _bitpay = bpcService.getClient();
+    var _bwc = bwcService.getClient();
+
+    var _error = undefined;
+    var _pendingPayments = [];
 
     // 
     // data.additionalData.paymentUri is a BIP73 payment URI
@@ -31,38 +32,75 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
     // 
     // Handle a POS payment notification (a push service request).
     root.handlePosPaymentNotification = function(data) {
-      // TODO: getting payment uri from the notification is temporary, need to get it from a service.
-      root.message = data.message;
-      root.paymentUri = data.additionalData.paymentUri;
+      $log.info('POS payment notification received: ' + data.message);
 
-      // Can't use go(), creates a circular dependency.
-      $state.transitionTo('posPayment');
+      _error = undefined;
+      _pendingPayments = [];
+
+      var opts = {
+        deviceToken: pushNotificationsService.token
+      };
+
+      _bitpay.getNotifiedInvoices(opts, function(err, response) {
+        if (err) {
+          _error = 'Could not get payment information from Bitpay.';
+          $log.error(_error + ': ' + err.message);
+        } else {
+
+          $log.debug('Pending invoices received from BitPay: ' + JSON.stringify(response.paymentUrls));
+
+          // Get payment information from the paypro uris.
+          // More than one pending payment may be returned, we let the user choose which to pay.
+          var fetched = 0;
+          for (var i = 0; i < response.paymentUrls.length; i++) {
+            // Avoid caching the pending payment more than once.
+            var index = lodash.findIndex(_pendingPayments, function(pendingPayment) {
+              return pendingPayment.uri == response.paymentUrls[i];
+            });
+
+            if (index >= 0) {
+              continue;
+            }
+
+            _getFromUri(response.paymentUrls[i], function(err, paypro) {
+              if (err) {
+                _error = 'Could not get payment information from Bitpay.';
+                $log.error(_error + ': ' + err.message);
+              } else {
+                _pendingPayments.push(paypro);
+              }
+              
+              // After fetching all payment details present the view.
+              if (++fetched == response.paymentUrls.length) {
+                $log.debug('Pending Payments: ' + JSON.stringify(_pendingPayments));
+                $state.transitionTo('posPayment');
+              }
+            });
+          }
+        }
+      });
     };
 
-    root.makePayment = function(client, uri, cb, sayStatus) {
-      sayStatus(gettextCatalog.getString('Fetching payment information'));
-      _getFromUri(client, uri, function(err, addr, amount, message) {
+    root.getError = function() {
+      return _error;
+    };
+
+    root.getPendingPayments = function() {
+      return _pendingPayments;
+    };
+
+    root.makePayment = function(client, paypro, cb, sayStatus) {
+      sayStatus(gettextCatalog.getString('Sending payment'));
+      _makePayment(client, paypro, function(err) {
         if (err) {
           cb(err);
         }
-        sayStatus(gettextCatalog.getString('Sending payment'));
-        _makePayment(client, addr, amount, message, function(err) {
-          if (err) {
-            cb(err);
-          }
-          sayStatus();
-          cb();
-        });
+        sayStatus();
+        cb();
       });
-
     };
     
-    function _getFromUri(client, uri, cb) {
-      var config = configService.getSync();
-      var unitToSatoshi = config.wallet.settings.unitToSatoshi;
-      var unitDecimals = config.wallet.settings.unitDecimals;
-      var satToUnit = 1 / unitToSatoshi;
-
+    function _getFromUri(uri, cb) {
       function sanitizeUri(uri) {
         // Fixes when a region uses comma to separate decimals
         var regex = /[\?\&]amount=(\d+([\,\.]\d+)?)/i;
@@ -78,12 +116,11 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
       // URI extensions for Payment Protocol with non-backwards-compatible request
       if ((/^bitcoin:\?r=[\w+]/).exec(uri)) {
         uri = decodeURIComponent(uri.replace('bitcoin:?r=', ''));
-        _getPayPro(client, uri, function(err, paypro) {
+        _getPayPro(uri, function(err, paypro) {
           if (err) {
             return cb(err);
           }
-          _paypro = paypro;
-          return cb(null, paypro.toAddress, (paypro.amount * satToUnit).toFixed(unitDecimals), paypro.memo);
+          return cb(null, paypro);
         });
       } else {
         uri = sanitizeUri(uri);
@@ -93,28 +130,29 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
         }
 
         var parsed = new bitcore.URI(uri);
-        var addr = parsed.address ? parsed.address.toString() : '';
-        var message = parsed.message;
-        var amount = parsed.amount ? (parsed.amount.toFixed(0) * satToUnit).toFixed(unitDecimals) : 0;
 
         if (parsed.r) {
-          _getPayPro(client, parsed.r, function(err, paypro) {
-            if (err && addr && amount) {
-              return cb(null, addr, amount, message);
+          _getPayPro(parsed.r, function(err, paypro) {
+            if (err) {
+              return cb(err);
             }
-            _paypro = paypro;
-            return cb(null, paypro.toAddress, (paypro.amount * satToUnit).toFixed(unitDecimals), paypro.memo);
+            return cb(null, paypro);
           });
         } else {
-          return cb(null, addr, amount, message);
+          return cb('Invalid URI: require payment protocol endpoint.');
         }
       }
     };
 
-    function _getPayPro(client, uri, cb) {
+    function _getPayPro(uri, cb) {
+      var config = configService.getSync();
+      var unitToSatoshi = config.wallet.settings.unitToSatoshi;
+      var unitDecimals = config.wallet.settings.unitDecimals;
+      var satToUnit = 1 / unitToSatoshi;
+
       $log.debug('Fetch PayPro Request...', uri);
       $timeout(function() {
-        client.fetchPayPro({
+        _bwc.fetchPayPro({
           payProUrl: uri,
         }, function(err, paypro) {
 
@@ -126,50 +164,51 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
             }
             return cb(msg);
           }
-
+/*
+TODO: defeat for testing only
           if (!paypro.verified) {
             $log.warn('Failed to verify payment protocol signatures');
             var msg = gettext('Payment Protocol Invalid');
             return cb(msg);
           }
-
-          _paymentTimeControl(paypro.expires);
+*/
+          paypro.displayAmount = (paypro.amount * satToUnit).toFixed(unitDecimals);
+          _paymentTimeControl(paypro);
           return cb(null, paypro);
         });
       });
-
     };
 
-    function _paymentTimeControl(expirationTime) {
-      _paymentExpired = false;
+    function _paymentTimeControl(paypro) {
+      paypro.timer = {};
+      paypro.timer.isExpired = false;
       setExpirationTime();
 
-      _countDown = $interval(function() {
+      paypro.timer.countDown = $interval(function() {
         setExpirationTime();
       }, 1000);
 
       function setExpirationTime() {
         var now = Math.floor(Date.now() / 1000);
-        if (now > expirationTime) {
+        if (now > paypro.expires) {
           setExpiredValues();
           return;
         }
 
-        var totalSecs = expirationTime - now;
+        var totalSecs = paypro.expires - now;
         var m = Math.floor(totalSecs / 60);
         var s = totalSecs % 60;
-        _remainingTimeStr = ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
+        paypro.timer.remainingTime = ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
       };
 
       function setExpiredValues() {
-        _paymentExpired = true;
-        _remainingTimeStr = null;
-        _paypro = null;
-        if (_countDown) $interval.cancel(_countDown);
+        paypro.timer.isExpired = true;
+        paypro.timer.remainingTime = null;
+        if (paypro.timer.countDown) $interval.cancel(paypro.timer.countDown);
       };
     };
 
-    function _makePayment(client, address, amount, message, cb) {
+    function _makePayment(client, paypro, cb) {
       var config = configService.getSync();
       var unitToSatoshi = config.wallet.settings.unitToSatoshi;
 
@@ -177,17 +216,17 @@ angular.module('copayApp.services').factory('posPaymentService', function($rootS
 
       var outputs = [];
       outputs.push({
-        'toAddress': address,
-        'amount': amount,
-        'message': message
+        'toAddress': paypro.toAddress,
+        'amount': paypro.amount,
+        'message': paypro.memo
       });
 
       var txp = {};
-      txp.toAddress = address;
-      txp.amount = amount;
+      txp.toAddress = paypro.toAddress;
+      txp.amount = paypro.amount;
       txp.outputs = outputs;
-      txp.message = message;
-      txp.payProUrl = _paypro ? _paypro.url : null;
+      txp.message = paypro.memo;
+      txp.payProUrl = paypro.url;
       txp.excludeUnconfirmedUtxos = config.wallet.spendUnconfirmed ? false : true;
       txp.feeLevel = config.wallet.settings.feeLevel || 'normal';
 
