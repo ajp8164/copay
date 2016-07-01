@@ -29,6 +29,16 @@ body {
   right: 0;
 }
 
+.qr-scanner-input-import {
+  position: absolute;
+  top: -5px;
+  right: 0;
+}
+
+.icon-close-import {
+  padding: 0px 40px 5px 10px;
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: #2C3E50;
 }
@@ -111,7 +121,7 @@ h4.title a {
 }
 
 .preferences ul li {
-  padding: 13px 20px;
+  padding: 16px 10px 16px 16px;
   border-bottom: 1px solid #E9E9EC;
 }
 
@@ -606,6 +616,14 @@ ul.manage li {
   margin-right: 10px;
 }
 
+.m40r {
+  margin-right: 40px;
+}
+
+.m25r {
+  margin-right: 25px;
+}
+
 .m10l {
   margin-left: 10px;
 }
@@ -695,6 +713,10 @@ ul.manage li {
   padding-left: 25px;
 }
 
+.p15l {
+  padding-left: 15px;
+}
+
 .p15 {
   padding: 15px;
 }
@@ -713,6 +735,10 @@ ul.manage li {
 
 .p10 {
   padding: 10px;
+}
+
+.p10i {
+  padding: 10px !important;
 }
 
 .p10b {
@@ -817,6 +843,7 @@ ul.manage li {
   font-size: 14px;
   font-weight: 400;
   padding-top: 0 !important;
+  line-height: 14px;
 }
 
 .release {
@@ -862,6 +889,12 @@ ul.manage li {
 
 .bg-success {
   background-color: #1ABC9C;
+}
+
+.lock-fromQR {
+  position: absolute;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .tx-proposal i {
@@ -1659,7 +1692,7 @@ a.missing-copayers {
     width: 35px;
     height: 30px;
     border-radius: 3px;
-    padding-top: 5px;
+    padding-top: 4px;
   }
 }
 

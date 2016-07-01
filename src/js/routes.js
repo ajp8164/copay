@@ -530,8 +530,47 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
   })
   .run(function($rootScope, $state, $location, $log, $timeout, $ionicPlatform, platformInfo, profileService, uxLanguage, go, gettextCatalog) {
 
+    if (platformInfo.isCordova) {
+      if (screen.width < 768) {
+        screen.lockOrientation('portrait');
+      } else {
+        window.addEventListener("orientationchange", function() {
+          var leftMenuWidth = document.querySelector("ion-side-menu[side='left']").clientWidth;
+          if (screen.orientation.includes('portrait')) {
+            // Portrait
+            document.querySelector("ion-side-menu-content").style.width = (screen.width - leftMenuWidth) + "px";
+          } else {
+            // Landscape
+            document.querySelector("ion-side-menu-content").style.width = (screen.height - leftMenuWidth) + "px";
+          }
+        });
+      }
+    } else {
+      if (screen.width >= 768) {
+        window.addEventListener('resize', function() {
+          $rootScope.$emit('Local/WindowResize');
+        });
+      }
+    }
+
     $ionicPlatform.ready(function() {
       if (platformInfo.isCordova) {
+
+        window.addEventListener('native.keyboardhide', function() {
+          $timeout(function() {
+            $rootScope.shouldHideMenuBar = false; //show menu bar when keyboard is hidden with back button action on send screen
+          }, 300);
+        });
+
+        window.addEventListener('native.keyboardshow', function() {
+          $rootScope.shouldHideMenuBar = true; //hide menu bar when keyboard opens with back button action on send screen
+          $rootScope.$digest();
+        });
+
+        if (window.cordova.plugins.Keyboard) {
+          cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+          cordova.plugins.Keyboard.disableScroll(true);
+        }
 
         $ionicPlatform.registerBackButtonAction(function(event) {
           event.preventDefault();

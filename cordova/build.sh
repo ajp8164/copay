@@ -158,6 +158,12 @@ if [ ! -d $PROJECT ]; then
   cordova plugin add cordova-plugin-android-fingerprint-auth
   checkOK
 
+  cordova plugin add cordova-plugin-screen-orientation
+  checkOK
+
+  cordova plugin add ionic-plugin-keyboard
+  checkOK
+
 fi
 
 if $DBGJS

@@ -5,6 +5,7 @@ angular.module('copayApp.services')
     var isChromeApp = platformInfo.isChromeApp;
     var isCordova = platformInfo.isCordova;
     var isWP = platformInfo.isWP;
+    var isIOS = platformInfo.isIOS;
 
     var root = {};
     var errors = bwcService.getErrors();
@@ -18,12 +19,15 @@ angular.module('copayApp.services')
     root.walletClients = {};
 
     root.Utils = bwcService.getUtils();
-    root.formatAmount = function(amount) {
+    root.formatAmount = function(amount, fullPrecision) {
       var config = configService.getSync().wallet.settings;
       if (config.unitCode == 'sat') return amount;
 
       //TODO : now only works for english, specify opts to change thousand separator and decimal separator
-      return this.Utils.formatAmount(amount, config.unitCode);
+      var opts = {
+        fullPrecision: !!fullPrecision
+      };
+      return this.Utils.formatAmount(amount, config.unitCode, opts);
     };
 
     root._setFocus = function(walletId, cb) {
@@ -115,29 +119,42 @@ angular.module('copayApp.services')
       return true;
     };
 
-    root.runValidation = function(client) {
-      var skipDeviceValidation = root.profile.isDeviceChecked(platformInfo.ua);
+    var validationLock = false;
+
+    root.runValidation = function(client, delay, retryDelay) {
+      delay = delay || 500;
+      retryDelay = retryDelay || 50;
+
+      if (validationLock) {
+        return $timeout(function() {
+          $log.debug('ValidatingWallet Locked: Retrying in: ' + retryDelay);
+          return root.runValidation(client, delay, retryDelay);
+        }, retryDelay);
+      }
+      validationLock = true;
+
+      // IOS devices are already checked
+      var skipDeviceValidation = isIOS || root.profile.isDeviceChecked(platformInfo.ua);
       var walletId = client.credentials.walletId;
 
+      $log.debug('ValidatingWallet: ' + walletId + ' skip Device:' + skipDeviceValidation);
       $timeout(function() {
-
-        $log.debug('ValidatingWallet: ' + walletId + ' skip Device:' + skipDeviceValidation);
-        $rootScope.$emit('Local/ValidatingWallet', walletId);
-
         client.validateKeyDerivation({
           skipDeviceValidation: skipDeviceValidation,
         }, function(err, isOK) {
-          $log.debug('ValidatingWallet End:  ' + walletId + ' isOK:' + isOK);
-          $rootScope.$emit('Local/ValidatingWalletEnded', walletId, isOK);
+          validationLock = false;
 
+          $log.debug('ValidatingWallet End:  ' + walletId + ' isOK:' + isOK);
           if (isOK) {
             root.profile.setChecked(platformInfo.ua, walletId);
           } else {
             $log.warn('Key Derivation failed for wallet:' + walletId);
             storageService.clearLastAddress(walletId, function() {});
           }
+          root.storeProfileIfDirty();
+          $rootScope.$emit('Local/ValidatingWalletEnded', walletId, isOK);
         });
-      }, 5000);
+      }, delay);
     };
 
     // Used when reading wallets from the profile
@@ -160,7 +177,7 @@ angular.module('copayApp.services')
 
       var skipKeyValidation = root.profile.isChecked(platformInfo.ua, credentials.walletId);
       if (!skipKeyValidation)
-        root.runValidation(client);
+        root.runValidation(client, 500);
 
       $log.info('Binding wallet:' + credentials.walletId + ' Validating?:' + !skipKeyValidation);
       return cb(null, root.bindWalletClient(client));
@@ -398,8 +415,8 @@ angular.module('copayApp.services')
 
         // check if exist
         if (lodash.find(root.profile.credentials, {
-            'walletId': walletData.walletId
-          })) {
+          'walletId': walletData.walletId
+        })) {
           return cb(gettext('Cannot join the same wallet more that once'));
         }
       } catch (ex) {
@@ -459,7 +476,7 @@ angular.module('copayApp.services')
       });
     };
 
-    root.setMetaData = function(walletClient, addressBook, historyCache, cb) {
+    root.setMetaData = function(walletClient, addressBook, cb) {
       storageService.getAddressbook(walletClient.credentials.network, function(err, localAddressBook) {
         var localAddressBook1 = {};
         try {
@@ -470,10 +487,7 @@ angular.module('copayApp.services')
         var mergeAddressBook = lodash.merge(addressBook, localAddressBook1);
         storageService.setAddressbook(walletClient.credentials.network, JSON.stringify(addressBook), function(err) {
           if (err) return cb(err);
-          storageService.setTxHistory(JSON.stringify(historyCache), walletClient.credentials.walletId, function(err) {
-            if (err) return cb(err);
-            return cb(null);
-          });
+          return cb(null);
         });
       });
     }
@@ -520,7 +534,6 @@ angular.module('copayApp.services')
       saveBwsUrl(function() {
         root.setAndStoreFocus(walletId, function() {
           storageService.storeProfile(root.profile, function(err) {
-
             var config = configService.getSync();
             if (config.pushNotifications.enabled)
               pushNotificationsService.enableNotifications(root.walletClients);
@@ -559,13 +572,12 @@ angular.module('copayApp.services')
       str = JSON.parse(str);
 
       var addressBook = str.addressBook || {};
-      var historyCache = str.historyCache ||  [];
 
       root.addAndBindWalletClient(walletClient, {
         bwsurl: opts.bwsurl
       }, function(err, walletId) {
         if (err) return cb(err);
-        root.setMetaData(walletClient, addressBook, historyCache, function(error) {
+        root.setMetaData(walletClient, addressBook, function(error) {
           if (error) $log.warn(error);
           return cb(err, walletId);
         });

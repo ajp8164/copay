@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, $ionicScrollDelegate, $ionicPopup, latestReleaseService, feeService, bwcService, pushNotificationsService, lodash, go, profileService, configService, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, addonManager, bwsError, txFormatService, uxLanguage, glideraService, coinbaseService, platformInfo, addressbookService, openURLService, ongoingProcess, posPaymentService) {
+angular.module('copayApp.controllers').controller('indexController', function($rootScope, $scope, $log, $filter, $timeout, $ionicScrollDelegate, $ionicPopup, $ionicSideMenuDelegate, latestReleaseService, feeService, bwcService, pushNotificationsService, lodash, go, profileService, configService, rateService, storageService, addressService, gettext, gettextCatalog, amMoment, addonManager, bwsError, txFormatService, uxLanguage, glideraService, coinbaseService, platformInfo, addressbookService, openURLService, ongoingProcess, posPaymentService) {
   var self = this;
   var SOFT_CONFIRMATION_LIMIT = 12;
   var errors = bwcService.getErrors();
@@ -18,6 +18,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
   ret.historyShowMoreLimit = 10;
   ret.isSearching = false;
   ret.prevState = 'walletHome';
+  ret.physicalScreenWidth = ((window.innerWidth > 0) ? window.innerWidth : screen.width);
 
   ret.menu = [{
     'title': gettext('Receive'),
@@ -68,6 +69,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     go.walletHome();
   };
 
+  self.allowRefresher = function() {
+    if ($ionicSideMenuDelegate.getOpenRatio() != 0) self.allowPullToRefresh = false;
+  }
+
   self.hideBalance = function() {
     storageService.getHideBalanceFlag(self.walletId, function(err, shouldHideBalance) {
       if (err) self.shouldHideBalance = false;
@@ -110,7 +115,6 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     var fc = profileService.focusedClient;
     if (!fc) return;
 
-    ongoingProcess.clear();
     self.cleanInstance();
     self.loadingWallet = true;
     self.setSpendUnconfirmed();
@@ -688,8 +692,8 @@ angular.module('copayApp.controllers').controller('indexController', function($r
       $log.debug('Fixing Tx Cache Unit to:' + name)
       lodash.each(txs, function(tx) {
 
-        tx.amountStr = profileService.formatAmount(tx.amount, config.unitName) + name;
-        tx.feeStr = profileService.formatAmount(tx.fees, config.unitName) + name;
+        tx.amountStr = profileService.formatAmount(tx.amount) + name;
+        tx.feeStr = profileService.formatAmount(tx.fees) + name;
       });
     };
 
@@ -1060,9 +1064,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     getToken(function(err, accessToken) {
       if (err || !accessToken) return;
       else {
-        ongoingProcess.set('connectingGlidera', true);
         glideraService.getAccessTokenPermissions(accessToken, function(err, p) {
-          ongoingProcess.set('connectingGlidera', false);
           if (err) {
             self.glideraError = err;
           } else {
@@ -1093,24 +1095,18 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     });
 
     if (permissions.transaction_history) {
-      ongoingProcess.set('Fetching Glidera Transactions', true);
       glideraService.getTransactions(accessToken, function(err, data) {
-        ongoingProcess.set('Fetching Glidera Transactions', false);
         self.glideraTxs = data;
       });
     }
 
     if (permissions.view_email_address && opts.fullUpdate) {
-      ongoingProcess.set('connectingGlidera', true);
       glideraService.getEmail(accessToken, function(err, data) {
-        ongoingProcess.set('connectingGlidera', false);
         self.glideraEmail = data.email;
       });
     }
     if (permissions.personal_info && opts.fullUpdate) {
-      ongoingProcess.set('connectingGlidera', true);
       glideraService.getPersonalInfo(accessToken, function(err, data) {
-        ongoingProcess.set('connectingGlidera', false);
         self.glideraPersonalInfo = data;
       });
     }
@@ -1145,9 +1141,7 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     getToken(function(err, accessToken) {
       if (err || !accessToken) return;
       else {
-        ongoingProcess.set('Getting primary account...', true);
         coinbaseService.getAccounts(accessToken, function(err, a) {
-          ongoingProcess.set('Getting primary account...', false);
           if (err) {
             self.coinbaseError = err;
             if (err.errors[0] && err.errors[0].id == 'expired_token') {
@@ -1416,15 +1410,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
     self.tab = 'walletHome';
   });
 
-  $rootScope.$on('Local/ValidatingWallet', function(ev, walletId) {
-    if (self.isInFocus(walletId)) {
-      ongoingProcess.set('validatingWallet', true);
-    }
-  });
-
   $rootScope.$on('Local/ValidatingWalletEnded', function(ev, walletId, isOK) {
+
     if (self.isInFocus(walletId)) {
-      ongoingProcess.set('validatingWallet', false);
+      // NOTE: If the user changed the wallet, the flag is already turn off.
       self.incorrectDerivation = isOK === false;
     }
   });
@@ -1656,12 +1645,6 @@ angular.module('copayApp.controllers').controller('indexController', function($r
       self.isComplete = null;
       self.walletName = null;
       uxLanguage.update();
-
-      profileService.isDisclaimerAccepted(function(v) {
-        if (v) {
-          go.path('import');
-        }
-      });
     });
   });
 
@@ -1687,6 +1670,10 @@ angular.module('copayApp.controllers').controller('indexController', function($r
 
   $rootScope.$on('Local/SetTab', function(event, tab, reset) {
     self.setTab(tab, reset);
+  });
+
+  $rootScope.$on('Local/WindowResize', function() {
+    self.physicalScreenWidth = ((window.innerWidth > 0) ? window.innerWidth : screen.width);
   });
 
   $rootScope.$on('Local/NeedsConfirmation', function(event, txp, cb) {
@@ -1742,6 +1729,11 @@ angular.module('copayApp.controllers').controller('indexController', function($r
       $scope.cancel = function() {
         return cb('No spending password given');
       };
+
+      $scope.keyPress = function(event) {
+        if (!$scope.data.password || $scope.loading) return;
+        if (event.keyCode == 13) $scope.set();
+      }
 
       $scope.set = function() {
         $scope.loading = true;

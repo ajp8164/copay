@@ -12,7 +12,6 @@ body {
   -ms-user-select: none;
   user-select: none;
   -webkit-touch-callout: none !important;
-  -webkit-overflow-scrolling: touch;
 }
 
 input {
@@ -102,6 +101,21 @@ _:-ms-fullscreen, :root .main {
     transform: scaleY(1.0);
     -webkit-transform: scaleY(1.0);
   }
+}
+
+@viewport {
+  width:320px;
+}
+
+@-ms-viewport {
+  width:320px;
+  zoom-user:fixed;
+  max-zoom:1;
+  min-zoom:1;
+}
+
+body, html {
+  -ms-overflow-style: none !important;
 }
 
 /* removes 300ms in IE */
