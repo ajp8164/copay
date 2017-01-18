@@ -85,7 +85,7 @@ module.exports = function(grunt) {
           'src/js/directives/*.js',
           'src/js/filters/*.js',
           'src/js/routes.js',
-          'src/js/services/*.js',
+          'src/js/services/**/*.js',
           'src/js/models/*.js',
           'src/js/controllers/**/*.js'
         ],
@@ -127,6 +127,8 @@ module.exports = function(grunt) {
           'bower_components/angular-md5/angular-md5.js',
           'bower_components/angular-mocks/angular-mocks.js',
           'bower_components/ngtouch/src/ngTouch.js',
+          'bower_components/chart.js//dist/Chart.min.js',
+          'bower_components/angular-chart/dist/angular-chart.min.js',
           'angular-bitauth/angular-bitauth.js',
           'angular-bitcore-wallet-client/angular-bitcore-wallet-client.js'
         ],
@@ -139,7 +141,7 @@ module.exports = function(grunt) {
           'src/js/directives/*.js',
           'src/js/filters/*.js',
           'src/js/models/*.js',
-          'src/js/services/*.js',
+          'src/js/services/**/*.js',
           'src/js/controllers/**/*.js',
           'src/js/translations.js',
           'src/js/appConfig.js',
@@ -171,7 +173,7 @@ module.exports = function(grunt) {
             'www/index.html',
             'www/views/**/*.html',
             'src/js/routes.js',
-            'src/js/services/*.js',
+            'src/js/services/**/*.js',
             'src/js/controllers/**/*.js'
           ]
         }

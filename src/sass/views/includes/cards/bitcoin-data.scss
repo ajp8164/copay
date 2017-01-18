@@ -1,0 +1,119 @@
+#bitcoin-data {
+  margin-bottom: 20px;
+
+  &.card {
+    color: $mid-gray;
+
+    .price {
+      font-size: 38px;
+      font-weight: normal;
+      position: relative;      
+      top: 5px;
+      margin-bottom: .5rem;
+
+      > .unit {
+        font-family: "Roboto-Light";
+      }
+
+    }
+
+    .infostamp {
+      font-size: 10px;
+      font-weight: normal;
+      color: $light-gray;
+
+      .source-name {
+        float: right;
+      }
+    }
+
+    .value {
+      font-size: 14px;
+      color: $dark-gray;
+
+      &.market-p-block {
+        display: inline-block;
+        position: relative;
+        top: -8px;
+        right: 0;
+
+        &:before {
+          margin: 0 auto;
+          position: relative;
+        }
+
+      }
+
+      &.highlight-up {
+        color: $success-green;
+
+        &.market-p-block {
+
+          &:before {
+            top: 6px;
+          }
+
+        }
+
+      }
+
+      &.highlight-down {
+        color: $warning-red;
+
+        &.market-p-block {
+
+          &:before {
+            top: 30px;
+          }
+
+        }
+
+      }
+
+    }
+
+    .section {
+      padding: 16px;
+
+      .title {
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      &.footer {
+        margin-bottom: 16px;
+      }
+
+      .centered {
+        text-align: center;
+      }
+
+      .description {
+        margin-top: 16px;
+      }
+
+      .action {
+        font-size: 12px;
+        text-transform: uppercase;
+        padding-right: 25px;
+        color: $soft-blue;
+        float: left;
+      }
+
+      &.stats {
+
+        .label {
+          font-size: 12px;
+          text-align: center;
+          color: $light-gray;
+        }
+
+      }
+
+    }
+
+  }
+
+}

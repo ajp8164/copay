@@ -10,6 +10,7 @@ var modules = [
   'ngTouch',
   'ngLodash',
   'ngCsv',
+  'chart.js',
   'angular-md5',
   'bwcModule',
   'bitauthModule',
