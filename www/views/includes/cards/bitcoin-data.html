@@ -1,0 +1,89 @@
+<div id="bitcoin-data" class="list card" ng-controller="bitcoinDataController">
+  <div class="item item-icon-right item-heading" ng-click="toggleCollapse()">
+    <div class="price">
+      {{(data.market['price'][marketSource] | currency : '' : 2) || na}} 
+      <span class="unit">
+        {{data.market['price'].unit}}
+      </span>
+      <i class="icon value market-p-block" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
+        ng-show="data.market['change-percent'][marketSource]">
+        {{(data.market['change-percent'][marketSource] * 100 | number : 2) || na}}{{data.market['change-percent'].unit}}
+      </i>
+    </div>
+    <div class="infostamp">
+      <span>Updated: {{data.market['timestamp'][marketSource] | date : "dd MMM, yyyy 'at' H:mm"}}</span>
+      <span class="source-name">{{data.market.sources[marketSource].name}} market data</span>
+    </div>
+    <i class="icon bp-arrow-up" ng-show="!collapsed"></i>
+    <i class="icon bp-arrow-down" ng-show="collapsed"></i>
+  </div>
+  <div ng-show="!collapsed">
+    <div class="section">
+
+    <canvas id="line" class="chart chart-line"
+      chart-data="data.market[selectedSeriesPrice][marketSource].data"
+      chart-labels="data.market[selectedSeriesPrice][marketSource].labels"
+      chart-series="data.market[selectedSeriesPrice][marketSource].series"
+      chart-options="charts.seriesPrice.options"
+      chart-colors="charts.seriesPrice.colors">
+    </canvas>
+
+<!--      
+      <img class="full-image" ng-src="http://www.mrgeek.me/wp-content/uploads/2013/03/Chart-JS.png">
+-->
+    </div>
+
+    <div class="section stats columns large-2 medium-2 small-2">
+      <div class="row">
+        <div class="col label">
+          {{data.market['open'].label}} 
+          <div class="value">
+            {{(data.market['open'][marketSource] | currency : '$' : 2) || na}}
+          </div>
+        </div>
+        <div class="col label">
+          {{data.market['change-usd'].label}} 
+          <div class="value" ng-class="marketUp ? 'highlight-up' : 'highlight-down'">
+              {{(data.market['change-usd'][marketSource] | currency : '$' : 2) || na}}
+            <i class="icon value" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
+              ng-show="data.market['change-usd'][marketSource]"></i>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col label">
+          {{data.market['high'].label}} 
+          <div class="value">
+            {{(data.market['high'][marketSource] | currency : '$' : 2) || na}}
+          </div>
+        </div>
+        <div class="col label">
+          {{data.network['market-cap'].label}} 
+          <div class="value">
+            {{(data.network['market-cap'][networkSource] | currency : '$' : 0) || na}}
+          </div>
+        </div>
+      </div>
+      <div class="row">        
+        <div class="col label">
+          {{data.market['low'].label}} 
+          <div class="value">
+            {{(data.market['low'][marketSource] | currency : '$' : 2) || na}}
+          </div>
+        </div>
+        <div class="col label">
+          {{data.network['total-bitcoin'].label}} 
+          <div class="value">
+            {{(data.network['total-bitcoin'][networkSource] | number) || na}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section footer">
+      <div class="action" ng-click="showAbout()">
+        <div translate>About</div>
+      </div>
+    </div>
+  </div>
+</div>
