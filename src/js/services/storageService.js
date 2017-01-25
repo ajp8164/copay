@@ -176,6 +176,7 @@ angular.module('copayApp.services')
               });
             });
           }
+          callback();
         }, function() {
           // done
           // Remove obsolete key.
@@ -244,7 +245,7 @@ angular.module('copayApp.services')
                 'the following accounts validated OK: ' + (verified.length > 0 ? verified : 'none'));
             });
           } else {
-            cb(null, (verified.length > 0 ? 'accounts OK: ' + verified : ''));
+            cb(null, (verified.length > 0 ? 'accounts OK: ' + verified : 'no accounts found'));
           }
         });
       });
@@ -339,8 +340,8 @@ angular.module('copayApp.services')
       var errorMessage = undefined;
       var keys = Object.keys(_upgraders).sort();
       var networks = ['livenet', 'testnet'];
-      _asyncEach(keys, function(key, callback) {
-        networks.forEach(function(network) {
+      _asyncEach(keys, function(key, callback_keys) {
+        _asyncEach(networks, function(network, callback_networks) {
           var storagekey = key.split('_')[1];
           _upgraders[key](storagekey, network, function(err, msg) {
             if (err) {
@@ -349,11 +350,14 @@ angular.module('copayApp.services')
               errorMessage = errorCount + ' storage upgrade failures';
             }
             if (msg) _handleUpgradeSuccess(storagekey + '-' + network, msg);
-            callback();
+            callback_networks();
           });
+        }, function() {
+          // done - networks
+          callback_keys();
         });
       }, function() {
-        //done
+        //done - keys
         cb(errorMessage);
       });
     };
@@ -704,15 +708,18 @@ angular.module('copayApp.services')
         }
         bitpayAccounts = bitpayAccounts || {};
         var cards = [];
-        Object.keys(bitpayAccounts).forEach(function(email) {
+        _asyncEach(Object.keys(bitpayAccounts), function(email, callback) {
           // For the UI, add the account email to the card object.
           var acctCards = bitpayAccounts[email]['bitpayDebitCards-' + network] || [];
           for (var i = 0; i < acctCards.length; i++) {
             acctCards[i].email = email;
           }
           cards = cards.concat(acctCards);
+          callback();
+        }, function() {
+          // done
+          cb(err, cards);
         });
-        cb(err, cards);
       });
     };
 
@@ -734,7 +741,7 @@ angular.module('copayApp.services')
           bitpayAccounts = JSON.parse(bitpayAccounts);
         }
         bitpayAccounts = bitpayAccounts || {};
-        Object.keys(bitpayAccounts).forEach(function(email) {
+        _asyncEach(Object.keys(bitpayAccounts), function(email, callback) {
           var data = bitpayAccounts[email]['bitpayDebitCards-' + network];
           var newCards = lodash.reject(data, {
             'eid': card.eid
@@ -748,12 +755,15 @@ angular.module('copayApp.services')
             root.getBitpayDebitCards(network, function(err, cards) {
               if (err) cb(err);
               if (cards.length == 0) {
-                root.removeNextStep('BitpayCard', cb);
+                root.removeNextStep('BitpayCard', callback());
               } else {
-                cb();
+                callback()
               }
             });
           });
+        }, function() {
+          // done
+          cb();
         });
       });
     };
