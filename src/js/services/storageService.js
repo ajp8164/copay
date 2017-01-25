@@ -420,6 +420,9 @@ angular.module('copayApp.services')
           account.cards = lodash.reject(account.cards, {
             'eid': cardEid
           });
+        }, function() {
+          // done
+          cb();
         });
 
         storage.set('bitpayAccounts-v2-' + network, allAccounts, cb);

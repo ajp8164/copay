@@ -202,23 +202,9 @@ angular.module('copayApp.services').factory('configService', function(storageSer
         if (!configCache.wallet.settings.unitCode) {
           configCache.wallet.settings.unitCode = defaultConfig.wallet.settings.unitCode;
         }
-<<<<<<< HEAD
 
         if (!configCache.hideNextSteps) {
           configCache.hideNextSteps = defaultConfig.hideNextSteps;
-=======
-        if (!configCache.glidera) {
-          configCache.glidera = defaultConfig.glidera;
-        }
-        if (!configCache.coinbaseV2) {
-          configCache.coinbaseV2 = defaultConfig.coinbaseV2;
-        }
-        if (!configCache.amazon) {
-          configCache.amazon = defaultConfig.amazon;
-        }
-        if (!configCache.bitpayCard) {
-          configCache.bitpayCard = defaultConfig.bitpayCard;
->>>>>>> Enable Coinbase to old and new users
         }
 
         if (!configCache.recentTransactions) {
