@@ -85,7 +85,7 @@ angular.module('copayApp.controllers').controller('tabHomeController',
           var wallet = profileService.getWallet(walletId);
           updateWallet(wallet);
           if ($scope.recentTransactionsEnabled) getNotifications();
-          if (type == 'NewBlock' && n && n.data && n.data.network == 'livenet') {
+          if ($scope.coinbaseEnabled && type == 'NewBlock' && n && n.data && n.data.network == 'livenet') {
             // Update Coinbase
             coinbaseService.updatePendingTransactions();
           }
@@ -104,7 +104,7 @@ angular.module('copayApp.controllers').controller('tabHomeController',
           var isWindowsPhoneApp = platformInfo.isWP && platformInfo.isCordova;
 
           $scope.glideraEnabled = config.glidera.enabled && !isWindowsPhoneApp;
-          $scope.coinbaseEnabled = config.coinbase.enabled && !isWindowsPhoneApp;
+          $scope.coinbaseEnabled = config.coinbaseV2 && !isWindowsPhoneApp;
           $scope.amazonEnabled = config.amazon.enabled;
           $scope.bitpayCardEnabled = config.bitpayCard.enabled;
 
