@@ -152,6 +152,26 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
               toValue: _seriesClose_toValue
             }
           }
+        }        
+      ]
+    },
+    //////////////////////////////////////////////////////////////////////////
+    ///
+    /// Series data
+    ///     
+    {
+      meta: {
+        enabled: true,
+        description: gettextCatalog.getString('Public BTC/USD OHLC data')
+      },
+      api: {
+        toUrl: function(query) {
+          var url = 'https://api.bitfinex.com/v2/candles/trade:{interval}:tBTCUSD/hist?limit={limit}&start={start}&end={end}';
+          url = url.replace('{start}', query.start());
+          url = url.replace('{end}', query.end());
+          url = url.replace('{interval}', query.interval());
+          url = url.replace('{limit}', query.limit());
+          return url;
         },
         {
           params: {

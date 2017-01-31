@@ -172,6 +172,25 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
               toValue: _seriesClose_toValue
             }
           }
+        }
+      ]
+    },
+    //////////////////////////////////////////////////////////////////////////
+    ///
+    /// Series data
+    ///     
+    {
+      meta: {
+        enabled: false,
+        description: gettextCatalog.getString('Public BTC/USD OHLC data from Bitcoin Charts')
+      },
+      api: {
+        toUrl: function(query) {
+          var url = 'http://bitcoincharts.com/charts/chart.json?m=bitstampUSD&SubmitButton=Draw&r=1&i={granularity}&c=1&s={start}&e={end}&Prev=&Next=&t=C&b=&a1=&m1=10&a2=&m2=25&x=0&i1=&i2=&i3=&i4=&v=0&cv=0&ps=0&l=0&p=0&';
+          url = url.replace('{start}', query.start());
+          url = url.replace('{end}', query.end());
+          url = url.replace('{granularity}', query.granularity());
+          return url;
         },
         //////////////////////////////////////////////////////////////////////////
         ///

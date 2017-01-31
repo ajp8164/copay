@@ -69,6 +69,21 @@ angular.module('copayApp.controllers').controller('advancedSettingsController', 
     });
   };
 
+  $scope.toggledDataServices = function () {
+    var opts = {
+      experimental: {
+        dataServices: {
+          enabled: $scope.experimental.dataServices.value
+        }
+      }
+    };
+    configService.set(opts, function(err) {
+      if (err) $log.debug(err);
+      $rootScope.$emit('Local/ExperimentChange');
+      $log.debug('Experimental - data services: ' + $scope.experimental.dataServices.value);
+    });
+  };
+
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
     updateConfig();
   });
