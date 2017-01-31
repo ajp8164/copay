@@ -24,6 +24,11 @@ angular.module('copayApp.controllers').controller('advancedSettingsController', 
     $scope.recentTransactionsEnabled = {
       value: config.recentTransactions.enabled
     };
+    $scope.experimental = {
+      dataServices: {
+        value: config.experimental.dataServices.enabled
+      }
+    };
   };
 
   $scope.spendUnconfirmedChange = function() {
@@ -87,6 +92,21 @@ angular.module('copayApp.controllers').controller('advancedSettingsController', 
     };
     configService.set(opts, function(err) {
       if (err) $log.debug(err);
+    });
+  };
+
+  $scope.toggledDataServices = function () {
+    var opts = {
+      experimental: {
+        dataServices: {
+          enabled: $scope.experimental.dataServices.value
+        }
+      }
+    };
+    configService.set(opts, function(err) {
+      if (err) $log.debug(err);
+      $rootScope.$emit('Local/ExperimentChange');
+      $log.debug('Experimental - data services: ' + $scope.experimental.dataServices.value);
     });
   };
 

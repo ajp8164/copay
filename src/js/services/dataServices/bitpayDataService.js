@@ -1,32 +1,67 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitpayDataService', function($log, dataService) {
+angular.module('copayApp.services').factory('bitpayDataService', function($log, gettextCatalog, dataService) {
   var root = {};
 
   var service = {
     info: {
-      name: 'BitPay, Inc.',
-      url: 'https://bitpay.com'
+      id: 'bitpay',
+      name: 'BitPay',
+      title: gettextCatalog.getString('BitPay market data'),
+      description: gettextCatalog.getString('Bitcoin market data provided by BitPay.'),
+      category: 'market',
+      url: 'https://bitpay.com',
+      icon: 'img/ds/icon-bitpay.png',
+      logo: 'img/ds/bitpay.png'
     },
-    sources: [{
-      api: {
-        url: 'https://bitpay.com/api/rates/usd'
+    sources: [
+    //////////////////////////////////////////////////////////////////////////
+    ///
+    /// Element data
+    ///     
+    {
+      meta: {
+        enabled: false,
+        description: gettextCatalog.getString('Public BTC/USD rates')
       },
-      data: {
-        'price': {
-          params: ['rate'],
-          toValue: function(rawValues) {
-            return parseFloat(rawValues[0]);
-          }
+      api: {
+        toUrl: function(params) {
+          return 'https://bitpay.com/api/rates/usd';
         },
-        'timestamp': { // Doesn't post a timestamp, so generate one here.
-          params: ['timestamp'],
-          toValue: function(rawValues) {
-            return new Date();
+        errorCheck: {
+          path: 'error[0]',
+          test: undefined,
+          msgs: ['error[0]']
+        }
+      },
+      queries: [
+        {
+          params: {},
+          results: {
+            price: {
+              elems: ['rate'],
+              toValue: function(rawValues) {
+                return parseFloat(rawValues[0]);
+              }
+            },
+            timestamp: { // Doesn't provide, so calculate value here.
+              elems: [],
+              toValue: function(rawValues) {
+                return new Date();
+              }
+            }
           }
         }
-      }
+      ]
     }]
+  };
+
+  root.enable = function() {
+    dataService.setEnabled(service, true);
+  };
+
+  root.disable = function() {
+    dataService.setEnabled(service, false);
   };
 
   root.getInfo = function() {
@@ -39,7 +74,6 @@ angular.module('copayApp.services').factory('bitpayDataService', function($log, 
 
   root.fetch = function(cb) {
     dataService.fetch(service, function() {
-      $log.info('Data service: done fetching ' + service.info.name + ' data');
       cb();
     });
   };

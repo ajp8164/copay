@@ -1,88 +1,151 @@
-<div id="bitcoin-data" class="list card" ng-controller="bitcoinDataController">
-  <div class="item item-icon-right item-heading" ng-click="toggleCollapse()">
-    <div class="price">
-      {{(data.market['price'][marketSource] | currency : '' : 2) || na}} 
-      <span class="unit">
-        {{data.market['price'].unit}}
-      </span>
-      <i class="icon value market-p-block" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
-        ng-show="data.market['change-percent'][marketSource]">
-        {{(data.market['change-percent'][marketSource] * 100 | number : 2) || na}}{{data.market['change-percent'].unit}}
-      </i>
-    </div>
-    <div class="infostamp">
-      <span>Updated: {{data.market['timestamp'][marketSource] | date : "dd MMM, yyyy 'at' H:mm"}}</span>
-      <span class="source-name">{{data.market.sources[marketSource].name}} market data</span>
-    </div>
-    <i class="icon bp-arrow-up" ng-show="!collapsed"></i>
-    <i class="icon bp-arrow-down" ng-show="collapsed"></i>
-  </div>
-  <div ng-show="!collapsed">
-    <div class="section">
-
-    <canvas id="line" class="chart chart-line"
-      chart-data="data.market[selectedSeriesPrice][marketSource].data"
-      chart-labels="data.market[selectedSeriesPrice][marketSource].labels"
-      chart-series="data.market[selectedSeriesPrice][marketSource].series"
-      chart-options="charts.seriesPrice.options"
-      chart-colors="charts.seriesPrice.colors">
-    </canvas>
-
-<!--      
-      <img class="full-image" ng-src="http://www.mrgeek.me/wp-content/uploads/2013/03/Chart-JS.png">
--->
-    </div>
-
-    <div class="section stats columns large-2 medium-2 small-2">
-      <div class="row">
-        <div class="col label">
-          {{data.market['open'].label}} 
-          <div class="value">
-            {{(data.market['open'][marketSource] | currency : '$' : 2) || na}}
-          </div>
-        </div>
-        <div class="col label">
-          {{data.market['change-usd'].label}} 
-          <div class="value" ng-class="marketUp ? 'highlight-up' : 'highlight-down'">
-              {{(data.market['change-usd'][marketSource] | currency : '$' : 2) || na}}
-            <i class="icon value" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
-              ng-show="data.market['change-usd'][marketSource]"></i>
-          </div>
-        </div>
+<div ng-controller="bitcoinDataController">
+  <div id="bitcoin-data" class="list card" ng-show="dataServiceEnabled">
+    <div class="item item-icon-right item-heading" ng-click="toggleCollapse()">
+      <div class="price">
+        {{(data.market.price[config.marketSource.id] | currency : '' : 2) || na}} 
+        <span class="unit">
+          {{data.market.price.unit}}
+        </span>
+        <i class="icon value market-p-block" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
+          ng-show="data.market.changePercent[config.marketSource.id]">
+          {{(data.market.changePercent[config.marketSource.id] * 100 | number : 2) || na}}{{data.market.changePercent.unit}}
+        </i>
       </div>
-      <div class="row">
-        <div class="col label">
-          {{data.market['high'].label}} 
-          <div class="value">
-            {{(data.market['high'][marketSource] | currency : '$' : 2) || na}}
-          </div>
-        </div>
-        <div class="col label">
-          {{data.network['market-cap'].label}} 
-          <div class="value">
-            {{(data.network['market-cap'][networkSource] | currency : '$' : 0) || na}}
-          </div>
-        </div>
+      <div class="infostamp">
+        <span>Updated: {{(data.market.timestamp[config.marketSource.id] | date : "dd MMM, yyyy 'at' H:mm") || na}}</span>
+        <span class="source-name" ng-show="data.market.sources[config.marketSource.id].name">
+          {{data.market.sources[config.marketSource.id].title}}
+        </span>
       </div>
-      <div class="row">        
-        <div class="col label">
-          {{data.market['low'].label}} 
-          <div class="value">
-            {{(data.market['low'][marketSource] | currency : '$' : 2) || na}}
-          </div>
-        </div>
-        <div class="col label">
-          {{data.network['total-bitcoin'].label}} 
-          <div class="value">
-            {{(data.network['total-bitcoin'][networkSource] | number) || na}}
-          </div>
-        </div>
-      </div>
+      <i class="icon bp-arrow-up" ng-show="!collapsed"></i>
+      <i class="icon bp-arrow-down" ng-show="collapsed"></i>
     </div>
+    <div ng-show="!collapsed">
 
-    <div class="section footer">
-      <div class="action" ng-click="showAbout()">
-        <div translate>About</div>
+      <div class="section chart">
+        <ion-slides class="slides" slider="chartSliderDelegate" options="chartSliderOptions" ng-show="charts.length > 0">
+          <ion-slide-page ng-repeat="chart in charts track by $index">
+            <div class="title">{{chart.title}}</div>
+            <canvas id="{{chart.id}}" class="chart chart-line" style="max-height: 165px"
+              chart-data="chart.data"
+              chart-labels="chart.labels"
+              chart-series="chart.series"
+              chart-options="chart.options"
+              chart-colors="chart.colors">
+            </canvas>
+          </ion-slide-page>
+        </ion-slides>
+      </div>
+
+      <div class="section stats columns large-2 medium-2 small-2">
+        <ion-slides class="slides" slider="statsSliderDelegate" options="statsSliderOptions">
+            <!-- Market Data -->
+          <ion-slide-page>
+            <div class="row">
+              <div class="col label">
+                {{data.market.open.label}} 
+                <div class="value">
+                  {{(data.market.open[config.marketSource.id] | currency : '$' : 2) || na}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.market.changeUSD.label}} 
+                <div class="value" ng-class="marketUp ? 'highlight-up' : 'highlight-down'">
+                    {{(data.market.changeUSD[config.marketSource.id] | currency : '$' : 2) || na}}
+                  <i class="icon value" ng-class="marketUp ? 'highlight-up ion-arrow-up-b' : 'highlight-down ion-arrow-down-b'"
+                    ng-show="data.market.changeUSD[config.marketSource.id]"></i>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col label">
+                {{data.market.high.label}} 
+                <div class="value">
+                  {{(data.market.high[config.marketSource.id] | currency : '$' : 2) || na}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.network.marketCap.label}} 
+                <div class="value">
+                  {{(data.network.marketCap[config.networkSource.id] | currency : '$' : 0) || na}}
+                </div>
+              </div>
+            </div>
+            <div class="row">        
+              <div class="col label">
+                {{data.market.low.label}} 
+                <div class="value">
+                  {{(data.market.low[config.marketSource.id] | currency : '$' : 2) || na}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.network.totalBitcoin.label}} 
+                <div class="value">
+                  {{(data.network.totalBitcoin[config.networkSource.id] | number) || na}}
+                </div>
+              </div>
+            </div>
+          </ion-slide-page>
+
+          <!-- Network Data -->
+          <ion-slide-page>
+            <div class="row">
+              <div class="col label">
+                {{data.network.numberBlockTotal.label}} 
+                <div class="value">
+                  {{(data.network.numberBlockTotal[config.networkSource.id] | number) || na}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.network.rewardPerBlock.label}} 
+                <div class="value">
+                  {{(data.network.rewardPerBlock[config.networkSource.id] | number) || na}} {{data.network.rewardPerBlock.unit}}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col label">
+                {{data.network.difficulty.label}} 
+                <div class="value">
+                  {{(data.network.difficulty[config.networkSource.id] | number) || na}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.network.nextRetarget.label}} 
+                <div class="value">
+                  {{(data.network.nextRetarget[config.networkSource.id] | number) || na}} 
+                </div>
+              </div>
+            </div>
+            <div class="row">        
+              <div class="col label">
+                {{data.network.hashRate.label}} 
+                <div class="value">
+                  {{(data.network.hashRate[config.networkSource.id] | number) || na}} {{data.network.hashRate.unit}}
+                </div>
+              </div>
+              <div class="col label">
+                {{data.network.timeBetweenBlocks.label}} 
+                <div class="value">
+                  {{(data.network.timeBetweenBlocks[config.networkSource.id] | number) || na}} {{data.network.timeBetweenBlocks.unit}}
+                </div>
+              </div>
+            </div>
+          </ion-slide-page>
+        </ion-slides>
+      </div>
+
+      <div class="section footer">
+        <div class="action left" ng-click="showAbout()">
+          <i class="icon big-icon-svg">
+            <img src="img/icon-about.svg"/>
+          </i>
+        </div>
+        <div class="action right" ng-click="refresh()">
+          <i class="icon big-icon-svg">
+            <img src="img/icon-sync.svg"/>
+          </i>
+        </div>
       </div>
     </div>
   </div>

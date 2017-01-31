@@ -58,7 +58,6 @@ angular.module('copayApp.services').factory('configService', function(storageSer
       enabled: true
     },
 
-
     recentTransactions: {
       enabled: true,
     },
@@ -91,6 +90,29 @@ angular.module('copayApp.services').factory('configService', function(storageSer
     emailNotifications: {
       enabled: false,
     },
+
+    dataServices: {
+      enabled: false,
+      refreshPeriod: 1,
+      bitcoinDataService: {
+        enabled: true,
+        marketSource: {
+          id: 'bitstamp'
+        },
+        networkSource: {
+          id: 'blockchain'
+        },
+        charts: "[\"series1dPriceUSD\",\"series7dPriceUSD\",\"series30dPriceUSD\"]"
+      }
+    },
+
+    //Experimental Features
+    experimental: {
+      dataServices: {
+        enabled: false
+      }
+    }
+
   };
 
   var configCache = null;
@@ -208,6 +230,12 @@ angular.module('copayApp.services').factory('configService', function(storageSer
         }
         if (!configCache.pushNotifications) {
           configCache.pushNotifications = defaultConfig.pushNotifications;
+        }
+        if (!configCache.dataServices) {
+          configCache.dataServices = defaultConfig.dataServices;
+        }
+        if (!configCache.experimental) {
+          configCache.experimental = defaultConfig.experimental;
         }
 
       } else {

@@ -7,6 +7,19 @@
   .item {
     color: $dark-gray;
     border-color: rgba(221, 221, 221, 0.3);
+    &.item-radio,
+    &.item-toggle {
+      .icon {
+        &.left {
+          padding-right: 14px;
+          position: relative;
+          top: 2px;
+          img {
+            height: 16px;
+          }
+        }
+      }
+    }
   }
   .has-comment {
     border-bottom: 0 none;

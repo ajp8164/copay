@@ -1,0 +1,19 @@
+<ion-view class="settings">
+  <ion-nav-bar class="bar-royal">
+    <ion-nav-title>
+      {{'Refresh Data'|translate}}
+    </ion-nav-title>
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content>
+    <div class="settings-explanation">
+      <div class="settings-description" translate>
+        The time between data service updates.
+      </div>
+    </div>
+    <ion-radio ng-repeat="period in periods" ng-value="period.value" ng-model="currentPeriod"
+      ng-click="save(period)">{{period.label}}
+    </ion-radio>
+  </ion-content>
+</ion-view>
