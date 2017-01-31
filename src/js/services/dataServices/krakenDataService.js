@@ -1,18 +1,18 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitfinexDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('krakenDataService', function($log, gettextCatalog, dataService) {
   var root = {};
 
   var service = {
     info: {
-      id: 'bitfinex',
-      name: 'Bitfinex',
-      title: gettextCatalog.getString('Bitfinex market data'),
-      description: gettextCatalog.getString('Bitcoin market data provided by Bitfinex.'),
+      id: 'kraken',
+      name: 'Kraken',
+      title: gettextCatalog.getString('Kraken market data'),
+      description: gettextCatalog.getString('Bitcoin market data provided by Kraken.'),
       category: 'market',
-      url: 'https://www.bitfinex.com',
-      icon: 'img/ds/icon-bitfinex.png',
-      logo: 'img/ds/bitfinex.png'
+      url: 'https://www.kraken.com/',
+      icon: 'img/ds/icon-kraken.png',
+      logo: 'img/ds/kraken.png'
     },
     sources: [
     //////////////////////////////////////////////////////////////////////////
@@ -22,11 +22,11 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
     {
       meta: {
         enabled: false,
-        description: gettextCatalog.getString('Public BTC/USD ticker')
+        description: gettextCatalog.getString('Public BTC/USD Ticker')
       },
       api: {
         toUrl: function(params) {
-          return 'https://api.bitfinex.com/v2/ticker/tBTCUSD';
+          return 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD';
         },
         errorCheck: {
           path: 'error[0]',
@@ -39,35 +39,43 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
           params: {},
           results: {
             price: {
-              elems: ['[6]'],
+              elems: ['result.XXBTZUSD.c'],
+              toValue: function(rawValues) {
+                return parseFloat(rawValues[0]);
+              }
+            },
+            open: {
+              elems: ['result.XXBTZUSD.o'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             high: {
-              elems: ['[8]'],
+              elems: ['result.XXBTZUSD.h'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             low: {
-              elems: ['[9]'],
+              elems: ['result.XXBTZUSD.l'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             changePercent: {
-              elems: ['[5]'],
+              elems: ['result.XXBTZUSD.o', 'result.XXBTZUSD.c'],
               toValue: function(rawValues) {
-                return parseFloat(rawValues[0]);
+                var open = parseFloat(rawValues[0]);
+                var last = parseFloat(rawValues[1]);
+                return (last - open) / open;
               }
             },
             changeUSD: {
-              elems: ['[6]', '[4]'],
+              elems: ['result.XXBTZUSD.o', 'result.XXBTZUSD.c'],
               toValue: function(rawValues) {
-                var price = parseFloat(rawValues[0]);
-                var changeBTC = parseFloat(rawValues[1]);
-                return (price * changeBTC);
+                var open = parseFloat(rawValues[0]);
+                var last = parseFloat(rawValues[1]);
+                return last - open;
               }
             },
             timestamp: { // Doesn't provide, so calculate value here.
@@ -77,7 +85,7 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
               }
             }
           }
-        }        
+        }
       ]
     },
     //////////////////////////////////////////////////////////////////////////
@@ -91,82 +99,62 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
       },
       api: {
         toUrl: function(query) {
-          var url = 'https://api.bitfinex.com/v2/candles/trade:{interval}:tBTCUSD/hist?limit={limit}&start={start}&end={end}';
-          url = url.replace('{start}', query.start());
-          url = url.replace('{end}', query.end());
+          var url = 'https://api.kraken.com/0/public/OHLC?pair=XXBTZUSD&interval={interval}&since={since}';
           url = url.replace('{interval}', query.interval());
-          url = url.replace('{limit}', query.limit());
+          url = url.replace('{since}', query.since());
           return url;
         },
         errorCheck: {
-          path: '[0]',
-          test: 'error',
-          msgs: ['[2]']
+          path: 'error[0]',
+          test: undefined,
+          msgs: ['error[0]']
         }
       },
       queries: [
         {
           params: {
-            start: function() {
-              return moment().subtract(1, 'days').unix() * 1000;
-            },
-            end: function() {
-              return moment().unix() * 1000;
-            },
             interval: function() {
-              return '15m';
+              return 5; // minutes
             },
-            limit: function() {
-              return 200;
+            since: function() {
+              return moment().subtract(1, 'days').unix();
             }
           },
           results: {
             series1dPriceUSD: {
-              elems: [],
+              elems: ['result.XXBTZUSD'],
               toValue: _seriesPrice_toValue
             }
           }
         },
         {
           params: {
-            start: function() {
-              return moment().subtract(7, 'days').unix() * 1000;
-            },
-            end: function() {
-              return moment().unix() * 1000;
-            },
             interval: function() {
-              return '1h';
+              return 30; // minutes
             },
-            limit: function() {
-              return 200;
+            since: function() {
+              return moment().subtract(7, 'days').unix();
             }
           },
           results: {
             series7dPriceUSD: {
-              elems: [],
+              elems: ['result.XXBTZUSD'],
               toValue: _seriesPrice_toValue
             }
           }
         },
         {
           params: {
-            start: function() {
-              return moment().subtract(30, 'days').unix() * 1000;
-            },
-            end: function() {
-              return moment().unix() * 1000;
-            },
             interval: function() {
-              return '6h';
+              return 240; // minutes
             },
-            limit: function() {
-              return 200;
+            since: function() {
+              return moment().subtract(30, 'days').unix();
             }
           },
           results: {
             series30dPriceUSD: {
-              elems: [],
+              elems: ['result.XXBTZUSD'],
               toValue: _seriesPrice_toValue
             }
           }
@@ -201,7 +189,7 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
   // 
   function _seriesPrice_toValue(rawValues) {
     // rawValues: [
-    //  [time, open, close, high, low, volume]
+    //  [time, open, high, low, close, vwap, volume, count]
     // ]
     // Note: time is truncated by 3 digits
     var result = {
@@ -209,11 +197,9 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
       labels: [],
       series: ['Series 1']
     };
-    if (Array.isArray(rawValues) && rawValues.length > 0) {
-      for (var i = 0; i < rawValues.length; i++) {
-        result.data[0].push(rawValues[i][2]); //close
-        result.labels.push(new Date(rawValues[i][0])); // time
-      }
+    for (var i = 0; i < rawValues[0].length; i++) {
+      result.data[0].push(rawValues[0][i][4]); //close
+      result.labels.push(new Date(rawValues[0][i][0]*1000)); // time
     }
     return result;
   };

@@ -31,6 +31,7 @@ angular.module('copayApp.controllers').controller('tabSettingsController', funct
         $scope.bitpayCards = cards && cards.length > 0;
       });
 
+      $scope.dataServicesEnabled = config.experimental.dataServices.enabled;
     });
   };
 

@@ -1,20 +1,77 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitstampDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('btceDataService', function($log, gettextCatalog, dataService) {
   var root = {};
 
   var service = {
     info: {
-      id: 'bitstamp',
-      name: 'Bitstamp',
-      title: gettextCatalog.getString('Bitstamp market data'),
-      description: gettextCatalog.getString('Bitcoin market data provided by Bitstamp. Bitstamp historical data provided by Bitcoin Charts (http://bitcoincharts.com).'),
+      id: 'btce',
+      name: 'BTC-e',
+      title: gettextCatalog.getString('BTC-e market data'),
+      description: gettextCatalog.getString('Bitcoin market data provided by BTC-e. BTC-e historical data provided by Bitcoin Charts (http://bitcoincharts.com).'),
       category: 'market',
-      url: 'https://www.bitstamp.net',
-      icon: 'img/ds/icon-bitstamp.png',
-      logo: 'img/ds/bitstamp.png'
+      url: 'https://btc-e.com/',
+      icon: 'img/ds/icon-btce.png',
+      logo: 'img/ds/btce.png'
     },
     sources: [
+    //////////////////////////////////////////////////////////////////////////
+    ///
+    /// Element data - open
+    /// 
+    /// Daily open price not directly available. As an estimate, use series data
+    /// to go back one day to get price to use as open.
+    ///     
+    {
+      meta: {
+        enabled: false,
+        description: gettextCatalog.getString('Public BTC/USD OHLC data from Bitcoin Charts')
+      },
+      api: {
+        toUrl: function(query) {
+          var url = 'http://bitcoincharts.com/charts/chart.json?m=btceUSD&SubmitButton=Draw&r=1&i={granularity}&c=1&s={start}&e={end}&Prev=&Next=&t=S&b=&a1=&m1=10&a2=&m2=25&x=0&i1=&i2=&i3=&i4=&v=1&cv=0&ps=0&l=0&p=0&';
+          url = url.replace('{start}', query.start());
+          url = url.replace('{end}', query.end());
+          url = url.replace('{granularity}', query.granularity());
+          return url;
+        },
+        errorCheck: {
+          path: 'error[0]',
+          test: undefined,
+          msgs: ['error[0]']
+        }
+      },
+      queries: [
+        {
+          params: {
+            start: function() {
+              return moment().subtract(1, 'days').format('YYYY-MM-DD');
+            },
+            end: function() {
+              return moment().format('YYYY-MM-DD');
+            },
+            granularity: function() {
+              return 'Daily';
+            }
+          },
+          results: {
+            open: {
+              elems: [],
+              toValue: function(rawValues) {
+                // rawValues: [{
+                //   time, open, high, low, close, volume (btc), volume (currency), weighted price
+                // }]
+                var result = undefined;
+                if (Array.isArray(rawValues) && rawValues.length > 0) {
+                  result = rawValues[rawValues.length - 2][4]; //open
+                }
+                return result;
+              }
+            }
+          }
+        }
+      ]
+    },
     //////////////////////////////////////////////////////////////////////////
     ///
     /// Element data
@@ -26,7 +83,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
       },
       api: {
         toUrl: function(params) {
-          return 'https://www.bitstamp.net/api/v2/ticker/btcusd/';
+          return 'https://btc-e.com/api/3/ticker/btc_usd';
         },
         errorCheck: {
           path: 'error[0]',
@@ -39,31 +96,25 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
           params: {},
           results: {
             price: {
-              elems: ['last'],
-              toValue: function(rawValues) {
-                return parseFloat(rawValues[0]);
-              }
-            },
-            open: {
-              elems: ['open'],
+              elems: ['btc_usd.last'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             high: {
-              elems: ['high'],
+              elems: ['btc_usd.high'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             low: {
-              elems: ['low'],
+              elems: ['btc_usd.low'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             changePercent: {
-              elems: ['open', 'last'],
+              elems: ['this.open', 'btc_usd.last'],
               toValue: function(rawValues) {
                 var open = parseFloat(rawValues[0]);
                 var last = parseFloat(rawValues[1]);
@@ -71,7 +122,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
               }
             },
             changeUSD: {
-              elems: ['open', 'last'],
+              elems: ['this.open', 'btc_usd.last'],
               toValue: function(rawValues) {
                 var open = parseFloat(rawValues[0]);
                 var last = parseFloat(rawValues[1]);
@@ -79,7 +130,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
               }
             },
             timestamp: {
-              elems: ['timestamp'],
+              elems: ['btc_usd.updated'],
               toValue: function(rawValues) {
                 return new Date(parseInt(rawValues[0] + '000'));
               }
@@ -99,7 +150,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
       },
       api: {
         toUrl: function(query) {
-          var url = 'http://bitcoincharts.com/charts/chart.json?m=bitstampUSD&SubmitButton=Draw&r=1&i={granularity}&c=1&s={start}&e={end}&Prev=&Next=&t=C&b=&a1=&m1=10&a2=&m2=25&x=0&i1=&i2=&i3=&i4=&v=0&cv=0&ps=0&l=0&p=0&';
+          var url = 'http://bitcoincharts.com/charts/chart.json?m=btceUSD&SubmitButton=Draw&r=1&i={granularity}&c=1&s={start}&e={end}&Prev=&Next=&t=S&b=&a1=&m1=10&a2=&m2=25&x=0&i1=&i2=&i3=&i4=&v=1&cv=0&ps=0&l=0&p=0&';
           url = url.replace('{start}', query.start());
           url = url.replace('{end}', query.end());
           url = url.replace('{granularity}', query.granularity());
@@ -159,7 +210,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
               return moment().format('YYYY-MM-DD');
             },
             granularity: function() {
-              return '6-hour';
+              return '2-hour';
             }
           },
           results: {

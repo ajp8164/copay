@@ -21,6 +21,7 @@
     "angular-clipboard": "^1.4.2",
     "angular-md5": "^0.1.10",
     "ngtouch": "^1.0.1",
+    "async": "^2.1.4",
     "chart.js": "^2.4.0",
     "angular-chart": "git://github.com/jtblin/angular-chart.git"
   },
