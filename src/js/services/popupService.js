@@ -6,11 +6,14 @@ angular.module('copayApp.services').service('popupService', function($log, $ioni
 
   /*************** Ionic ****************/
 
-  var _ionicAlert = function(title, message, cb, buttonName) {
+  var _ionicAlert = function(title, message, cb, buttonName, opts) {
+    opts = opts || {};
     if (!cb) cb = function() {};
     $ionicPopup.alert({
       title: title,
       subTitle: message,
+      cssClass: opts.class,
+      template: opts.template,
       okType: 'button-clear button-positive',
       okText: buttonName || gettextCatalog.getString('OK'),
     }).then(cb);
@@ -74,16 +77,20 @@ angular.module('copayApp.services').service('popupService', function($log, $ioni
    * @param {String} Title (optional)
    * @param {String} Message
    * @param {Callback} Function (optional)
+   * @param {String} buttonName (optional)
+   * @param {String} opts (optional)
    */
 
-  this.showAlert = function(title, msg, cb, buttonName) {
+  this.showAlert = function(title, msg, cb, buttonName, opts) {
     var message = (msg && msg.message) ? msg.message : msg;
     $log.warn(title ? (title + ': ' + message) : message);
 
-    if (isCordova)
+    opts = opts ||  {};
+
+    if (isCordova && !opts.forceHTMLPrompt)
       _cordovaAlert(title, message, cb, buttonName);
     else
-      _ionicAlert(title, message, cb, buttonName);
+      _ionicAlert(title, message, cb, buttonName, opts);
   };
 
   /**

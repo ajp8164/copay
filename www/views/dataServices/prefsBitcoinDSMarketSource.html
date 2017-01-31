@@ -1,0 +1,24 @@
+<ion-view class="settings">
+  <ion-nav-bar class="bar-royal">
+    <ion-nav-title>
+      {{'Bitcoin Market Data Source'|translate}}
+    </ion-nav-title>
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content>
+    <div class="settings-explanation">
+      <div class="settings-description" translate>
+        Choose a provider for bitcoin market data.
+      </div>
+    </div>
+    <div class="list">
+      <ion-radio ng-repeat="source in sources" ng-value="source.id" ng-model="currentSource" ng-click="save(source)">
+        <i class="icon left">
+          <img ng-src="{{source.icon}}">
+        </i>
+        {{source.name}}
+      </ion-radio>
+    </div>
+  </ion-content>
+</ion-view>

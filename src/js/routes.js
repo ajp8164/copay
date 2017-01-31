@@ -405,6 +405,51 @@ angular.module('copayApp').config(function(historicLogProvider, $provide, $logPr
           }
         }
       })
+      .state('tabs.dataServices', {
+        url: '/dataServices',
+        views: {
+          'tab-settings@tabs': {
+            controller: 'preferencesDataServicesController',
+            templateUrl: 'views/preferencesDataServices.html'
+          }
+        }
+      })
+      .state('tabs.dataServicesRefresh', {
+        url: '/dataServicesRefresh',
+        views: {
+          'tab-settings@tabs': {
+            controller: 'prefsDataServicesRefreshController',
+            templateUrl: 'views/dataServices/prefsDataServicesRefresh.html'
+          }
+        }
+      })
+      .state('tabs.bitcoinDSMarketSource', {
+        url: '/bitcoinDSMarketSource',
+        views: {
+          'tab-settings@tabs': {
+            controller: 'prefsBitcoinDSMarketSourceController',
+            templateUrl: 'views/dataServices/prefsBitcoinDSMarketSource.html'
+          }
+        }
+      })
+      .state('tabs.bitcoinDSNetworkSource', {
+        url: '/bitcoinDSNetworkSource',
+        views: {
+          'tab-settings@tabs': {
+            controller: 'prefsBitcoinDSNetworkSourceController',
+            templateUrl: 'views/dataServices/prefsBitcoinDSNetworkSource.html'
+          }
+        }
+      })
+      .state('tabs.bitcoinDSCharts', {
+        url: '/bitcoinDSCharts',
+        views: {
+          'tab-settings@tabs': {
+            controller: 'prefsBitcoinDSChartsController',
+            templateUrl: 'views/dataServices/prefsBitcoinDSCharts.html'
+          }
+        }
+      })
       .state('tabs.about', {
         url: '/about',
         views: {

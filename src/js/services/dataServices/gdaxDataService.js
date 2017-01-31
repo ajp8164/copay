@@ -1,18 +1,18 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitfinexDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('gdaxDataService', function($log, gettextCatalog, dataService) {
   var root = {};
 
   var service = {
     info: {
-      id: 'bitfinex',
-      name: 'Bitfinex',
-      title: gettextCatalog.getString('Bitfinex market data'),
-      description: gettextCatalog.getString('Bitcoin market data provided by Bitfinex.'),
+      id: 'gdax',
+      name: 'GDAX',
+      title: gettextCatalog.getString('GDAX market data'),
+      description: gettextCatalog.getString('Bitcoin market data provided by GDAX.'),
       category: 'market',
-      url: 'https://www.bitfinex.com',
-      icon: 'img/ds/icon-bitfinex.png',
-      logo: 'img/ds/bitfinex.png'
+      url: 'https://www.gdax.com',
+      icon: 'img/ds/icon-gdax.png',
+      logo: 'img/ds/gdax.png'
     },
     sources: [
     //////////////////////////////////////////////////////////////////////////
@@ -22,11 +22,11 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
     {
       meta: {
         enabled: false,
-        description: gettextCatalog.getString('Public BTC/USD ticker')
+        description: gettextCatalog.getString('Public BTC/USD statistics')
       },
       api: {
         toUrl: function(params) {
-          return 'https://api.bitfinex.com/v2/ticker/tBTCUSD';
+          return 'https://api.gdax.com/products/BTC-USD/stats';
         },
         errorCheck: {
           path: 'error[0]',
@@ -39,35 +39,49 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
           params: {},
           results: {
             price: {
-              elems: ['[6]'],
+              elems: ['last'],
+              toValue: function(rawValues) {
+                return parseFloat(rawValues[0]);
+              }
+            },
+            open: {
+              elems: ['open'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             high: {
-              elems: ['[8]'],
+              elems: ['high'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             low: {
-              elems: ['[9]'],
+              elems: ['low'],
               toValue: function(rawValues) {
                 return parseFloat(rawValues[0]);
               }
             },
             changePercent: {
-              elems: ['[5]'],
+              elems: ['open', 'last'],
               toValue: function(rawValues) {
-                return parseFloat(rawValues[0]);
+                var open = parseFloat(rawValues[0]);
+                var last = parseFloat(rawValues[1]);
+                return (last - open) / open;
               }
             },
             changeUSD: {
-              elems: ['[6]', '[4]'],
+              elems: ['open', 'last'],
               toValue: function(rawValues) {
-                var price = parseFloat(rawValues[0]);
-                var changeBTC = parseFloat(rawValues[1]);
-                return (price * changeBTC);
+                var open = parseFloat(rawValues[0]);
+                var last = parseFloat(rawValues[1]);
+                return last - open;
+              }
+            },
+            volume: {
+              elems: ['volume'],
+              toValue: function(rawValues) {
+                return parseFloat(rawValues[0]);
               }
             },
             timestamp: { // Doesn't provide, so calculate value here.
@@ -77,7 +91,7 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
               }
             }
           }
-        }        
+        }
       ]
     },
     //////////////////////////////////////////////////////////////////////////
@@ -86,38 +100,34 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
     ///     
     {
       meta: {
-        enabled: true,
+        enabled: false,
         description: gettextCatalog.getString('Public BTC/USD OHLC data')
       },
       api: {
         toUrl: function(query) {
-          var url = 'https://api.bitfinex.com/v2/candles/trade:{interval}:tBTCUSD/hist?limit={limit}&start={start}&end={end}';
+          var url = 'https://api.gdax.com/products/BTC-USD/candles?start={start}&end={end}&granularity={granularity}';
           url = url.replace('{start}', query.start());
           url = url.replace('{end}', query.end());
-          url = url.replace('{interval}', query.interval());
-          url = url.replace('{limit}', query.limit());
+          url = url.replace('{granularity}', query.granularity());
           return url;
         },
         errorCheck: {
-          path: '[0]',
-          test: 'error',
-          msgs: ['[2]']
+          path: 'error[0]',
+          test: undefined,
+          msgs: ['error[0]']
         }
       },
       queries: [
         {
           params: {
             start: function() {
-              return moment().subtract(1, 'days').unix() * 1000;
+              return moment().subtract(1, 'days').toISOString();
             },
             end: function() {
-              return moment().unix() * 1000;
+              return moment().toISOString();
             },
-            interval: function() {
-              return '15m';
-            },
-            limit: function() {
-              return 200;
+            granularity: function() {
+              return 435;
             }
           },
           results: {
@@ -130,16 +140,13 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(7, 'days').unix() * 1000;
+              return moment().subtract(7, 'days').toISOString();
             },
             end: function() {
-              return moment().unix() * 1000;
+              return moment().toISOString();
             },
-            interval: function() {
-              return '1h';
-            },
-            limit: function() {
-              return 200;
+            granularity: function() {
+              return 3000;
             }
           },
           results: {
@@ -152,16 +159,13 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(30, 'days').unix() * 1000;
+              return moment().subtract(30, 'days').toISOString();
             },
             end: function() {
-              return moment().unix() * 1000;
+              return moment().toISOString();
             },
-            interval: function() {
-              return '6h';
-            },
-            limit: function() {
-              return 200;
+            granularity: function() {
+              return 12500;
             }
           },
           results: {
@@ -200,9 +204,9 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
   // Data source transforms.
   // 
   function _seriesPrice_toValue(rawValues) {
-    // rawValues: [
-    //  [time, open, close, high, low, volume]
-    // ]
+    // rawValues: [{
+    //   time, low, high, open, close, volume
+    // }]
     // Note: time is truncated by 3 digits
     var result = {
       data: [[]],
@@ -211,8 +215,8 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
     };
     if (Array.isArray(rawValues) && rawValues.length > 0) {
       for (var i = 0; i < rawValues.length; i++) {
-        result.data[0].push(rawValues[i][2]); //close
-        result.labels.push(new Date(rawValues[i][0])); // time
+        result.data[0].push(rawValues[i][4]); //close
+        result.labels.push(new Date(rawValues[i][0]*1000)); // time
       }
     }
     return result;

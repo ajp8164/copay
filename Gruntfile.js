@@ -118,6 +118,7 @@ module.exports = function(grunt) {
           'bower_components/qrcode-generator/js/qrcode_UTF8.js',
           'bower_components/moment/min/moment-with-locales.js',
           'bower_components/angular-moment/angular-moment.js',
+          'bower_components/async/dist/async.min.js',
           'bower_components/ng-lodash/build/ng-lodash.js',
           'bower_components/angular-qrcode/angular-qrcode.js',
           'bower_components/angular-gettext/dist/angular-gettext.js',

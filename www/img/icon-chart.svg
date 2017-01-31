@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="18px" viewBox="0 0 20 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-chart</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-chart" transform="translate(1.000000, 0.000000)" stroke="#9B9BAB">
+            <g id="Page-1">
+                <g id="Icons">
+                    <path d="M12.5,7.5 L17.5,0.5" id="Line" stroke-linecap="square"></path>
+                    <path d="M9.5,5.5 L12.5,7.5" id="Line" stroke-linecap="square"></path>
+                    <path d="M6.66666667,11.4166667 L9.33333333,5.58333333" id="Line" stroke-linecap="square"></path>
+                    <path d="M0.5,12.5 L6.5,11.5" id="Line" stroke-linecap="square"></path>
+                    <polyline id="Shape" points="0.435897 1 0.435897 16.6969704 18.435897 16.6969704"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
