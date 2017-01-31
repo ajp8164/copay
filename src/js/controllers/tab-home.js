@@ -32,8 +32,12 @@ angular.module('copayApp.controllers').controller('tabHomeController',
             $log.warn(err);
             return;
           }
-
-          if (newRelease) $scope.newRelease = true;
+          if (newRelease) {
+            $scope.newRelease = true;
+            $scope.updateText = gettextCatalog.getString('There is a new version of {{appName}} available', {
+              appName: $scope.name
+            });
+          }
         });
       }
 
@@ -83,7 +87,7 @@ angular.module('copayApp.controllers').controller('tabHomeController',
           var wallet = profileService.getWallet(walletId);
           updateWallet(wallet);
           if ($scope.recentTransactionsEnabled) getNotifications();
-          if (type == 'NewBlock' && n && n.data && n.data.network == 'livenet') {
+          if ($scope.coinbaseEnabled && type == 'NewBlock' && n && n.data && n.data.network == 'livenet') {
             // Update Coinbase
             coinbaseService.updatePendingTransactions();
           }
@@ -102,7 +106,7 @@ angular.module('copayApp.controllers').controller('tabHomeController',
           var isWindowsPhoneApp = platformInfo.isWP && platformInfo.isCordova;
 
           $scope.glideraEnabled = config.glidera.enabled && !isWindowsPhoneApp;
-          $scope.coinbaseEnabled = config.coinbase.enabled && !isWindowsPhoneApp;
+          $scope.coinbaseEnabled = config.coinbaseV2 && !isWindowsPhoneApp;
           $scope.amazonEnabled = config.amazon.enabled;
           $scope.bitpayCardEnabled = config.bitpayCard.enabled;
 
@@ -213,7 +217,7 @@ angular.module('copayApp.controllers').controller('tabHomeController',
         walletService.getStatus(wallet, {}, function(err, status) {
           if (err) {
 
-            wallet.error = (err === 'WALLET_NOT_REGISTERED') ? gettextCatalog.getString('Wallet not registered') :  bwcError.msg(err);
+            wallet.error = (err === 'WALLET_NOT_REGISTERED') ? gettextCatalog.getString('Wallet not registered') : bwcError.msg(err);
 
             $log.error(err);
           } else {
@@ -292,6 +296,9 @@ angular.module('copayApp.controllers').controller('tabHomeController',
           return;
         }
         $scope.bitpayCards = data;
+        $timeout(function() {
+          $scope.$digest();
+        }, 100);
       });
       bitpayCardService.getBitpayDebitCardsHistory(null, function(err, data) {
         if (err) return;
