@@ -125,16 +125,6 @@
       </div>
     </div>
 
-    <div class="list card" ng-if="payrollEnabled && payrollRecords[0] && externalServices.Payroll">
-      <a ui-sref="tabs.payroll.summary" class="item item-sub item-icon-left item-big-icon-left item-icon-right next-step">
-        <i class="icon big-icon-svg">
-          <div class="bg icon-payroll"></div>
-        </i>
-        <span translate>Bitcoin Payroll</span>
-        <i class="icon bp-arrow-right"></i>
-      </a>
-    </div>
-
     <div class="list card" ng-if="wallets[0] && externalServices.BuyAndSell && (glideraEnabled || coinbaseEnabled)">
       <div class="item item-sub item-icon-right item-heading">
         <span translate>Buy &amp; Sell Bitcoin</span>
