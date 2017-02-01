@@ -163,6 +163,10 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
         }
       },
       queries: [
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// Close
+        ///     
         {
           params: {
             start: function() {
@@ -176,9 +180,9 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
             }
           },
           results: {
-            series1dPriceUSD: {
+            series1dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -195,9 +199,9 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
             }
           },
           results: {
-            series7dPriceUSD: {
+            series7dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -214,9 +218,70 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
             }
           },
           results: {
-            series30dPriceUSD: {
+            series30dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
+            }
+          }
+        },
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// OHLC
+        ///     
+        {
+          params: {
+            start: function() {
+              return moment().subtract(1, 'days').format('YYYY-MM-DD');
+            },
+            end: function() {
+              return moment().format('YYYY-MM-DD');
+            },
+            granularity: function() {
+              return '15-min';
+            }
+          },
+          results: {
+            series1dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            start: function() {
+              return moment().subtract(7, 'days').format('YYYY-MM-DD');
+            },
+            end: function() {
+              return moment().format('YYYY-MM-DD');
+            },
+            granularity: function() {
+              return 'Hourly';
+            }
+          },
+          results: {
+            series7dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            start: function() {
+              return moment().subtract(30, 'days').format('YYYY-MM-DD');
+            },
+            end: function() {
+              return moment().format('YYYY-MM-DD');
+            },
+            granularity: function() {
+              return '2-hour';
+            }
+          },
+          results: {
+            series30dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
             }
           }
         }
@@ -248,23 +313,31 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
 
   // Data source transforms.
   // 
-  function _seriesPrice_toValue(rawValues) {
+  function _seriesClose_toValue(rawValues) {
     // rawValues: [{
     //   time, open, high, low, close, volume (btc), volume (currency), weighted price
     // }]
     // Note: time is truncated by 3 digits
     var result = {
-      data: [[]],
-      labels: [],
-      series: ['Series 1']
+      data: [],
     };
     if (Array.isArray(rawValues) && rawValues.length > 0) {
       for (var i = 0; i < rawValues.length; i++) {
-        result.data[0].push(rawValues[i][4]); //close
-        result.labels.push(new Date(rawValues[i][0]*1000)); // time
+        result.data.push({
+          date: new Date(rawValues[i][0]*1000),
+          open: rawValues[i][1],
+          high: rawValues[i][2],
+          low: rawValues[i][3],
+          close: rawValues[i][4],
+          volume: rawValues[i][6]
+        });
       }
     }
     return result;
+  };
+
+  function _seriesOHLC_toValue(rawValues) {
+    return _seriesClose_toValue(rawValues);
   };
 
   return root;

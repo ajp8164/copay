@@ -49,23 +49,77 @@ angular.module('copayApp.services').factory('bitcoinDataService', function($root
           logo: ''
         }
       },
-      series1dPriceUSD: {
+      series1dCloseUSD: {
         label: gettextCatalog.getString('Market Price, 1 day'),
         description: '',
         unit: 'USD',
-        kind: 'series'
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'close',
+            cssClass: 'close'
+          }
+        }
       },
-      series7dPriceUSD: {
+      series7dCloseUSD: {
         label: gettextCatalog.getString('Market Price, 7 day'),
         description: '',
         unit: 'USD',
-        kind: 'series'
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'close',
+            cssClass: 'close'
+          }
+        }
       },
-      series30dPriceUSD: {
+      series30dCloseUSD: {
         label: gettextCatalog.getString('Market Price, 30 day'),
         description: '',
         unit: 'USD',
-        kind: 'series'
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'close',
+            cssClass: 'close'
+          }
+        }
+      },
+      series1dOHLCUSD: {
+        label: gettextCatalog.getString('OHLC, 1 day'),
+        description: '',
+        unit: 'USD',
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'ohlc',
+            cssClass: 'ohlc'
+          }
+        }
+      },
+      series7dOHLCUSD: {
+        label: gettextCatalog.getString('OHLC, 7 day'),
+        description: '',
+        unit: 'USD',
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'ohlc',
+            cssClass: 'ohlc'
+          }
+        }
+      },
+      series30dOHLCUSD: {
+        label: gettextCatalog.getString('OHLC, 30 day'),
+        description: '',
+        unit: 'USD',
+        kind: 'series',
+        chart: {
+          techan: {
+            plot: 'ohlc',
+            cssClass: 'ohlc'
+          }
+        }
       },
       price: {
         label: gettextCatalog.getString('Market Price'),

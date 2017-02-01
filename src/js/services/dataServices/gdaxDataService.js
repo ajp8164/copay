@@ -118,6 +118,10 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
         }
       },
       queries: [
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// Close
+        ///     
         {
           params: {
             start: function() {
@@ -131,9 +135,9 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
             }
           },
           results: {
-            series1dPriceUSD: {
+            series1dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -150,9 +154,9 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
             }
           },
           results: {
-            series7dPriceUSD: {
+            series7dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -169,9 +173,70 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
             }
           },
           results: {
-            series30dPriceUSD: {
+            series30dCloseUSD: {
               elems: [],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
+            }
+          }
+        },
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// OHLC
+        ///     
+        {
+          params: {
+            start: function() {
+              return moment().subtract(1, 'days').toISOString();
+            },
+            end: function() {
+              return moment().toISOString();
+            },
+            granularity: function() {
+              return 435;
+            }
+          },
+          results: {
+            series1dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            start: function() {
+              return moment().subtract(7, 'days').toISOString();
+            },
+            end: function() {
+              return moment().toISOString();
+            },
+            granularity: function() {
+              return 3000;
+            }
+          },
+          results: {
+            series7dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            start: function() {
+              return moment().subtract(30, 'days').toISOString();
+            },
+            end: function() {
+              return moment().toISOString();
+            },
+            granularity: function() {
+              return 12500;
+            }
+          },
+          results: {
+            series30dOHLCUSD: {
+              elems: [],
+              toValue: _seriesOHLC_toValue
             }
           }
         }
@@ -203,23 +268,31 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
 
   // Data source transforms.
   // 
-  function _seriesPrice_toValue(rawValues) {
+  function _seriesClose_toValue(rawValues) {
     // rawValues: [{
     //   time, low, high, open, close, volume
     // }]
     // Note: time is truncated by 3 digits
     var result = {
-      data: [[]],
-      labels: [],
-      series: ['Series 1']
+      data: []
     };
     if (Array.isArray(rawValues) && rawValues.length > 0) {
       for (var i = 0; i < rawValues.length; i++) {
-        result.data[0].push(rawValues[i][4]); //close
-        result.labels.push(new Date(rawValues[i][0]*1000)); // time
+        result.data.push({
+          date: new Date(rawValues[i][0]*1000),
+          open: rawValues[i][3],
+          high: rawValues[i][2],
+          low: rawValues[i][1],
+          close: rawValues[i][4],
+          volume: rawValues[i][5]
+        });
       }
     }
     return result;
+  };
+
+  function _seriesOHLC_toValue(rawValues) {
+    return _seriesClose_toValue(rawValues);
   };
 
   return root;
