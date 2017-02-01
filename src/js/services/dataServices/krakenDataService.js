@@ -111,6 +111,10 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
         }
       },
       queries: [
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// Close
+        ///     
         {
           params: {
             interval: function() {
@@ -121,9 +125,9 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
             }
           },
           results: {
-            series1dPriceUSD: {
+            series1dCloseUSD: {
               elems: ['result.XXBTZUSD'],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -137,9 +141,9 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
             }
           },
           results: {
-            series7dPriceUSD: {
+            series7dCloseUSD: {
               elems: ['result.XXBTZUSD'],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
             }
           }
         },
@@ -153,9 +157,61 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
             }
           },
           results: {
-            series30dPriceUSD: {
+            series30dCloseUSD: {
               elems: ['result.XXBTZUSD'],
-              toValue: _seriesPrice_toValue
+              toValue: _seriesClose_toValue
+            }
+          }
+        },
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// OHLC
+        ///     
+        {
+          params: {
+            interval: function() {
+              return 5; // minutes
+            },
+            since: function() {
+              return moment().subtract(1, 'days').unix();
+            }
+          },
+          results: {
+            series1dOHLCUSD: {
+              elems: ['result.XXBTZUSD'],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            interval: function() {
+              return 30; // minutes
+            },
+            since: function() {
+              return moment().subtract(7, 'days').unix();
+            }
+          },
+          results: {
+            series7dOHLCUSD: {
+              elems: ['result.XXBTZUSD'],
+              toValue: _seriesOHLC_toValue
+            }
+          }
+        },
+        {
+          params: {
+            interval: function() {
+              return 240; // minutes
+            },
+            since: function() {
+              return moment().subtract(30, 'days').unix();
+            }
+          },
+          results: {
+            series30dOHLCUSD: {
+              elems: ['result.XXBTZUSD'],
+              toValue: _seriesOHLC_toValue
             }
           }
         }
@@ -187,21 +243,31 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
 
   // Data source transforms.
   // 
-  function _seriesPrice_toValue(rawValues) {
+  function _seriesClose_toValue(rawValues) {
     // rawValues: [
     //  [time, open, high, low, close, vwap, volume, count]
     // ]
     // Note: time is truncated by 3 digits
     var result = {
-      data: [[]],
-      labels: [],
-      series: ['Series 1']
+      data: []
     };
-    for (var i = 0; i < rawValues[0].length; i++) {
-      result.data[0].push(rawValues[0][i][4]); //close
-      result.labels.push(new Date(rawValues[0][i][0]*1000)); // time
+    if (Array.isArray(rawValues) && rawValues.length > 0) {
+      for (var i = 0; i < rawValues[0].length; i++) {
+        result.data.push({
+          date: new Date(rawValues[i][0]*1000),
+          open: rawValues[i][1],
+          high: rawValues[i][2],
+          low: rawValues[i][3],
+          close: rawValues[i][4],
+          volume: rawValues[i][6]
+        });
+      }
     }
     return result;
+  };
+
+  function _seriesOHLC_toValue(rawValues) {
+    return _seriesClose_toValue(rawValues);
   };
 
   return root;

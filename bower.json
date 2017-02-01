@@ -22,8 +22,7 @@
     "angular-md5": "^0.1.10",
     "ngtouch": "^1.0.1",
     "async": "^2.1.4",
-    "chart.js": "^2.4.0",
-    "angular-chart": "git://github.com/jtblin/angular-chart.git"
+    "techan": "^0.8.0"
   },
   "resolutions": {
     "angular": "1.5.3"
