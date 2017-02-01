@@ -25,14 +25,10 @@
       <div class="section chart">
         <ion-slides class="slides" slider="chartSliderDelegate" options="chartSliderOptions" ng-show="charts.length > 0">
           <ion-slide-page ng-repeat="chart in charts track by $index">
+
             <div class="title">{{chart.title}}</div>
-            <canvas id="{{chart.id}}" class="chart chart-line" style="max-height: 165px"
-              chart-data="chart.data"
-              chart-labels="chart.labels"
-              chart-series="chart.series"
-              chart-options="chart.options"
-              chart-colors="chart.colors">
-            </canvas>
+            <techan options="chart.options" data="chart.data" class="techan-chart"></techan>
+
           </ion-slide-page>
         </ion-slides>
       </div>

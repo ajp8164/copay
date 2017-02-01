@@ -102,7 +102,7 @@ angular.module('copayApp.services').factory('configService', function(storageSer
         networkSource: {
           id: 'blockchain'
         },
-        charts: "[\"series1dPriceUSD\",\"series7dPriceUSD\",\"series30dPriceUSD\"]"
+        charts: "[\"series1dCloseUSD\",\"series7dCloseUSD\",\"series30dCloseUSD\"]"
       }
     },
 
