@@ -4,17 +4,24 @@ angular.module('copayApp.controllers').controller('prefsBitcoinDSChartsControlle
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
     bitcoinDataService.getConfig(function(config) {
-      var bitcoinData = bitcoinDataService.getData();
+      var bitcoinData = bitcoinDataService.getView('default');
 
-      $scope.charts = lodash.pick(bitcoinData.market, function(prop) {
-        return prop.kind == 'series';
-      });
+      $scope.charts = {};
+      var categories = bitcoinDataService.categoryList();
+      for (var i = 0; i < categories.length; i++) {
+
+        var charts = lodash.pick(bitcoinData[categories[i]], function(elem) {
+          return (elem.options && elem.options.plot);
+        });
+
+        lodash.merge($scope.charts, charts);
+      }
 
       // Select configured charts.
       Object.keys($scope.charts).forEach(function(chartId) {
         $scope.charts[chartId].selected = config.charts.includes(chartId);
     
-        // Place the chart id into each chart object.
+        // Add the chart id into each chart object so we can save it later.
         $scope.charts[chartId].id = chartId;
       });
 

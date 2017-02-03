@@ -20,13 +20,14 @@
       <i class="icon bp-arrow-up" ng-show="!collapsed"></i>
       <i class="icon bp-arrow-down" ng-show="collapsed"></i>
     </div>
+
     <div ng-show="!collapsed">
 
       <div class="section chart">
         <ion-slides class="slides" slider="chartSliderDelegate" options="chartSliderOptions" ng-show="charts.length > 0">
           <ion-slide-page ng-repeat="chart in charts track by $index">
 
-            <div class="title">{{chart.title}}</div>
+            <div class="title">{{chart.name}} ({{chart.unit}}) - {{chart.period}}</div>
             <techan options="chart.options" data="chart.data" class="techan-chart"></techan>
 
           </ion-slide-page>
@@ -143,6 +144,8 @@
           </i>
         </div>
       </div>
+
     </div>
+
   </div>
 </div>

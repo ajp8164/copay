@@ -4,7 +4,7 @@ angular.module('ngTechan',[
 
 angular.module('ng.techan',[])
 
-.directive('techan', function($window) {
+.directive('techan', function($rootScope, $log, $window, $timeout, lodash) {
 	return {
 		restrict : 'E',
 		scope : {
@@ -12,7 +12,61 @@ angular.module('ng.techan',[])
       options: '='
 		},
 		link : function(scope, elem, attr) {
-      // Initialize space
+      // Check inputs.
+      if (!scope.data) {
+        $log.error('[ngTechan] No data set specified');
+        return;
+      }
+
+      // Check and setup options.
+      var opts = lodash.cloneDeep(scope.options);
+
+      var required = ['plot'];
+      var diff = lodash.difference(required, Object.keys(opts));
+      if (diff.length > 0) {
+        $log.error('[ngTechan] Missing required options: ' + diff.toString());
+        return;
+      }
+
+      // The css class is constrained to the plot name.
+      opts.cssClass = opts.plot;
+
+      var intervals = {
+        'min'       : [ null, 'timeMinute' ],
+        'day'       : [ null, 'timeDay' ],
+        'hour'      : [ null, 'timeHour' ],
+        'month'     : [ null, 'timeMonth' ],
+        'week'      : [ null, 'timeWeek' ],
+        'year'      : [ null, 'timeYear' ],
+        'daily'     : [  '1', 'timeDay' ],
+        'houly'     : [  '1', 'timeHour' ],
+        'monthly'   : [  '1', 'timeMonth' ],
+        'weekly'    : [  '1', 'timeWeek' ],
+        'yearly'    : [  '1', 'timeYear' ],
+        'monday'    : [  '1', 'timeMonday' ],
+        'tuesday'   : [  '1', 'timeTuesday' ],
+        'wednesday' : [  '1', 'timeWednesday' ],
+        'thursday'  : [  '1', 'timeThursday' ],
+        'friday'    : [  '1', 'timeFriday' ],
+        'saturday'  : [  '1', 'timeSaturday' ],
+        'sunday'    : [  '1', 'timeSunday' ]
+      };
+
+      try {
+        var ti = opts.timeInterval.split('-');
+        if (ti.length == 2) {
+          opts.timeStep = ti[0];
+          opts.timeInterval = intervals[ti[1]][1];
+        } else if (ti.length == 1) {
+          opts.timeStep = intervals[ti[0]][0];
+          opts.timeInterval = intervals[ti[0]][1];
+        }
+      } catch(e) {
+        $log.error('[ngTechan] Unrecognized time interval: ' + scope.options.timeInterval);
+        return;
+      };
+
+      // Initialize space.
       var margin = getMargin(elem);
       var maxWidth = (window.getComputedStyle(elem[0]).maxWidth != 'none' ? parseInt(window.getComputedStyle(elem[0]).maxWidth) : undefined);
       var maxHeight = (window.getComputedStyle(elem[0]).maxHeight != 'none' ? parseInt(window.getComputedStyle(elem[0]).maxHeight) : undefined);
@@ -25,41 +79,56 @@ angular.module('ng.techan',[])
       var y;
       var dataCache;
 
-      // Initialize svg
+      // These plot allow area fill.
+      var hasArea = ['close'].includes(opts.plot);
+
+      // Setup svg.
       var svg = d3.select(elem[0]).append('svg');
 
       var chartWrapper = svg.append('g');
 
+      var gridWrapper = chartWrapper.append('g')
+        .attr('class', 'grid');
+
       var plotWrapper = chartWrapper.append('g')
-        .attr('class', scope.options.cssClass);
+        .attr('class', opts.cssClass);
+
+      if (hasArea) {
+        var areaWrapper = plotWrapper.append('g')
+          .attr('class', 'area')
+          .append('path');
+      }
 
       var xAxisWrapper = chartWrapper.append('g')
         .attr('class', 'x axis');
 
       var yAxisWrapper = chartWrapper.append('g')
-        .attr('class', 'y axis')
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 6)
-        .attr('dy', '.71em')
-        .style('text-anchor', 'end')
-        .text('Price ($)');
+        .attr('class', 'y axis');
 
+      // Draw it.
       render(scope.data);
 
+      // Watch it.
       scope.$watch('data', function(newData, oldData) {
         render(newData);
-      });
+      }, true);
 
+      // Render the chart on window resize.
       $window.addEventListener('resize', onResize);
+
+      // Render the chart when asked.
+      $rootScope.$on('ngTechan/Render', function(e) {
+        $timeout(function() {
+          render([]);
+        });
+      });
 
       function onResize() {
         render([]);
       };
 
       function render(data) {
-        console.log('render techan chart');
-
+        // Cache the data set and use it when no data is specified (as during window resize).
         if (data.length == 0) {
           data = dataCache;
         } else {
@@ -68,16 +137,36 @@ angular.module('ng.techan',[])
 
         updateDimensions();
 
-        // Re-scale the axis
+        // Re-scale the axis.
         x = techan.scale.financetime().range([0, width]);
         y = d3.scaleLinear().range([height, 0]);
 
         var xAxis = d3.axisBottom(x);
+
+        if (opts.timeFormat) {
+          xAxis = xAxis.tickFormat(d3.timeFormat(opts.timeFormat));
+        }
+        if (opts.timeInterval) {
+          xAxis = xAxis.ticks(d3[opts.timeInterval], opts.timeStep);
+        }
+
         var yAxis = d3.axisLeft(y);
 
-        // The plot generator for the chart
+        var grid = d3.axisLeft(y)
+          .tickFormat('')
+          .tickSizeInner(-width)
+          .tickSizeOuter(0)
+          .tickPadding(10);
+
+        // Select the plot generator for the chart.
         var plot;
-        switch (scope.options.plot) {
+        switch (opts.plot) {
+          case 'candlestick':
+            plot = techan.plot.candlestick().xScale(x).yScale(y);
+            x.domain(data.map(plot.accessor().d));
+            y.domain(techan.scale.plot.ohlc(data, plot.accessor()).domain()); // ohlc is correct here
+            break;
+
           case 'ohlc':
             plot = techan.plot.ohlc().xScale(x).yScale(y);
             x.domain(data.map(plot.accessor().d));
@@ -88,15 +177,47 @@ angular.module('ng.techan',[])
             plot = techan.plot.close().xScale(x).yScale(y);
             x.domain(data.map(plot.accessor().d));
             y.domain(techan.scale.plot.ohlc(data, plot.accessor()).domain()); // ohlc is correct here
+
+            if (hasArea) {
+              var area = d3.area()
+                .x(function(d) { return x(d.date); })
+                .y0(height)
+                .y1(function(d) { return y(d.close); });
+            }
+            break;
+
+          case 'macd':
+            plot = techan.plot.macd().xScale(x).yScale(y);
+
+            data = techan.indicator.macd()(data);
+            x.domain(data.map(plot.accessor().d));
+            y.domain(techan.scale.plot.macd(data).domain());
+
+            yAxis = d3.axisLeft(y)
+              .tickFormat(d3.format(",.2s")); // Shorten format
+            break;
+
+          case 'volume':
+            plot = techan.plot.volume().xScale(x).yScale(y).accessor(techan.accessor.ohlc()); // ohlc is correct here
+            x.domain(data.map(plot.accessor().d));
+            y.domain(techan.scale.plot.volume(data, plot.accessor().v).domain());
+
+            yAxis = d3.axisLeft(y)
+              .tickFormat(d3.format(",.2s")); // Shorten format
             break;
         }
 
-        // Update the data
-        svg.selectAll('g.' + scope.options.cssClass).datum(data).call(plot);
+        // Update the data.
+        svg.selectAll('g.' + opts.cssClass).datum(data).call(plot);
         svg.selectAll('g.x.axis').call(xAxis);
         svg.selectAll('g.y.axis').call(yAxis);
+        svg.selectAll('g.grid').call(grid);
 
-        // Update svg elements to new dimensions
+        if (hasArea) {
+          svg.selectAll('g.' + opts.cssClass + ' .area path').datum(data).attr('d', area);
+        }
+
+        // Update svg elements to new dimensions.
         svg
           .attr('width', width + margin.right + margin.left)
           .attr('height', height + margin.top + margin.bottom);

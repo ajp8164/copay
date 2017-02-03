@@ -181,7 +181,7 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
         },
         //////////////////////////////////////////////////////////////////////////
         ///
-        /// OHLC
+        /// OHLC, candlestick, MACD
         ///     
         {
           params: {

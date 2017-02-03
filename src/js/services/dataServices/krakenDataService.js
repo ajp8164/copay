@@ -165,7 +165,7 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
         },
         //////////////////////////////////////////////////////////////////////////
         ///
-        /// OHLC
+        /// OHLC, candlestick, MACD
         ///     
         {
           params: {
