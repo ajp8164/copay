@@ -131,11 +131,13 @@ angular.module('copayApp.services').factory('dataService', function($rootScope, 
               }
               stat.value = stat.toValue(rawValues);
 
+              /*
               if (Array.isArray(stat.value.data)) {
                 $log.debug(k + '; ' + stat.value.data.length + ' data elements');
               } else {
                 $log.debug(k + '=' + JSON.stringify(stat.value));
               }
+              */
               callback_results();
             }, function() {
               //done

@@ -4,7 +4,7 @@ angular.module('copayApp.controllers').controller('prefsBitcoinDSNetworkSourceCo
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
     bitcoinDataService.getConfig(function(config) {
-      var bitcoinData = bitcoinDataService.getData();
+      var bitcoinData = bitcoinDataService.getView('default');
 
       $scope.sources = bitcoinData.network.sources;
       $scope.currentSource = bitcoinData.network.sources[config.networkSource.id].id;

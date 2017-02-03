@@ -105,6 +105,10 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         }
       },
       queries: [
+        //////////////////////////////////////////////////////////////////////////
+        ///
+        /// Close
+        ///     
         {
           params: {
             start: function() {
@@ -171,9 +175,9 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
             }
           }
         },
-       //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
         ///
-        /// OHLC
+        /// OHLC, candlestick, MACD
         ///     
         {
           params: {
