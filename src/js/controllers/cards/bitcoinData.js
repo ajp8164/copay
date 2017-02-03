@@ -59,6 +59,11 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
 
   $scope.toggleCollapse = function() {
     $scope.collapsed = !$scope.collapsed;
+
+    if (!$scope.collapsed) {
+      $rootScope.$emit('ngTechan/Render');
+    }
+
     $timeout(function() {
       $ionicScrollDelegate.resize();
       $scope.$apply();
