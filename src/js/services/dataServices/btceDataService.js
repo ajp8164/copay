@@ -226,7 +226,7 @@ angular.module('copayApp.services').factory('btceDataService', function($log, ge
         },
         //////////////////////////////////////////////////////////////////////////
         ///
-        /// OHLC
+        /// OHLC, candlestick, MACD
         ///     
         {
           params: {

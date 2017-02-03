@@ -119,7 +119,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(1, 'days').format('YYYY-MM-DD');
+              return moment().format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');
@@ -138,7 +138,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(7, 'days').format('YYYY-MM-DD');
+              return moment().subtract(6, 'days').format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');
@@ -157,7 +157,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(30, 'days').format('YYYY-MM-DD');
+              return moment().subtract(29, 'days').format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');
@@ -175,12 +175,12 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         },
         //////////////////////////////////////////////////////////////////////////
         ///
-        /// OHLC
+        /// OHLC, candlestick, MACD
         ///     
         {
           params: {
             start: function() {
-              return moment().subtract(1, 'days').format('YYYY-MM-DD');
+              return moment().format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');
@@ -199,7 +199,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(7, 'days').format('YYYY-MM-DD');
+              return moment().subtract(6, 'days').format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');
@@ -218,7 +218,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(30, 'days').format('YYYY-MM-DD');
+              return moment().subtract(29, 'days').format('YYYY-MM-DD');
             },
             end: function() {
               return moment().format('YYYY-MM-DD');

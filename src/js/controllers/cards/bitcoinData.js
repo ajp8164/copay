@@ -12,7 +12,7 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
 
   function setScope() {
     bitcoinDataService.getConfig(function(config) {
-      $scope.data = bitcoinDataService.getData();
+      $scope.data = bitcoinDataService.getView('default');
       $scope.na = $scope.data.info.naPlaceholder;
       $scope.config = config;
 
@@ -20,21 +20,22 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
       $scope.marketUp = ($scope.data.market.changeUSD[$scope.config.marketSource.id] >= 0);
 
       $scope.charts = [];
+      var categories = bitcoinDataService.categoryList();
+
       for (var i = 0; i < $scope.config.charts.length; i++) {
-        if ($scope.data.market[$scope.config.charts[i]][$scope.config.marketSource.id]) {          
-          if ($scope.data.market[$scope.config.charts[i]].chart.techan) {
-            var title = $scope.data.market[$scope.config.charts[i]].label;
-            if ($scope.data.market[$scope.config.charts[i]].unit.length > 0) {
-              title += ' (' + $scope.data.market[$scope.config.charts[i]].unit + ')';
-            }
+        for (var j = 0; j < categories.length; j++) {
+
+          var chart = $scope.data[categories[j]][$scope.config.charts[i]];
+          
+          if (chart && chart[$scope.config.marketSource.id]) {
             $scope.charts.push({
               id: $scope.config.charts[i],
-              title: title,
-              data: $scope.data.market[$scope.config.charts[i]][$scope.config.marketSource.id].data,
-              options: $scope.data.market[$scope.config.charts[i]].chart.techan
+              name: chart.name,
+              period: chart.label,
+              unit: chart.unit,
+              data: chart[$scope.config.marketSource.id].data,
+              options: chart.options
             });
-          } else {
-            $log.debug('View doesn\'t know how to render chart: ' + $scope.config.charts[i]);
           }
         }
       }
@@ -47,6 +48,11 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
 
   $scope.toggleCollapse = function() {
     $scope.collapsed = !$scope.collapsed;
+
+    if (!$scope.collapsed) {
+      $rootScope.$emit('ngTechan/Render');
+    }
+
     $timeout(function() {
       $ionicScrollDelegate.resize();
       $scope.$apply();

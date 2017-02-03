@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitcoinDataService', function($rootScope, $log, $injector, lodash, configService, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('bitcoinDataService', function($rootScope, $log, $injector, $timeout, lodash, configService, gettextCatalog, dataService) {
   var root = {};
 
   var _isAvailable = false;
@@ -32,6 +32,10 @@ angular.module('copayApp.services').factory('bitcoinDataService', function($root
         'other liability arising from, out of or in connection with the data and/or its representation.'
       )
     },
+    // Views are used to present data in structures for easier access.
+    views: {
+      default: {}
+    },
     //////////////////////////////////////////////////////////////////////////
     ///
     /// Market data
@@ -49,120 +53,241 @@ angular.module('copayApp.services').factory('bitcoinDataService', function($root
           logo: ''
         }
       },
-      series1dCloseUSD: {
-        label: gettextCatalog.getString('Market Price, 1 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'close',
-            cssClass: 'close'
+      groups: [
+        {
+          id: 'seriesClose',
+          name: gettextCatalog.getString('Market Price'),
+          options: {
+            plot: 'close'
+          },
+          elements: {
+            series1dCloseUSD: {
+              label: gettextCatalog.getString('1 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%H:%M',
+                timeInterval: '3-hour'
+              }
+            },
+            series7dCloseUSD: {
+              label: gettextCatalog.getString('7 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: 'daily'
+              }
+            },
+            series30dCloseUSD: {
+              label: gettextCatalog.getString('30 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: '6-day'
+              }
+            }
+          }
+        },
+        {
+          id: 'seriesOHLC',
+          name: 'OHLC',
+          options: {
+            plot: 'ohlc'
+          },
+          elements: {
+            series1dOHLCUSD: {
+              label: gettextCatalog.getString('1 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%H:%M',
+                timeInterval: '3-hour'
+              }
+            },
+            series7dOHLCUSD: {
+              label: gettextCatalog.getString('7 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: 'daily'
+              }
+            },
+            series30dOHLCUSD: {
+              label: gettextCatalog.getString('30 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: '2-day'
+              }
+            }
+          }
+        },
+        {
+          id: 'seriesCandlestick',
+          name: 'Candlestick',
+          options: {
+            plot: 'candlestick'
+          },
+          // Uses OHLC data.
+          elements: {
+            series1dOHLCUSD: {
+              alias: 'series1dCandlestickUSD',
+              label: gettextCatalog.getString('1 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%H:%M',
+                timeInterval: '3-hour'
+              }
+            },
+            series7dOHLCUSD: {
+              alias: 'series7dCandlestickUSD',
+              label: gettextCatalog.getString('7 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: 'daily'
+              }
+            },
+            series30dOHLCUSD: {
+              alias: 'series30dCandlestickUSD',
+              label: gettextCatalog.getString('30 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: '2-day'
+              }
+            }
+          }
+        },
+        {
+          id: 'seriesVolume',
+          name: 'Volume',
+          options: {
+            plot: 'volume'
+          },
+          // Uses OHLC data.
+          elements: {
+            series1dOHLCUSD: {
+              alias: 'series1dVolumeUSD',
+              label: gettextCatalog.getString('1 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%H:%M',
+                timeInterval: '3-hour'
+              }
+            },
+            series7dOHLCUSD: {
+              alias: 'series7dVolumeUSD',
+              label: gettextCatalog.getString('7 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: 'daily'
+              }
+            },
+            series30dOHLCUSD: {
+              alias: 'series30dVolumeUSD',
+              label: gettextCatalog.getString('30 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: '2-day'
+              }
+            }
+          }
+        },
+        {
+          id: 'seriesMACD',
+          name: 'MACD',
+          options: {
+            plot: 'macd'
+          },
+          // Uses OHLC data.
+          elements: {
+            series1dOHLCUSD: {
+              alias: 'series1dVolumeUSD',
+              label: gettextCatalog.getString('1 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%H:%M',
+                timeInterval: '3-hour'
+              }
+            },
+            series7dOHLCUSD: {
+              alias: 'series7dVolumeUSD',
+              label: gettextCatalog.getString('7 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: 'daily'
+              }
+            },
+            series30dOHLCUSD: {
+              alias: 'series30dVolumeUSD',
+              label: gettextCatalog.getString('30 day'),
+              description: '',
+              unit: 'USD',
+              options: {
+                timeFormat: '%b %e',
+                timeInterval: '2-day'
+              }
+            }
+          }
+        },
+        {
+          id: 'marketStats',
+          name: 'Market statistics',
+          elements: {
+            price: {
+              label: gettextCatalog.getString('Market Price'),
+              description: '',
+              unit: 'USD'
+            },
+            open: {
+              label: gettextCatalog.getString('Today\'s Open'),
+              description: '',
+              unit: 'USD'
+            },
+            high: {
+              label: gettextCatalog.getString('Today\'s High'),
+              description: '',
+              unit: 'USD'
+            },
+            low: {
+              label: gettextCatalog.getString('Today\'s Low'),
+              description: '',
+              unit: 'USD'
+            },
+            changePercent: {
+              label: gettextCatalog.getString('Change'),
+              description: '',
+              unit: '%'
+            },
+            changeUSD: {
+              label: gettextCatalog.getString('Change'),
+              description: '',
+              unit: 'USD'
+            },
+            timestamp: {
+              label: gettextCatalog.getString('Last Updated'),
+              description: '',
+              unit: ''
+            }
           }
         }
-      },
-      series7dCloseUSD: {
-        label: gettextCatalog.getString('Market Price, 7 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'close',
-            cssClass: 'close'
-          }
-        }
-      },
-      series30dCloseUSD: {
-        label: gettextCatalog.getString('Market Price, 30 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'close',
-            cssClass: 'close'
-          }
-        }
-      },
-      series1dOHLCUSD: {
-        label: gettextCatalog.getString('OHLC, 1 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'ohlc',
-            cssClass: 'ohlc'
-          }
-        }
-      },
-      series7dOHLCUSD: {
-        label: gettextCatalog.getString('OHLC, 7 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'ohlc',
-            cssClass: 'ohlc'
-          }
-        }
-      },
-      series30dOHLCUSD: {
-        label: gettextCatalog.getString('OHLC, 30 day'),
-        description: '',
-        unit: 'USD',
-        kind: 'series',
-        chart: {
-          techan: {
-            plot: 'ohlc',
-            cssClass: 'ohlc'
-          }
-        }
-      },
-      price: {
-        label: gettextCatalog.getString('Market Price'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      open: {
-        label: gettextCatalog.getString('Today\'s Open'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      high: {
-        label: gettextCatalog.getString('Today\'s High'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      low: {
-        label: gettextCatalog.getString('Today\'s Low'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      changePercent: {
-        label: gettextCatalog.getString('Change'),
-        description: '',
-        unit: '%',
-        kind: 'single'
-      },
-      changeUSD: {
-        label: gettextCatalog.getString('Change'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      timestamp: {
-        label: gettextCatalog.getString('Last Updated'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      }
+      ]
     },
     //////////////////////////////////////////////////////////////////////////
     ///
@@ -181,155 +306,184 @@ angular.module('copayApp.services').factory('bitcoinDataService', function($root
           logo: ''
         }
       },
-      price: {
-        label: gettextCatalog.getString('Market Price'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      marketCap: {
-        label: gettextCatalog.getString('Market Cap'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      hashRate: {
-        label: gettextCatalog.getString('Hash Rate'),
-        description: '',
-        unit: 'GH/s',
-        kind: 'single'
-      },
-      totalFeesBTC: {
-        label: gettextCatalog.getString('Total Transaction Fees'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      numberBTCMined: {
-        label: gettextCatalog.getString('Bitcoins Mined'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      numberTx: {
-        label: gettextCatalog.getString('No. of Transactions'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      numberBlocksMined: {
-        label: gettextCatalog.getString('Blocks Mined'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      timeBetweenBlocks: {
-        label: gettextCatalog.getString('Time Between Blocks'),
-        description: '',
-        unit: 'Mins',
-        kind: 'single'
-      },
-      totalBitcoin: {
-        label: gettextCatalog.getString('Total Bitcoins'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      numberBlockTotal: {
-        label: gettextCatalog.getString('Total Blocks'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      estimatedTransactionVolumeUSD: {
-        label: gettextCatalog.getString('Est. Transaction Volume'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      blocksSize: {
-        label: gettextCatalog.getString('Blocks Size '),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      minersRevenueUSD: {
-        label: gettextCatalog.getString('Total Miners Revenue'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      nextRetarget: {
-        label: gettextCatalog.getString('Next Retarget Block'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      difficulty: {
-        label: gettextCatalog.getString('Difficulty'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      estimatedBTCSent: {
-        label: gettextCatalog.getString('Est. Transaction Volume'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      minersRevenueBTC: {
-        label: gettextCatalog.getString('Total Miners Revenue'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      totalBTCSent: {
-        label: gettextCatalog.getString('Total Output Volume'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      },
-      tradeVolumeBTC: {
-        label: gettextCatalog.getString('Trade Volume'),
-        description: '',
-        unit: 'BTC',
-        kind: 'single'
-      },
-      tradeVolumeUSD: {
-        label: gettextCatalog.getString('Trade Volume'),
-        description: '',
-        unit: 'USD',
-        kind: 'single'
-      },
-      rewardPerBlock: {
-        label: gettextCatalog.getString('Reward Per Block'),
-        description: '',
-        unit: 'XBT',
-        kind: 'single'
-      },
-      timestamp: {
-        label: gettextCatalog.getString('Last Updated'),
-        description: '',
-        unit: '',
-        kind: 'single'
-      }
+      groups: [
+        {
+          id: 'networkStats',
+          name: gettextCatalog.getString('Network statistics'),
+          elements: {
+            price: {
+              label: gettextCatalog.getString('Market Price'),
+              description: '',
+              unit: 'USD'
+            },
+            marketCap: {
+              label: gettextCatalog.getString('Market Cap'),
+              description: '',
+              unit: 'USD'
+            },
+            hashRate: {
+              label: gettextCatalog.getString('Hash Rate'),
+              description: '',
+              unit: 'GH/s'
+            },
+            totalFeesBTC: {
+              label: gettextCatalog.getString('Total Transaction Fees'),
+              description: '',
+              unit: 'BTC'
+            },
+            numberBTCMined: {
+              label: gettextCatalog.getString('Bitcoins Mined'),
+              description: '',
+              unit: 'BTC'
+            },
+            numberTx: {
+              label: gettextCatalog.getString('No. of Transactions'),
+              description: '',
+              unit: ''
+            },
+            numberBlocksMined: {
+              label: gettextCatalog.getString('Blocks Mined'),
+              description: '',
+              unit: ''
+            },
+            timeBetweenBlocks: {
+              label: gettextCatalog.getString('Time Between Blocks'),
+              description: '',
+              unit: 'Mins'
+            },
+            totalBitcoin: {
+              label: gettextCatalog.getString('Total Bitcoins'),
+              description: '',
+              unit: 'BTC'
+            },
+            numberBlockTotal: {
+              label: gettextCatalog.getString('Total Blocks'),
+              description: '',
+              unit: ''
+            },
+            estimatedTransactionVolumeUSD: {
+              label: gettextCatalog.getString('Est. Transaction Volume'),
+              description: '',
+              unit: 'USD'
+            },
+            blocksSize: {
+              label: gettextCatalog.getString('Blocks Size '),
+              description: '',
+              unit: ''
+            },
+            minersRevenueUSD: {
+              label: gettextCatalog.getString('Total Miners Revenue'),
+              description: '',
+              unit: 'USD'
+            },
+            nextRetarget: {
+              label: gettextCatalog.getString('Next Retarget Block'),
+              description: '',
+              unit: ''
+            },
+            difficulty: {
+              label: gettextCatalog.getString('Difficulty'),
+              description: '',
+              unit: ''
+            },
+            estimatedBTCSent: {
+              label: gettextCatalog.getString('Est. Transaction Volume'),
+              description: '',
+              unit: 'BTC'
+            },
+            minersRevenueBTC: {
+              label: gettextCatalog.getString('Total Miners Revenue'),
+              description: '',
+              unit: 'BTC'
+            },
+            totalBTCSent: {
+              label: gettextCatalog.getString('Total Output Volume'),
+              description: '',
+              unit: ''
+            },
+            tradeVolumeBTC: {
+              label: gettextCatalog.getString('Trade Volume'),
+              description: '',
+              unit: 'BTC'
+            },
+            tradeVolumeUSD: {
+              label: gettextCatalog.getString('Trade Volume'),
+              description: '',
+              unit: 'USD'
+            },
+            rewardPerBlock: {
+              label: gettextCatalog.getString('Reward Per Block'),
+              description: '',
+              unit: 'XBT'
+            },
+            timestamp: {
+              label: gettextCatalog.getString('Last Updated'),
+              description: '',
+              unit: ''
+            }
+          }
+        }
+      ]
     }
   };
 
-  // Maps retrievec data source data to _data and returns the result.
-  root.getData = function() {
+  root.categoryList = function() {
+    // Exclude keys that are not category names.
+    return lodash.filter(Object.keys(_data), function(k) {
+      return ['info', 'views'].indexOf(k) < 0;
+    });
+  };
+
+  root.getView = function(viewName) {
+    loadData();
+    return _data.views[viewName];
+  };
+
+  // Maps retrieved data source data to _data and returns the result.
+  var loadData = function() {
+    // Init the view.
+    var view = _data.views.default;
+    view.info = _data.info;
+
     for(var i = 0; i < _dataServices.length; i++) {
       var serviceName = _dataServices[i];
       try {
         var service = $injector.get(serviceName);
         var serviceInfo = service.getInfo();
+        var segments = _data[serviceInfo.category];
 
-        Object.keys(_data[serviceInfo.category]).forEach(function(elem) {
-          if (elem == 'sources') {
-            _data[serviceInfo.category][elem][serviceInfo.id] = serviceInfo;
-          } else {
-            // All other keys are data elements that need service bindings.
-            _data[serviceInfo.category][elem][serviceInfo.id] = service.get(elem);
+        // Define the view key for this category.
+        view[serviceInfo.category] = view[serviceInfo.category] || {};
+        var viewCategory = view[serviceInfo.category];
+
+        Object.keys(segments).forEach(function(seg) {
+
+          switch (seg) {
+            case 'sources':
+              segments[seg][serviceInfo.id] = serviceInfo;
+
+              // Add service info to view.
+              viewCategory[seg] = segments[seg];
+              break;
+
+            case 'groups':
+              // Get all data groups.
+              var groups = segments[seg];
+              for (var i = 0; i < groups.length; i++) {
+                // Get data elements that need service bindings.
+                var elements = groups[i].elements;
+                Object.keys(elements).forEach(function(elem) {
+                  elements[elem][serviceInfo.id] = service.get(elem);
+
+                  // Add element to the view.
+                  // An alias allows reuseable mapping of source data to view data. Prefer alias over element name.
+                  var elemId = (elements[elem].alias ? elements[elem].alias : elem);
+                  viewCategory[elemId] = elements[elem];
+                  viewCategory[elemId].name = groups[i].name;
+                  lodash.merge(viewCategory[elemId].options, groups[i].options);
+                });
+              }
+              break;
           }
         });
       } catch(e) {

@@ -13,7 +13,7 @@ angular.module('copayApp.controllers').controller('preferencesDataServicesContro
     });
 
     // Bitcoin data service settings
-    var bitcoinData = bitcoinDataService.getData();
+    var bitcoinData = bitcoinDataService.getView('default');
     $scope.dataServices.bitcoinDataService.marketSourceName = bitcoinData.market.sources[$scope.dataServices.bitcoinDataService.marketSource.id].name;
     $scope.dataServices.bitcoinDataService.networkSourceName = bitcoinData.network.sources[$scope.dataServices.bitcoinDataService.networkSource.id].name;
 
