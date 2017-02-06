@@ -34,12 +34,14 @@ angular.module('copayApp.controllers').controller('buyCoinbaseController', funct
   };
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
-    coinbaseService.setCredentials();
-
     $scope.isFiat = data.stateParams.currency ? true : false;
-    [amount, currency, $scope.amountUnitStr] = coinbaseService.parseAmount(
+    var parsedAmount = coinbaseService.parseAmount(
       data.stateParams.amount, 
       data.stateParams.currency);
+
+    amount = parsedAmount.amount;
+    currency = parsedAmount.currency;
+    $scope.amountUnitStr = parsedAmount.amountUnitStr;
 
     $scope.network = coinbaseService.getNetwork();
     $scope.wallets = profileService.getWallets({
