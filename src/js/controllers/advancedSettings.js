@@ -11,16 +11,13 @@ angular.module('copayApp.controllers').controller('advancedSettingsController', 
     $scope.recentTransactionsEnabled = {
       value: config.recentTransactions.enabled
     };
-<<<<<<< HEAD
     $scope.experimental = {
       dataServices: {
         value: config.experimental.dataServices.enabled
       }
-=======
-
+    };
     $scope.hideNextSteps = {
       value: config.hideNextSteps.enabled
->>>>>>> master
     };
   };
 
