@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitcoinDataService', function($rootScope, $log, $injector, $timeout, lodash, configService, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('bitcoinDataService', function($rootScope, $log, $injector, $timeout, lodash, gettextCatalog, dataService) {
   var root = {};
 
   var _isAvailable = false;
@@ -532,12 +532,11 @@ angular.module('copayApp.services').factory('bitcoinDataService', function($root
     }
 
     var opts = {
-      dataServices: {
-        bitcoinDataService: config
-      }
+      bitcoinDataService: config
     };
-    configService.set(opts, function(err) {
+    dataService.setConfig(opts, function(err) {
       if (err) return cb(err);
+      cb();
 
       // Configure the services according to changed settings.
       configureServices(function() {

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('gdaxDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('gdaxDataService', function($log, gettextCatalog, lodash, dataService) {
   var root = {};
 
   var service = {
@@ -288,6 +288,7 @@ angular.module('copayApp.services').factory('gdaxDataService', function($log, ge
         });
       }
     }
+    result.data = lodash.sortBy(result.data, 'date');
     return result;
   };
 
