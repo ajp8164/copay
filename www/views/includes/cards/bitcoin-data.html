@@ -24,18 +24,18 @@
     <div ng-show="!collapsed">
 
       <div class="section chart">
-        <ion-slides class="slides" slider="chartSliderDelegate" options="chartSliderOptions" ng-show="charts.length > 0">
-          <ion-slide-page ng-repeat="chart in charts track by $index">
+        <ion-slides class="slides" delegate-handle="chart-slider" slider="chartSliderDelegate" options="chartSliderOptions" ng-show="charts.length > 0">
+          <ion-slide-page ng-repeat="chart in charts track by chart.id">
 
             <div class="title">{{chart.name}} ({{chart.unit}}) - {{chart.period}}</div>
-            <techan options="chart.options" data="chart.data" class="techan-chart"></techan>
+            <techan id="{{chart.id}}" options="chart.options" data="chart.data" class="techan-chart"></techan>
 
           </ion-slide-page>
         </ion-slides>
       </div>
 
       <div class="section stats columns large-2 medium-2 small-2">
-        <ion-slides class="slides" slider="statsSliderDelegate" options="statsSliderOptions">
+        <ion-slides class="slides" delegate-handle="stats-slider" slider="statsSliderDelegate" options="statsSliderOptions">
             <!-- Market Data -->
           <ion-slide-page>
             <div class="row">

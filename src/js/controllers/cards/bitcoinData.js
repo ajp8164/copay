@@ -2,6 +2,8 @@
 
 angular.module('copayApp.controllers').controller('bitcoinDataController', function($rootScope, $scope, $timeout, $log, $ionicScrollDelegate, lodash, bitcoinDataService, configService, popupService) {
 
+  var sliders = [];
+
   // Card is initially collaped.
   $scope.collapsed = true;
 
@@ -43,19 +45,28 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
       $timeout(function(){
         $scope.$apply();
       });
+
+
+
+    });
+  };
+
+  function updateSliders() {
+    sliders.forEach(function(slider) {
+      slider.update();
     });
   };
 
   $scope.toggleCollapse = function() {
     $scope.collapsed = !$scope.collapsed;
-
-    if (!$scope.collapsed) {
-      $rootScope.$emit('ngTechan/Render');
-    }
-
     $timeout(function() {
       $ionicScrollDelegate.resize();
       $scope.$apply();
+
+      if (!$scope.collapsed && sliders.length == 2) {
+        sliders[0].update();
+        sliders[1].update();
+      }
     }, 10);
   };
 
@@ -112,6 +123,10 @@ angular.module('copayApp.controllers').controller('bitcoinDataController', funct
 
   $rootScope.$on('Local/BitcoinDataServiceUpdate', function(event, config) {
     setScope();
+  });
+
+  $scope.$on('$ionicSlides.sliderInitialized', function(event, data) {
+    sliders.push(data.slider);
   });
 
   $rootScope.$on('Local/ExperimentChange', function(event, config) {

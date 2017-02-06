@@ -13,23 +13,21 @@ angular.module('ng.techan',[])
 		},
 		link : function(scope, elem, attr) {
       // Check inputs.
-      if (!scope.data) {
-        $log.error('[ngTechan] No data set specified');
-        return;
-      }
+      var _data = scope.data || [];
+      var _id = attr.id || Date.now(); // Create an id if not provided.
 
       // Check and setup options.
-      var opts = lodash.cloneDeep(scope.options);
+      var _opts = lodash.cloneDeep(scope.options);
 
       var required = ['plot'];
-      var diff = lodash.difference(required, Object.keys(opts));
+      var diff = lodash.difference(required, Object.keys(_opts));
       if (diff.length > 0) {
         $log.error('[ngTechan] Missing required options: ' + diff.toString());
         return;
       }
 
       // The css class is constrained to the plot name.
-      opts.cssClass = opts.plot;
+      _opts.cssClass = _opts.plot;
 
       var intervals = {
         'min'       : [ null, 'timeMinute' ],
@@ -53,13 +51,13 @@ angular.module('ng.techan',[])
       };
 
       try {
-        var ti = opts.timeInterval.split('-');
+        var ti = _opts.timeInterval.split('-');
         if (ti.length == 2) {
-          opts.timeStep = ti[0];
-          opts.timeInterval = intervals[ti[1]][1];
+          _opts.timeStep = ti[0];
+          _opts.timeInterval = intervals[ti[1]][1];
         } else if (ti.length == 1) {
-          opts.timeStep = intervals[ti[0]][0];
-          opts.timeInterval = intervals[ti[0]][1];
+          _opts.timeStep = intervals[ti[0]][0];
+          _opts.timeInterval = intervals[ti[0]][1];
         }
       } catch(e) {
         $log.error('[ngTechan] Unrecognized time interval: ' + scope.options.timeInterval);
@@ -77,10 +75,10 @@ angular.module('ng.techan',[])
       var height;
       var x;
       var y;
-      var dataCache;
+      var dataCache = [];
 
       // These plot allow area fill.
-      var hasArea = ['close'].includes(opts.plot);
+      var hasArea = ['close'].includes(_opts.plot);
 
       // Setup svg.
       var svg = d3.select(elem[0]).append('svg');
@@ -91,7 +89,7 @@ angular.module('ng.techan',[])
         .attr('class', 'grid');
 
       var plotWrapper = chartWrapper.append('g')
-        .attr('class', opts.cssClass);
+        .attr('class', _opts.cssClass);
 
       if (hasArea) {
         var areaWrapper = plotWrapper.append('g')
@@ -106,11 +104,25 @@ angular.module('ng.techan',[])
         .attr('class', 'y axis');
 
       // Draw it.
-      render(scope.data);
+      //$log.debug('Techan - init render()');
+      render(_data);
 
-      // Watch it.
+      // Watch for data changes.
       scope.$watch('data', function(newData, oldData) {
+        if (newData == oldData) return;
+        //$log.debug('Techan - new data render()');
         render(newData);
+      }, true);
+
+      // Render when we are un-hidden (e.g., our width is changed).
+      scope.$watch(function() {
+        return {
+          width: document.getElementById(_id).offsetWidth
+        }
+      }, function(newData, oldData) {
+        if (!(newData.width > 0 && oldData.width == 0)) return;
+        //$log.debug('Techan - unhidden render()');
+        render();
       }, true);
 
       // Render the chart on window resize.
@@ -119,23 +131,38 @@ angular.module('ng.techan',[])
       // Render the chart when asked.
       $rootScope.$on('ngTechan/Render', function(e) {
         $timeout(function() {
-          render([]);
+          //$log.debug('Techan - requested to render()');
+          render();
         });
       });
 
       function onResize() {
-        render([]);
+        //$log.debug('Techan - resize render()');
+        render();
       };
 
       function render(data) {
         // Cache the data set and use it when no data is specified (as during window resize).
+        // If there is no data then we just draw an empty chart.
+        // Need to check and cache data prior to checking dimensions; it's possible to get a
+        // data set but not be able to render the chart yet (e.g., on $watch()).
+        data = data || [];
         if (data.length == 0) {
           data = dataCache;
+          //$log.debug('Techan render: ' + _id + ' - reading from data cache');
         } else {
           dataCache = data;
+          //$log.debug('Techan render: ' + _id + ' - set data cache');
         }
 
-        updateDimensions();
+        // If we cannot get valid dimensions then there is nothing to do.
+        // Can happen when render() is called on an event while we're out of DOM or hidden.
+        if (!updateDimensions()) {
+          //$log.debug('Techan render: ' + _id + ' - hidden (won\'t draw)');
+          return;
+        }
+
+        //$log.debug('Techan render: ' + _id) + ' - drawing';
 
         // Re-scale the axis.
         x = techan.scale.financetime().range([0, width]);
@@ -143,11 +170,11 @@ angular.module('ng.techan',[])
 
         var xAxis = d3.axisBottom(x);
 
-        if (opts.timeFormat) {
-          xAxis = xAxis.tickFormat(d3.timeFormat(opts.timeFormat));
+        if (_opts.timeFormat) {
+          xAxis = xAxis.tickFormat(d3.timeFormat(_opts.timeFormat));
         }
-        if (opts.timeInterval) {
-          xAxis = xAxis.ticks(d3[opts.timeInterval], opts.timeStep);
+        if (_opts.timeInterval) {
+          xAxis = xAxis.ticks(d3[_opts.timeInterval], _opts.timeStep);
         }
 
         var yAxis = d3.axisLeft(y);
@@ -160,7 +187,7 @@ angular.module('ng.techan',[])
 
         // Select the plot generator for the chart.
         var plot;
-        switch (opts.plot) {
+        switch (_opts.plot) {
           case 'candlestick':
             plot = techan.plot.candlestick().xScale(x).yScale(y);
             x.domain(data.map(plot.accessor().d));
@@ -208,13 +235,13 @@ angular.module('ng.techan',[])
         }
 
         // Update the data.
-        svg.selectAll('g.' + opts.cssClass).datum(data).call(plot);
+        svg.selectAll('g.' + _opts.cssClass).datum(data).call(plot);
         svg.selectAll('g.x.axis').call(xAxis);
         svg.selectAll('g.y.axis').call(yAxis);
         svg.selectAll('g.grid').call(grid);
 
         if (hasArea) {
-          svg.selectAll('g.' + opts.cssClass + ' .area path').datum(data).attr('d', area);
+          svg.selectAll('g.' + _opts.cssClass + ' .area path').datum(data).attr('d', area);
         }
 
         // Update svg elements to new dimensions.
@@ -230,6 +257,11 @@ angular.module('ng.techan',[])
       };
 
       function updateDimensions() {
+        var containerRect = getContainerRect();
+        if (!containerRect || containerRect.width == 0 || containerRect.height == 0) {
+          return false;
+        }
+
         // Determine width using style preference
         if (!(cssWidth.includes('px') || cssWidth.includes('%'))) {
           cssWidth = '100%'; // default value for all other settings
@@ -238,7 +270,6 @@ angular.module('ng.techan',[])
         if (cssWidth.includes('px')) {
           width = parseInt(cssWidth);
         } else if (cssWidth.includes('%')) {
-          var containerRect = getContainerRect();
           var percent = parseInt(cssWidth) / 100.0;
           width = containerRect.width * percent;
         }
@@ -256,7 +287,6 @@ angular.module('ng.techan',[])
         if (cssHeight.includes('px')) {
           height = parseInt(cssHeight);
         } else if (cssHeight.includes('%')) {
-          var containerRect = getContainerRect();
           var percent = parseInt(cssHeight) / 100.0;
           height = containerRect.height * percent;
         }
@@ -265,14 +295,18 @@ angular.module('ng.techan',[])
           height = Math.min(height, maxHeight);
         }
         height = height - margin.top - margin.bottom;
+
+        return true;
       };
 
       function getContainerRect() {
-        var containerRect;
-        if (elem[0].id != '') {
-          containerRect = document.getElementById(elem[0].id).parentElement.getBoundingClientRect();
-        } else {
-          containerRect = document.querySelector(elem[0].nodeName).parentElement.getBoundingClientRect();
+        var containerRect = undefined;
+        try {
+          containerRect = document.getElementById(_id).parentElement.getBoundingClientRect();
+        } catch(e) {
+          // Likely the document query for the elem failed.
+          // Can happen when render() is called while we're ouf of DOM or hidden.
+          // Silently return undefined.
         }
         return containerRect;
       };

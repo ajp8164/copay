@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('prefsBitcoinDSChartsController', function($scope, $log, lodash, popupService, gettextCatalog, bitcoinDataService) {
+angular.module('copayApp.controllers').controller('prefsBitcoinDSChartsController', function($rootScope, $scope, $log, lodash, popupService, gettextCatalog, bitcoinDataService) {
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
     bitcoinDataService.getConfig(function(config) {
@@ -41,15 +41,13 @@ angular.module('copayApp.controllers').controller('prefsBitcoinDSChartsControlle
 
       bitcoinDataService.setConfig({
         charts: charts
-      }, completeSave);
+      }, function(err) {
+        if (err) {
+          $log.error(err);
+          return popupService.showAlert(gettextCatalog.getString('Error'), gettextCatalog.getString('Could not save settings.'));
+        }
+      });
     });
-  };
-
-  var completeSave = function(err) {
-    if (err) {
-      $log.error(err);
-      return popupService.showAlert(gettextCatalog.getString('Error'), gettextCatalog.getString('Could not save settings.'));
-    }
   };
 
 });

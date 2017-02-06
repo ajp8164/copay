@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitstampDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('bitstampDataService', function($log, gettextCatalog, lodash, dataService) {
   var root = {};
 
   var service = {
@@ -282,6 +282,7 @@ angular.module('copayApp.services').factory('bitstampDataService', function($log
         });
       }
     }
+    result.data = lodash.sortBy(result.data, 'date');
     return result;
   };
 

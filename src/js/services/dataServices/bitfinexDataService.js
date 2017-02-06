@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('bitfinexDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('bitfinexDataService', function($log, gettextCatalog, lodash, dataService) {
   var root = {};
 
   var service = {
@@ -182,13 +182,16 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(1, 'days').format('YYYY-MM-DD');
+              return moment().subtract(1, 'days').unix() * 1000;
             },
             end: function() {
-              return moment().format('YYYY-MM-DD');
+              return moment().unix() * 1000;
             },
-            granularity: function() {
-              return '15-min';
+            interval: function() {
+              return '15m';
+            },
+            limit: function() {
+              return 200;
             }
           },
           results: {
@@ -201,13 +204,16 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(7, 'days').format('YYYY-MM-DD');
+              return moment().subtract(7, 'days').unix() * 1000;
             },
             end: function() {
-              return moment().format('YYYY-MM-DD');
+              return moment().unix() * 1000;
             },
-            granularity: function() {
-              return 'Hourly';
+            interval: function() {
+              return '1h';
+            },
+            limit: function() {
+              return 200;
             }
           },
           results: {
@@ -220,13 +226,16 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         {
           params: {
             start: function() {
-              return moment().subtract(30, 'days').format('YYYY-MM-DD');
+              return moment().subtract(30, 'days').unix() * 1000;
             },
             end: function() {
-              return moment().format('YYYY-MM-DD');
+              return moment().unix() * 1000;
             },
-            granularity: function() {
-              return '6-hour';
+            interval: function() {
+              return '6h';
+            },
+            limit: function() {
+              return 200;
             }
           },
           results: {
@@ -268,14 +277,13 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
     // rawValues: [
     //  [time, open, close, high, low, volume]
     // ]
-    // Note: time is truncated by 3 digits
     var result = {
       data: []
     };
     if (Array.isArray(rawValues) && rawValues.length > 0) {
       for (var i = 0; i < rawValues.length; i++) {
         result.data.push({
-          date: new Date(rawValues[i][0]*1000),
+          date: new Date(rawValues[i][0]),
           open: rawValues[i][1],
           high: rawValues[i][3],
           low: rawValues[i][4],
@@ -284,6 +292,7 @@ angular.module('copayApp.services').factory('bitfinexDataService', function($log
         });
       }
     }
+    result.data = lodash.sortBy(result.data, 'date');
     return result;
   };
 
