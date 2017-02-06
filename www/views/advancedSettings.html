@@ -23,6 +23,20 @@
         If enabled, the Recent Transactions card - a list of transactions occuring across all wallets - will appear in the Home tab.
       </div>
 
+      <div class="item item-divider" translate>Experimental Features</div>
+      <div class="settings-explanation">
+        <div class="settings-description" translate>
+          These features aren't quite ready for primetime. They may change, stop working, or disappear at any time.
+        </div>
+      </div>
+
+      <ion-toggle class="has-comment" ng-model="experimental.dataServices.value" toggle-class="toggle-balanced" ng-change="toggledDataServices()">
+        <span class="toggle-label" translate>Data Services</span>
+      </ion-toggle>
+      <div class="comment" translate>
+        This feature provides bitcoin market data, network data, and charts. It may be unstable.
+      </div>
+
       <ion-toggle ng-model="hideNextSteps.value" toggle-class="toggle-balanced" ng-change="nextStepsChange()">
         <span class="toggle-label" translate>Hide Next Steps Card</span>
       </ion-toggle>
