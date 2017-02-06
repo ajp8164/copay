@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('krakenDataService', function($log, gettextCatalog, dataService) {
+angular.module('copayApp.services').factory('krakenDataService', function($log, gettextCatalog, lodash, dataService) {
   var root = {};
 
   var service = {
@@ -251,18 +251,20 @@ angular.module('copayApp.services').factory('krakenDataService', function($log, 
     var result = {
       data: []
     };
-    if (Array.isArray(rawValues) && rawValues.length > 0) {
-      for (var i = 0; i < rawValues[0].length; i++) {
+    if (Array.isArray(rawValues) && Array.isArray(rawValues[0])) {
+      rawValues = rawValues[0];
+      for (var i = 0; i < rawValues.length; i++) {
         result.data.push({
           date: new Date(rawValues[i][0]*1000),
-          open: rawValues[i][1],
-          high: rawValues[i][2],
-          low: rawValues[i][3],
-          close: rawValues[i][4],
-          volume: rawValues[i][6]
+          open: +rawValues[i][1],
+          high: +rawValues[i][2],
+          low: +rawValues[i][3],
+          close: +rawValues[i][4],
+          volume: +rawValues[i][6]
         });
       }
     }
+    result.data = lodash.sortBy(result.data, 'date');
     return result;
   };
 
