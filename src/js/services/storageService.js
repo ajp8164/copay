@@ -414,9 +414,9 @@ angular.module('copayApp.services')
     // }
     root.removeBitpayDebitCard = function(network, cardEid, cb) {
 
-      root.getBitpayAccounts(network, function(err, allAccounts){
+      root.getBitpayAccounts(network, function(err, allAccounts) {
 
-        lodash.each(allAccounts, function(account){
+        lodash.each(allAccounts, function(account) {
           account.cards = lodash.reject(account.cards, {
             'eid': cardEid
           });
@@ -450,10 +450,16 @@ angular.module('copayApp.services')
       storage.get('bitpayAccounts-v2-' + network, function(err, allAccountsStr) {
         if (err) return cb(err);
 
+        if (!allAccountsStr) 
+          return cb(null, {});
+
         var allAccounts = {};
         try {
           allAccounts = JSON.parse(allAccountsStr);
-        } catch (e) {};
+        } catch (e) {
+          $log.error('Bad storage value for bitpayAccount-v2' + allAccountsStr)
+          return cb(null, {});
+        };
 
         var anyMigration;
 
@@ -477,10 +483,10 @@ angular.module('copayApp.services')
         });
 
         if (anyMigration) {
-          storage.set('bitpayAccounts-v2-' + network, allAccounts, function(){
+          storage.set('bitpayAccounts-v2-' + network, allAccounts, function() {
             return cb(err, allAccounts);
           });
-        } else 
+        } else
           return cb(err, allAccounts);
 
       });
