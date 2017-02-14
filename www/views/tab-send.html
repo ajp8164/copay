@@ -62,9 +62,9 @@
             <span translate>Transfer to Wallet</span>
           </div>
           <a class="item item-icon-left item-icon-right" ng-repeat="item in list" ng-if="hasWallets && item.isWallet" ng-click="goToAmount(item)">
-            <!-- <i ng-show="item.isWallet" class="icon ion-briefcase size-21" ng-style="{'color':item.color}"></i> -->
+            <!-- <i ng-show="item.isWallet" class="icon ion-briefcase size-21" ng-class="{'wallet-color-default': !item.color}" ng-style="{'color':item.color}"></i> -->
             <i class="icon big-icon-svg" ng-if="item.isWallet">
-              <img src="img/icon-wallet.svg" ng-style="{'background-color': item.color}" class="bg"/>
+              <img src="img/icon-wallet.svg" ng-class="{'wallet-background-color-default': !item.color}" ng-style="{'background-color': item.color}" class="bg"/>
             </i>
             {{item.name}}
             <i class="icon bp-arrow-right"></i>

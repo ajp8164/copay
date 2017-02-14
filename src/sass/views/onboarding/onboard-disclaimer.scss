@@ -1,8 +1,8 @@
 #onboarding-disclaimer {
   .checkbox input, .checkbox-icon {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 28px;
+    height: 28px;
     display: block;
     border: 0;
     background: transparent;
@@ -69,25 +69,7 @@
     border: none;
     color: #fff;
     text-align: left;
-    .checkbox input:before,
-    .checkbox .checkbox-icon:before,
-    .checkbox input:after,
-    .checkbox-icon:after,
-    .checkbox input:checked:after,
-    input:checked + .checkbox-icon:after{
-        border:none;
-    }
-    .checkbox input:before,
-    .checkbox .checkbox-icon:before {
-      padding: 1.2rem;
-      position: relative;
-      background:url("../img/onboarding-checkbox-unchecked.svg") top center no-repeat;
-    }
-    .checkbox input:checked:before,
-    .checkbox input:checked + .checkbox-icon:before {
-      border:none;
-      background:url("../img/onboarding-checkbox-checked.svg") top center no-repeat;
-    }
+
     .item-content {
       width: 90%;
       margin-left: 6%;
