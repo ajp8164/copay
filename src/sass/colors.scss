@@ -2,6 +2,8 @@
  * Wallet colors
  */
 
+$default-wallet-color-index: 6;
+
 $wallet-color-map: (
    0: (color: #DD4B39, name: 'Cinnabar'),
    1: (color: #F38F12, name: 'Carrot Orange'),
@@ -16,13 +18,25 @@ $wallet-color-map: (
   10: (color: #9B59B6, name: 'Deep Lilac'),
   11: (color: #E856EF, name: 'Free Speech Magenta'),
   12: (color: #FF599E, name: 'Brilliant Rose'),
-  13: (color: #7A8C9E, name: 'Light Slate Grey')
+  13: (color: #7A8C9E, name: 'Light Slate Grey'),
 );
 
 .wallet-color-count {
-  content: '14';
+  content: length($wallet-color-map);
 }
 
+/* background-color and color defaults should be the same */
+$default-wallet-color: map-get( map-get($wallet-color-map, $default-wallet-color-index) , color);
+
+.wallet-background-color-default {
+  background-color: $default-wallet-color;
+}
+
+.wallet-color-default {
+  color: $default-wallet-color;
+}
+
+/* generate classes for all colors */
 @each $id, $map in $wallet-color-map {
   .wallet-color-#{$id} {
     background: map-get($map, color);
