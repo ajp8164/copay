@@ -764,7 +764,7 @@ $wallet-color-map: (
 );
 
 .wallet-color-count {
-  content: length($wallet-color-map);
+  content: '' + length($wallet-color-map);
 }
 
 /* background-color and color defaults should be the same */
