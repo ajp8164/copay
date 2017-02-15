@@ -747,7 +747,7 @@ ion-tabs.tabs-color-active-positive {
  * 
  ***********************************************************************************************************/
 
-$default-wallet-color-index: 7;
+$default-wallet-color-index: 6;
 
 $wallet-color-map: (
    0: (color: $bisonHide,  name: 'Bison Hide'),
@@ -755,9 +755,8 @@ $wallet-color-map: (
    2: (color: $terracotta, name: 'Terracotta'),
    3: (color: $anzac,      name: 'Anzac'),
    4: (color: $hampton,    name: 'Hampton'),
-   5: (color: $bajaWhite,  name: 'Baja White'),
-   6: (color: $oxley,      name: 'Oxley'),
-   7: (color: $tiber,      name: 'Tiber')  
+   5: (color: $oxley,      name: 'Oxley'),
+   6: (color: $tiber,      name: 'Tiber')  
 );
 
 .wallet-color-count {
