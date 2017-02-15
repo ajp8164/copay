@@ -720,11 +720,11 @@ $wallet-color-map: (
   10: (color: #9B59B6, name: 'Deep Lilac'),
   11: (color: #E856EF, name: 'Free Speech Magenta'),
   12: (color: #FF599E, name: 'Brilliant Rose'),
-  13: (color: #7A8C9E, name: 'Light Slate Grey'),
+  13: (color: #7A8C9E, name: 'Light Slate Grey')
 );
 
 .wallet-color-count {
-  content: length($wallet-color-map);
+  content: '' + length($wallet-color-map);
 }
 
 /* background-color and color defaults should be the same */
