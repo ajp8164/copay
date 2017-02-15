@@ -55,6 +55,7 @@ $success-color:                    map-get($palette, success);
  */
 
 $icon-color:                       $app-accent-color;
+$icon-negative-color:              $app-accent-color;
 
 $primary-button-color:             $ctrl-primary-color;
 $primary-button-text-color:        $ctrl-accent-color;
@@ -76,7 +77,7 @@ $gradient-bg-bottom-color:         $app-secondary-color;
  * Third-party brand specific colors
  */
 
-$bitcoin-orange-color:                  #ffa24b;
+$bitcoin-orange-color:                  #FF9900;
 
 $bitpay-primary-button-color:           $soft-blue;
 $bitpay-primary-button-activated-color: #4E69E5;
@@ -133,34 +134,34 @@ a {
     background-position: center;
     margin: 6px 0 2px;
     &.ico-home {
-      background-image: url('../img/app/tab-icons/ico-home.svg');
+      background-image: url(/img/app/tab-icons/ico-home.svg);
     }
     &.ico-home-selected {
-      background-image: url('../img/app/tab-icons/ico-home-selected.svg');
+      background-image: url(/img/app/tab-icons/ico-home-selected.svg);
     }
     &.ico-receive {
-      background-image: url('../img/app/tab-icons/ico-receive.svg');
+      background-image: url(/img/app/tab-icons/ico-receive.svg);
     }
     &.ico-receive-selected {
-      background-image: url('../img/app/tab-icons/ico-receive-selected.svg');
+      background-image: url(/img/app/tab-icons/ico-receive-selected.svg);
     }
     &.ico-settings {
-      background-image: url('../img/app/tab-icons/ico-settings.svg');
+      background-image: url(/img/app/tab-icons/ico-settings.svg);
     }
     &.ico-settings-selected {
-      background-image: url('../img/app/tab-icons/ico-settings-selected.svg');
+      background-image: url(/img/app/tab-icons/ico-settings-selected.svg);
     }
     &.ico-scan {
-      background-image: url('../img/app/tab-icons/ico-scan.svg');
+      background-image: url(/img/app/tab-icons/ico-scan.svg);
     }
     &.ico-scan-selected {
-      background-image: url('../img/app/tab-icons/ico-scan-selected.svg');
+      background-image: url(/img/app/tab-icons/ico-scan-selected.svg);
     }
     &.ico-send {
-      background-image: url('../img/app/tab-icons/ico-send.svg');
+      background-image: url(/img/app/tab-icons/ico-send.svg);
     }
     &.ico-send-selected {
-      background-image: url('../img/app/tab-icons/ico-send-selected.svg');
+      background-image: url(/img/app/tab-icons/ico-send-selected.svg);
     }
   }
 }
@@ -307,7 +308,7 @@ ion-tabs.tabs-color-active-positive {
   }
 
   img {
-    content: url(../img/app/logo-negative.svg);
+    content: url(/img/app/logo-negative.svg);
   }
 
   .button.button-primary {
@@ -334,15 +335,15 @@ ion-tabs.tabs-color-active-positive {
   }
 
   .onboarding-illustration-secure {
-    background-image: url(../img/app/onboarding/tour-phone.svg)
+    background-image: url(/img/app/onboarding/tour-phone.svg)
   }
 
   .onboarding-illustration-currency {
-    background-image: url(../img/app/onboarding/tour-currency.svg)
+    background-image: url(/img/app/onboarding/tour-currency.svg)
   }
 
   .onboarding-illustration-control {
-    background-image: url(../img/app/onboarding/tour-control.svg)
+    background-image: url(/img/app/onboarding/tour-control.svg)
   }
 
   .button.button-primary {
@@ -381,7 +382,7 @@ ion-tabs.tabs-color-active-positive {
 
 #onboarding-push-notifications {
   .onboarding-illustration-notifications {
-    background-image: url(../img/app/onboarding/push-notifications.svg)
+    background-image: url(/img/app/onboarding/push-notifications.svg)
   }
 }
 
@@ -597,6 +598,7 @@ ion-tabs.tabs-color-active-positive {
 
   .icon-buy-bitcoin {
     background-color: $bitcoin-orange-color;
+    background-image: url(/img/app/icon-bitcoin.svg);
   }
 }
 
@@ -694,7 +696,7 @@ ion-tabs.tabs-color-active-positive {
 
 #view-address-book {
   i.icon>svg#Add_Contact path.st0 {
-    stroke: $icon-color;
+    stroke: $icon-negative-color;
   }
 }
 
