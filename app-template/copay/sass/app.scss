@@ -63,8 +63,8 @@ $primary-button-text-color:        $ctrl-accent-color;
 $secondary-button-color:           $ctrl-secondary-color;
 $secondary-button-text-color:      $ctrl-primary-color;
 
-$check-button-color:               $ctrl-secondary-color;
-$toggle-button-color:              $ctrl-secondary-color;
+$check-button-color:               $ctrl-primary-color;
+$toggle-button-color:              $ctrl-primary-color;
 
 $primary-background-color:         $app-primary-color;
 $secondary-background-color:       $app-secondary-color;
@@ -134,34 +134,34 @@ a {
     background-position: center;
     margin: 6px 0 2px;
     &.ico-home {
-      background-image: url(/img/app/tab-icons/ico-home.svg);
+      background-image: url(../img/app/tab-icons/ico-home.svg);
     }
     &.ico-home-selected {
-      background-image: url(/img/app/tab-icons/ico-home-selected.svg);
+      background-image: url(../img/app/tab-icons/ico-home-selected.svg);
     }
     &.ico-receive {
-      background-image: url(/img/app/tab-icons/ico-receive.svg);
+      background-image: url(../img/app/tab-icons/ico-receive.svg);
     }
     &.ico-receive-selected {
-      background-image: url(/img/app/tab-icons/ico-receive-selected.svg);
+      background-image: url(../img/app/tab-icons/ico-receive-selected.svg);
     }
     &.ico-settings {
-      background-image: url(/img/app/tab-icons/ico-settings.svg);
+      background-image: url(../img/app/tab-icons/ico-settings.svg);
     }
     &.ico-settings-selected {
-      background-image: url(/img/app/tab-icons/ico-settings-selected.svg);
+      background-image: url(../img/app/tab-icons/ico-settings-selected.svg);
     }
     &.ico-scan {
-      background-image: url(/img/app/tab-icons/ico-scan.svg);
+      background-image: url(../img/app/tab-icons/ico-scan.svg);
     }
     &.ico-scan-selected {
-      background-image: url(/img/app/tab-icons/ico-scan-selected.svg);
+      background-image: url(../img/app/tab-icons/ico-scan-selected.svg);
     }
     &.ico-send {
-      background-image: url(/img/app/tab-icons/ico-send.svg);
+      background-image: url(../img/app/tab-icons/ico-send.svg);
     }
     &.ico-send-selected {
-      background-image: url(/img/app/tab-icons/ico-send-selected.svg);
+      background-image: url(../img/app/tab-icons/ico-send-selected.svg);
     }
   }
 }
@@ -186,33 +186,43 @@ ion-tabs.tabs-color-active-positive {
  */
 
 /* Primary */
-.button.button-primary {
+.button.button-primary,
+.onboarding .button.button-primary,
+#agree-to-terms .button.button-primary,
+.button.button-positive {
   background-color: $primary-button-color;
   color: $primary-button-text-color !important;
 }
 
-.button.button-primary.activated {
+.button.button-primary.activated,
+.onboarding .button.button-primary.activated,
+#agree-to-terms .button.button-primary.activated,
+.button.button-positive.activated {
   background-color: $primary-button-color;
   opacity: 0.7;
 }
 
 /* Secondary */
-.button.button-secondary {
+.button.button-secondary,
+.onboarding .button.button-secondary {
   background-color: $secondary-button-color;
   color: $secondary-button-text-color !important;
 }
 
-.button.button-secondary.activated {
+.button.button-secondary.activated,
+.onboarding .button.button-secondary.activated {
   background-color: $secondary-button-color;
   opacity: 0.7
 }
 
 /* Clear */
-.button.button-clear {
+.button.button-clear,
+.onboarding .button.button-clear {
   color: $primary-button-color !important;
 }
 
-.button.button-clear.activated {
+.button.button-clear.activated,
+.onboarding .button.button-clear.activated {
   color: $primary-button-color;
   opacity: 0.7;
 }
@@ -296,166 +306,79 @@ ion-tabs.tabs-color-active-positive {
  * Onboarding views
  */
 
-#onboard-welcome {
-  &.onboarding {
+.onboarding {
+  color: $text-light-color !important;
+  background: $primary-background-color;
+  background-image: linear-gradient(to bottom, $gradient-bg-top-color 5%, $gradient-bg-bottom-color 100%);
+
+  .onboarding-description {
     color: $text-light-color;
-    background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
+    opacity: 0.7;
   }
 
-  > ion-content {
+  &#onboard-welcome > ion-content {
     background: none;
   }
 
-  img {
-    content: url(/img/app/logo-negative.svg);
-  }
-
-  .button.button-primary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
-  }
-
-  .button.button-primary.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-  }
-}
-
-#onboarding-tour {
-  &.onboarding {
-    color: $text-light-color;
-    background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
-  }
-
-  .onboarding-description {
-    color: $text-light-color;
-    opacity: 0.5;
+  &#onboard-welcome {
+    img#logo {
+      content: url(../img/app/logo-negative.svg);
+    }
   }
 
   .onboarding-illustration-secure {
-    background-image: url(/img/app/onboarding/tour-phone.svg)
+    background-image: url(../img/app/onboarding/tour-phone.svg)
   }
 
   .onboarding-illustration-currency {
-    background-image: url(/img/app/onboarding/tour-currency.svg)
+    background-image: url(../img/app/onboarding/tour-currency.svg)
   }
 
   .onboarding-illustration-control {
-    background-image: url(/img/app/onboarding/tour-control.svg)
+    background-image: url(../img/app/onboarding/tour-control.svg)
   }
 
-  .button.button-primary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
+  .onboarding-illustration-notifications {
+    background-image: url(../img/app/onboarding/push-notifications.svg)
   }
 
-  .button.button-primary.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-  }
-
-  .button.button-secondary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
-  }
-
-  .button.button-secondary.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-  }
-
-  .button.button-clear {
-    color: $primary-button-color !important;
-  }
-
-  .button.button-clear.activated {
-    color: $primary-button-color;
-    opacity: 0.7;
+  .onboarding-illustration-backup-warning {
+    background-image: url(../img/app/backup-warning.svg);
   }
 
   .swiper-pagination-bullet {
-    background: $ctrl-primary-color;
-  }
-}
-
-#onboarding-push-notifications {
-  .onboarding-illustration-notifications {
-    background-image: url(/img/app/onboarding/push-notifications.svg)
-  }
-}
-
-#onboarding-backup-request {
-  &.onboarding {
-    color: $text-light-color;
-    background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
+    background: $ctrl-primary-color !important;
   }
 
-  .onboarding-description {
-    color: $text-light-color;
-    opacity: 0.5;
-  }
-
-  .button.button-primary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
-  }
-
-  .button.button-primary.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-  }
-
-  .button.button-secondary {
-    background-color: $secondary-button-color;
-    color: $secondary-button-text-color !important;
-  }
-
-  .button.button-secondary.activated {
-    background-color: $secondary-button-color;
-    opacity: 0.7;
-  }
-
-  svg#alert-icon g {
-    stroke: $alert-color;
-  }
-
-  #arrow-down {
-    color: $alert-color;
-  }
-}
-
-#onboarding-disclaimer {
-  &.onboarding {
-    color: $text-light-color;
-    background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
-  }
-
-  .onboarding-description {
-    color: $text-light-color;
-    opacity: 0.5;
-  }
-
-  .item {
-    color: $text-light-color;
-  }
-
-  .checkbox input:before,
-  .checkbox .checkbox-icon:before {
-    border-color: $success-color;
-    background: transparent;
-  }
-
-  .checkbox {
-    input:checked + .checkbox-icon:before {
-      border-color: $success-color;
+  &#onboarding-backup-request {
+    svg#alert-icon g {
+      stroke: $alert-color;
     }
 
-    .checkbox-icon:after {
-      border-color: $success-color;
+    #arrow-down {
+      color: $alert-color;
+    }
+  }
+
+  &#onboarding-disclaimer {
+    .item {
+      color: $text-light-color;
+    }
+
+    .checkbox input:before,
+    .checkbox .checkbox-icon:before {
+      border-color: $ctrl-primary-color;
+      background: transparent;
+    }
+
+    .checkbox {
+      input:checked + .checkbox-icon:before {
+        border-color: $ctrl-primary-color;
+      }
+
+      .checkbox-icon:after {
+        border-color: $ctrl-primary-color;
+      }
     }
   }
 }
@@ -467,77 +390,34 @@ ion-tabs.tabs-color-active-positive {
     color: $text-light-color;
   }
 
-  a {
-    color: $text-link-color;
-  }
-
   .item {
     background: transparent;
   }
 
   .checkbox input:before,
   .checkbox .checkbox-icon:before {
-    border-color: $success-color;
+    border-color: $ctrl-primary-color;
     background: transparent;
   }
 
   .checkbox {
     input:checked + .checkbox-icon:before {
-      border-color: $success-color;
+      border-color: $ctrl-primary-color;
     }
 
     .checkbox-icon:after {
-      border-color: $success-color;
+      border-color: $ctrl-primary-color;
     }
   }
-
-  .button.button-positive {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
-  }
-
-  .button.button-positive.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-    border-color: transparent;
-  }  
 }
 
 /*
- * Backup views
+ * Other views
  */
-
-#backup-warning {
-  &.onboarding {
-    color: $text-light-color;
-    background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
-  }
-
-  .onboarding-description {
-    color: $text-light-color;
-    opacity: 0.5;
-  }
-
-  .onboarding-illustration-backup-warning {
-    background-image: url(/img/app/backup-warning.svg);
-  }
-
-  .button.button-primary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
-  }
-
-  .button.button-primary.activated {
-    background-color: $primary-button-color;
-    opacity: 0.7;
-  }
-}
 
 #wallet-backup-phrase {
   > ion-content {
     background: $primary-background-color;
-    background-image: linear-gradient(to bottom, $gradient-bg-top-color 0%, $gradient-bg-bottom-color 100%);
   }
 
   #wallet-backup-phrase-step-1 {
@@ -555,26 +435,148 @@ ion-tabs.tabs-color-active-positive {
 
     #select-phrase {
       background: $primary-background-color;
-    }
 
-    .tldr-prompt {
-      color: $text-light-color;
+      .tldr-prompt {
+        color: $text-light-color;
+      }
     }
 
     .select-word {
+      border-color: $ctrl-primary-color !important;
       background: $ctrl-primary-color;
       color: $text-dark-color;
     }
   }
+}
+
+#tab-home {
+  ion-content {
+    .list.card {
+      i > img,
+      i > div {
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .big-icon-svg > .bg.green {
+    background: $success-color;
+  }
+
+  .icon-buy-bitcoin {
+    background-color: $bitcoin-orange-color;
+    background-image: url(../img/app/icon-bitcoin.svg);
+  }
+
+}
+
+#walletDetails {
+  .bar.bar-header {
+    .button {
+      background-color: transparent;
+      .icon:before {
+        color: white;
+      }
+    }
+
+    .title {
+      color: white;
+    }
+  }
+}
+
+#view-add {
+  .bg {
+    background-color: $icon-color;
+  }
+}
+
+#addresses {
+  .addr-list .item.view-all span {
+    color: $app-primary-color;
+  }
+
+  .addr-list .item.view-all i {
+    color: $app-primary-color;
+  } 
+
+  img {
+    content: url(../img/app/tab-icons/ico-receive-selected.svg);
+  }
+} 
+
+#bitpayCard-intro {
+  .bar.bar-header {
+    .button {
+      background-color: transparent !important;
+      .icon:before {
+        color: $bitpay-button-text-color;
+      }
+    }
+
+    .title {
+      color: $bitpay-button-text-color;
+    }
+  }
 
   .button.button-primary {
-    background-color: $primary-button-color;
-    color: $primary-button-text-color !important;
+    background-color: $bitpay-primary-button-color;
+    color: $bitpay-button-text-color !important;
   }
 
   .button.button-primary.activated {
-    background-color: $primary-button-color;
+    background-color: $bitpay-primary-button-color;
     opacity: 0.7;
+  }
+
+  .button.button-clear {
+    color: $bitpay-button-text-color !important;
+  }
+}
+
+#tab-receive #address .backup,
+.wallet-not-backed-up-warning {
+  background: $alert-color;
+}
+
+#tab-scan {
+  svg#QR-scanner-guides path.st1 {
+    stroke: $app-accent-color;
+  }
+}
+
+#tab-send {
+  img {
+    content: url(../img/app/tab-icons/ico-send-selected.svg);
+  }
+}
+
+#view-amount {
+  item-selector .item-selector .option > i {
+    color: $app-secondary-color;
+  }
+
+  .keypad .operator-send {
+    background-color: $primary-button-color;
+  }
+}
+
+#view-address-book {
+  i.icon>svg#Add_Contact path.st0 {
+    stroke: $icon-negative-color;
+  }
+}
+
+#bitcoin-data {
+  &.card techan svg {
+    path.line {
+      stroke: $app-primary-color !important;
+    }
+
+    .area path {
+      fill: $app-primary-color !important;
+      fill-opacity: 0.2 !important;
+    }
   }
 }
 
@@ -598,7 +600,7 @@ ion-tabs.tabs-color-active-positive {
 
   .icon-buy-bitcoin {
     background-color: $bitcoin-orange-color;
-    background-image: url(/img/app/icon-bitcoin.svg);
+    background-image: url(../img/app/icon-bitcoin.svg);
   }
 }
 
@@ -633,7 +635,7 @@ ion-tabs.tabs-color-active-positive {
   } 
 
   img {
-    content: url(/img/app/tab-icons/ico-receive-selected.svg);
+    content: url(../img/app/tab-icons/ico-receive-selected.svg);
   }
 } 
 
@@ -680,7 +682,7 @@ ion-tabs.tabs-color-active-positive {
 
 #tab-send {
   img {
-    content: url(/img/app/tab-icons/ico-send-selected.svg);
+    content: url(../img/app/tab-icons/ico-send-selected.svg);
   }
 }
 
