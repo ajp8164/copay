@@ -7,8 +7,10 @@ angular.module('copayApp.controllers').controller('preferencesColorController', 
   var config = configService.getSync();
   config.colorFor = config.colorFor || {};
 
-  $scope.colorCount = getColorCount();
-  setCurrentColorIndex();
+  $scope.$on('$ionicView.loaded', function(event, data) {
+    $scope.colorCount = getColorCount();
+    setCurrentColorIndex();
+  });
 
   $scope.save = function(i) {
     var color = indexToColor(i);
