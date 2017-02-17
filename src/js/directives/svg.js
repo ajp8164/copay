@@ -17,7 +17,7 @@ angular.module('copayApp.directives')
         $http.get(imgUrl).success(function(data, status) {
           svg = angular.element(data);
           for (var i = svg.length - 1; i >= 0; i--) {
-            if (svg[i].constructor.name == 'SVGSVGElement') {
+            if (svg[i].constructor == SVGSVGElement) {
               svg = angular.element(svg[i]);
               break;
             }
