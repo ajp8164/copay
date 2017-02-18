@@ -35,4 +35,7 @@ function iconset {
 }
 
 postprocess app-name
-mv ./app-name ../../resources/rocket
+echo "Removing old resources..."
+rm -fr ../../resources/rocket
+echo "Moving to resources..."
+mv -v ./app-name ../../resources/rocket
