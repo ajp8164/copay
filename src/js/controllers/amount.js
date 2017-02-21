@@ -1,6 +1,7 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('amountController', function($scope, $filter, $timeout, $ionicScrollDelegate, $ionicHistory, gettextCatalog, platformInfo, lodash, configService, rateService, $stateParams, $window, $state, $log, txFormatService, ongoingProcess, bitpayCardService, popupService, bwcError, payproService, profileService, bitcore, amazonService, glideraService) {
+angular.module('copayApp.controllers').controller('amountController', function($scope, $filter, $timeout, $ionicScrollDelegate, $ionicHistory, gettextCatalog, platformInfo, lodash, configService, rateService, $stateParams, $window, $state, $log, txFormatService, ongoingProcess, popupService, bwcError, payproService, profileService, bitcore, amazonService) {
+  var _cardId;
   var unitToSatoshi;
   var satToUnit;
   var unitDecimals;
@@ -14,40 +15,27 @@ angular.module('copayApp.controllers').controller('amountController', function($
   });
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
-    // Glidera parameters
-    $scope.isGlidera = data.stateParams.isGlidera;
-    $scope.glideraAccessToken = data.stateParams.glideraAccessToken;
 
     // Go to...
+    _cardId = data.stateParams.id; // Optional (BitPay Card ID)
     $scope.nextStep = data.stateParams.nextStep;
     $scope.currency = data.stateParams.currency;
     $scope.forceCurrency = data.stateParams.forceCurrency;
 
-    $scope.cardId = data.stateParams.cardId;
     $scope.showMenu = $ionicHistory.backView() && $ionicHistory.backView().stateName == 'tabs.send';
-    var isWallet = data.stateParams.isWallet || 'false';
-    $scope.isWallet = (isWallet.toString().trim().toLowerCase() == 'true' ? true : false);
+    $scope.recipientType = data.stateParams.recipientType || null;
     $scope.toAddress = data.stateParams.toAddress;
     $scope.toName = data.stateParams.toName;
     $scope.toEmail = data.stateParams.toEmail;
-    $scope.showAlternativeAmount = !!$scope.cardId || !!$scope.isGlidera || !!$scope.nextStep;
+    $scope.showAlternativeAmount = !!$scope.nextStep;
     $scope.toColor = data.stateParams.toColor;
     $scope.showSendMax = false;
 
     $scope.customAmount = data.stateParams.customAmount;
 
-    if (!$scope.cardId && !$scope.isGlidera && !$scope.nextStep && !data.stateParams.toAddress) {
+    if (!$scope.nextStep && !data.stateParams.toAddress) {
       $log.error('Bad params at amount')
       throw ('bad params');
-    }
-
-    if ($scope.isGlidera) {
-      glideraService.getLimits($scope.glideraAccessToken, function(err, limits) {
-        $scope.limits = limits;
-        $timeout(function() {
-          $scope.$apply();
-        });
-      });
     }
 
     var reNr = /^[1234567890\.]$/;
@@ -78,7 +66,7 @@ angular.module('copayApp.controllers').controller('amountController', function($
     if (data.stateParams.currency) {
       $scope.alternativeIsoCode = data.stateParams.currency;
     } else {
-      $scope.alternativeIsoCode = !!$scope.cardId ? 'USD' : config.alternativeIsoCode;
+      $scope.alternativeIsoCode = config.alternativeIsoCode || 'USD';
     }
     $scope.specificAmount = $scope.specificAlternativeAmount = '';
     $scope.isCordova = platformInfo.isCordova;
@@ -108,11 +96,12 @@ angular.module('copayApp.controllers').controller('amountController', function($
   $scope.sendMax = function() {
     $scope.showSendMax = false;
     $state.transitionTo('tabs.send.confirm', {
-      isWallet: $scope.isWallet,
+      recipientType: $scope.recipientType,
       toAmount: null,
       toAddress: $scope.toAddress,
       toName: $scope.toName,
       toEmail: $scope.toEmail,
+      toColor: $scope.toColor,
       useSendMax: true,
     });
   };
@@ -228,80 +217,12 @@ angular.module('copayApp.controllers').controller('amountController', function($
     return result.replace('x', '*');
   };
 
-  $scope.getRates = function() {
-    bitpayCardService.getRates($scope.alternativeIsoCode, function(err, res) {
-      if (err) {
-        $log.warn(err);
-        return;
-      }
-      if ($scope.unitName == 'bits') {
-        $scope.exchangeRate = '1,000,000 bits ~ ' + res.rate + ' ' + $scope.alternativeIsoCode;
-      } else {
-        $scope.exchangeRate = '1 BTC ~ ' + res.rate + ' ' + $scope.alternativeIsoCode;
-      }
-    });
-  };
-
   $scope.finish = function() {
     var _amount = evaluate(format($scope.amount));
 
-    if ($scope.cardId) {
-      var amountUSD = $scope.showAlternativeAmount ? _amount : $filter('formatFiatAmount')(toFiat(_amount));
-
-      var dataSrc = {
-        amount: amountUSD,
-        currency: 'USD'
-      };
-
-      ongoingProcess.set('Preparing transaction...', true);
-      $timeout(function() {
-
-        bitpayCardService.topUp($scope.cardId, dataSrc, function(err, invoiceId) {
-          if (err) {
-            ongoingProcess.set('Preparing transaction...', false);
-            popupService.showAlert(gettextCatalog.getString('Error'), bwcError.msg(err));
-            return;
-          }
-
-          bitpayCardService.getInvoice(invoiceId, function(err, data) {
-            if (err) {
-              ongoingProcess.set('Preparing transaction...', false);
-              popupService.showAlert(gettextCatalog.getString('Error'), bwcError.msg(err));
-              return;
-            }
-            var payProUrl = data.paymentUrls.BIP73;
-
-            payproService.getPayProDetails(payProUrl, function(err, payProDetails) {
-              ongoingProcess.set('Preparing transaction...', false);
-              if (err) {
-                popupService.showAlert(gettextCatalog.getString('Error'), bwcError.msg(err));
-                return;
-              }
-              var stateParams = {
-                cardId: $scope.cardId,
-                cardAmountUSD: amountUSD,
-                toName: $scope.toName,
-                toAmount: payProDetails.amount,
-                toAddress: payProDetails.toAddress,
-                description: payProDetails.memo,
-                paypro: payProDetails
-              };
-
-              $state.transitionTo('tabs.bitpayCard.confirm', stateParams);
-            }, true);
-          });
-        });
-      });
-
-    } else if ($scope.isGlidera) {
-      var amount = $scope.showAlternativeAmount ? fromFiat(_amount) : _amount;
-      $state.transitionTo('tabs.buyandsell.glidera.confirm', {
-        toAmount: (amount * unitToSatoshi).toFixed(0),
-        isGlidera: $scope.isGlidera,
-        glideraAccessToken: $scope.glideraAccessToken
-      });
-    } else if ($scope.nextStep) {
+    if ($scope.nextStep) {
       $state.transitionTo($scope.nextStep, {
+        id: _cardId,
         amount: _amount,
         currency: $scope.showAlternativeAmount ? $scope.alternativeIsoCode : ''
       });
@@ -314,11 +235,12 @@ angular.module('copayApp.controllers').controller('amountController', function($
         });
       } else {
         $state.transitionTo('tabs.send.confirm', {
-          isWallet: $scope.isWallet,
+          recipientType: $scope.recipientType,
           toAmount: (amount * unitToSatoshi).toFixed(0),
           toAddress: $scope.toAddress,
           toName: $scope.toName,
-          toEmail: $scope.toEmail
+          toEmail: $scope.toEmail,
+          toColor: $scope.toColor,
         });
       }
     }
