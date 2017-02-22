@@ -14,8 +14,8 @@
 @import "advancedSettings";
 @import "bitpayCard";
 @import "bitpayCardIntro";
-@import "bitpayCardPreferences";
 @import "buyandsell";
+@import "bitpayServicesPreferences";
 @import "address-book";
 @import "addresses";
 @import "wallet-backup-phrase";
@@ -43,7 +43,7 @@
 @import "includes/itemSelector";
 @import "includes/cards/bitcoin-data";
 @import "includes/walletSelector";
-@import "includes/cards/bitcoin-data";
+@import "includes/accountSelector";
 @import "integrations/integrations";
 @import "integrations/coinbase";
 @import "integrations/glidera";
