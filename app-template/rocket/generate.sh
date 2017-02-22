@@ -39,3 +39,8 @@ echo "Removing old resources..."
 rm -fr ../../resources/rocket
 echo "Moving to resources..."
 mv -v ./app-name ../../resources/rocket
+
+# Post process img/
+# Rename .ico
+mv img/favicon.ico.png img/favicon.ico
+mv img/logo.ico.png img/logo.ico

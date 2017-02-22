@@ -9,46 +9,16 @@
  * Define color palettes
  */
 
-/* modern */
-$sangria:    #9E0000;
-$temptress:  #400000;
-
-/* retro */
-$bisonHide:  #BEB7A4;
-$goBen:      #786F52;
-$terracotta: #E06A4E;
-$anzac:      #DEB853;
-$hampton:    #E2D9A2;
-$bajaWhite:  #FFF8D0;
-$oxley:      #789f8A;
-$tiber:      #0A373A;
-
 $color-palettes: (
-  modern: (
-    primary:        $temptress,
-    secondary:      $sangria,
-    accent:         #FFFFFF,
-    ctrl-primary:   $temptress,
-    ctrl-secondary: $sangria,
-    ctrl-accent:    $temptress,
-    text-light:     white,
-    text-dark:      black,
-    text-link:      $sangria,
-    success:        #00FF00,
-    alert:          $sangria
-  ),
-  retro: (
-    primary:        $oxley,
-    secondary:      $anzac,
-    accent:         $bajaWhite,
-    ctrl-primary:   $tiber,
-    ctrl-secondary: $bajaWhite,
-    ctrl-accent:    $anzac,
-    text-light:     $bajaWhite,
-    text-dark:      $tiber,
-    text-link:      $oxley,
-    success:        $oxley,
-    alert:          $terracotta
+  default: (
+    primary:        #03244D,
+    secondary:      #496E9C,
+    accent:         #DEB853,
+    text-primary:   #03244D,
+    text-secondary: #DEB853,
+    text-highlight: #DEB853,
+    success:        #21943A,
+    alert:          #F68026
   )
 );
 
@@ -56,24 +26,20 @@ $color-palettes: (
  * Choose color palette
  */
 
-$selected-palette: retro;
+$selected-palette: default;
 $palette: map-get($color-palettes, $selected-palette);
 
 /*
  * Set colors based on the selected palette
  */
 
-$app-primary-color:                map-get($palette, primary);
-$app-secondary-color:              map-get($palette, secondary);
-$app-accent-color:                 map-get($palette, accent);
+$primary-color:                    map-get($palette, primary);
+$secondary-color:                  map-get($palette, secondary);
+$accent-color:                     map-get($palette, accent);
 
-$ctrl-primary-color:               map-get($palette, ctrl-primary);
-$ctrl-secondary-color:             map-get($palette, ctrl-secondary);
-$ctrl-accent-color:                map-get($palette, ctrl-accent);
-
-$text-dark-color:                  map-get($palette, text-dark);
-$text-light-color:                 map-get($palette, text-light);
-$text-link-color:                  map-get($palette, text-link);
+$text-primary-color:               map-get($palette, text-primary);
+$text-secondary-color:             map-get($palette, text-secondary);
+$text-highlight-color:             map-get($palette, text-highlight);
 
 $alert-color:                      map-get($palette, alert);
 $success-color:                    map-get($palette, success);
@@ -82,24 +48,26 @@ $success-color:                    map-get($palette, success);
  * Set element colors
  */
 
-$icon-color:                       $ctrl-accent-color;
-$icon-negative-color:              $app-primary-color;
+$icon-color:                       $accent-color;
+$icon-negative-color:              $primary-color;
 
-$primary-button-color:             $ctrl-primary-color;
-$primary-button-text-color:        $ctrl-accent-color;
+$primary-button-color:             $accent-color;
+$primary-button-text-color:        $text-primary-color;
 
-$secondary-button-color:           $ctrl-secondary-color;
-$secondary-button-text-color:      $ctrl-primary-color;
+$secondary-button-color:           $primary-color;
+$secondary-button-text-color:      $text-secondary-color;
 
-$check-button-color:               $ctrl-accent-color;
-$toggle-button-color:              $ctrl-accent-color;
+$popup-button-text-color:          $text-primary-color;
 
-$primary-background-color:         $app-primary-color;
-$secondary-background-color:       $app-secondary-color;
-$accent-background-color:          $app-accent-color;
+$check-button-color:               $accent-color;
+$toggle-button-color:              $accent-color;
 
-$gradient-bg-top-color:            $app-primary-color;
-$gradient-bg-bottom-color:         $app-secondary-color;
+$primary-background-color:         $primary-color;
+$secondary-background-color:       $secondary-color;
+$accent-background-color:          $accent-color;
+
+$gradient-bg-top-color:            $primary-color;
+$gradient-bg-bottom-color:         $secondary-color;
 
 /*
  * Third-party brand specific colors
@@ -118,13 +86,13 @@ $bitpay-button-text-color:              white;
  ***********************************************************************************************************/
 
 a {
-  color: $text-link-color;
+  color: $text-highlight-color;
 }
 
 .box-notification.error {
   background-color: $alert-color;
   border-color: $alert-color;
-  color: $text-dark-color;
+  color: $text-primary-color;
 }
 
 /* 
@@ -148,7 +116,7 @@ a {
   }
 
  .title {
-    color: $app-accent-color;
+    color: $text-secondary-color;
   }
 }
 
@@ -197,7 +165,7 @@ a {
 ion-tabs.tabs-color-active-positive {
   .tab-item.tab-item-active,
   .tab-item.activated {
-    color: $app-primary-color;
+    color: $primary-color;
   }
 }
 
@@ -206,7 +174,7 @@ ion-tabs.tabs-color-active-positive {
  */
 
 .top-tabs .col {
-  border-bottom-color: $ctrl-accent-color !important;
+  border-bottom-color: $accent-color !important;
 }
 
 /*
@@ -253,6 +221,20 @@ ion-tabs.tabs-color-active-positive {
 .onboarding .button.button-clear.activated {
   color: $primary-button-color;
   opacity: 0.7;
+}
+
+/* Popup buttons */
+.popup-buttons {
+  .button.button-clear,
+  .onboarding .button.button-clear {
+    color: $popup-button-text-color !important;
+  }
+
+  .button.button-clear.activated,
+  .onboarding .button.button-clear.activated {
+    color: $popup-button-text-color;
+    opacity: 0.7;
+  }
 }
 
 /*
@@ -334,12 +316,12 @@ ion-tabs.tabs-color-active-positive {
  */
 
 .onboarding {
-  color: $text-light-color !important;
+  color: $text-secondary-color !important;
   background: $primary-background-color;
   background-image: linear-gradient(to bottom, $gradient-bg-top-color 5%, $gradient-bg-bottom-color 100%);
 
   .onboarding-description {
-    color: $text-light-color;
+    color: $text-secondary-color;
     opacity: 0.7;
   }
 
@@ -374,7 +356,7 @@ ion-tabs.tabs-color-active-positive {
   }
 
   .swiper-pagination-bullet {
-    background: $ctrl-primary-color !important;
+    background: $accent-color !important;
   }
 
   &#onboarding-backup-request {
@@ -389,22 +371,22 @@ ion-tabs.tabs-color-active-positive {
 
   &#onboarding-disclaimer {
     .item {
-      color: $text-light-color;
+      color: $text-secondary-color;
     }
 
     .checkbox input:before,
     .checkbox .checkbox-icon:before {
-      border-color: $ctrl-secondary-color;
+      border-color: $check-button-color;
       background: transparent;
     }
 
     .checkbox {
       input:checked + .checkbox-icon:before {
-        border-color: $ctrl-secondary-color;
+        border-color: $check-button-color;
       }
 
       .checkbox-icon:after {
-        border-color: $ctrl-secondary-color;
+        border-color: $check-button-color;
       }
     }
   }
@@ -414,7 +396,7 @@ ion-tabs.tabs-color-active-positive {
   background: $secondary-background-color;
 
   p {
-    color: $text-light-color;
+    color: $text-secondary-color;
   }
 
   .item {
@@ -423,17 +405,17 @@ ion-tabs.tabs-color-active-positive {
 
   .checkbox input:before,
   .checkbox .checkbox-icon:before {
-    border-color: $ctrl-secondary-color;
+    border-color: $check-button-color;
     background: transparent;
   }
 
   .checkbox {
     input:checked + .checkbox-icon:before {
-      border-color: $ctrl-secondary-color;
+      border-color: $check-button-color;
     }
 
     .checkbox-icon:after {
-      border-color: $ctrl-secondary-color;
+      border-color: $check-button-color;
     }
   }
 }
@@ -448,30 +430,30 @@ ion-tabs.tabs-color-active-positive {
   }
 
   #wallet-backup-phrase-step-1 {
-    color: $text-light-color;
+    color: $text-secondary-color;
   }
 
   .backup-phrase {
     background-color: $secondary-background-color;
     border-color: $accent-background-color;
-    color: $text-light-color;
+    color: $text-secondary-color;
   }
 
   #wallet-backup-phrase-step-2 {
-    color: $text-light-color;
+    color: $text-secondary-color;
 
     #select-phrase {
       background: $primary-background-color;
 
       .tldr-prompt {
-        color: $text-light-color;
+        color: $text-secondary-color;
       }
     }
 
     .select-word {
-      border-color: $ctrl-primary-color !important;
-      background: $ctrl-primary-color;
-      color: $text-light-color;
+      border-color: $accent-color !important;
+      background: $accent-color;
+      color: $text-primary-color;
     }
   }
 }
@@ -520,11 +502,11 @@ ion-tabs.tabs-color-active-positive {
 
 #addresses {
   .addr-list .item.view-all span {
-    color: $app-primary-color;
+    color: $primary-color;
   }
 
   .addr-list .item.view-all i {
-    color: $app-primary-color;
+    color: $primary-color;
   } 
 
   img {
@@ -535,7 +517,7 @@ ion-tabs.tabs-color-active-positive {
 #bitpayCard-intro {
   .bar.bar-header {
     .button {
-      background-color: transparent !important;
+      background-color: none !important;
       .icon:before {
         color: $bitpay-button-text-color;
       }
@@ -568,7 +550,7 @@ ion-tabs.tabs-color-active-positive {
 
 #tab-scan {
   svg#QR-scanner-guides path.st1 {
-    stroke: $app-accent-color;
+    stroke: $accent-color;
   }
 }
 
@@ -580,7 +562,7 @@ ion-tabs.tabs-color-active-positive {
 
 #view-amount {
   item-selector .item-selector .option > i {
-    color: $app-secondary-color;
+    color: $secondary-color;
   }
 
   .keypad .operator-send {
@@ -597,11 +579,11 @@ ion-tabs.tabs-color-active-positive {
 #bitcoin-data {
   &.card techan svg {
     path.line {
-      stroke: $app-primary-color !important;
+      stroke: $primary-color !important;
     }
 
     .area path {
-      fill: $app-primary-color !important;
+      fill: $primary-color !important;
       fill-opacity: 0.2 !important;
     }
   }
@@ -613,16 +595,13 @@ ion-tabs.tabs-color-active-positive {
  * 
  ***********************************************************************************************************/
 
-$default-wallet-color-index: 6;
+$default-wallet-color-index: 1;
 
 $wallet-color-map: (
-   0: (color: $bisonHide,  name: 'Bison Hide'),
-   1: (color: $goBen,      name: 'Go Ben'),
-   2: (color: $terracotta, name: 'Terracotta'),
-   3: (color: $anzac,      name: 'Anzac'),
-   4: (color: $hampton,    name: 'Hampton'),
-   5: (color: $oxley,      name: 'Oxley'),
-   6: (color: $tiber,      name: 'Tiber')  
+   0: (color: #DD550C,  name: 'Bamboo'),
+   1: (color: #03244D,  name: 'Green Vogue'),
+   2: (color: #DEB853,  name: 'Anzac'),
+   3: (color: #496E9C,  name: 'Kashmir Blue')
 );
 
 .wallet-color-count {
