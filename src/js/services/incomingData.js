@@ -165,6 +165,10 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
 
       // BitPayCard Authentication
     } else if (data && data.indexOf(appConfigService.name + '://') === 0) {
+
+      // Disable BitPay Card
+      if (!appConfigService._enabledExtensions.debitcard) return false;
+
       var secret = getParameterByName('secret', data);
       var email = getParameterByName('email', data);
       var otp = getParameterByName('otp', data);
@@ -216,8 +220,15 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
         data: data,
         type: 'privateKey'
       });
-    } else {
+    } else if (data && ((data.substring(0, 2) == '1|') || (data.substring(0, 2) == '2|') || (data.substring(0, 2) == '3|'))) {
+      $state.go('tabs.home').then(function() {
+        $state.transitionTo('tabs.add.import', {
+          code: data
+        });
+      });
+      return true;
 
+    } else {
       if ($state.includes('tabs.scan')) {
         root.showMenu({
           data: data,

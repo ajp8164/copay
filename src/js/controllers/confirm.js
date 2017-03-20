@@ -7,12 +7,21 @@ angular.module('copayApp.controllers').controller('confirmController', function(
   var countDown = null;
   var cachedSendMax = {};
   $scope.isCordova = platformInfo.isCordova;
-  $ionicConfig.views.swipeBackEnabled(false);
+
+  $scope.$on("$ionicView.beforeLeave", function(event, data) {
+    $ionicConfig.views.swipeBackEnabled(true);
+  });
+
+  $scope.$on("$ionicView.enter", function(event, data) {
+    $ionicConfig.views.swipeBackEnabled(false);
+  });
 
   $scope.$on("$ionicView.beforeEnter", function(event, data) {
 
     toAmount = data.stateParams.toAmount;
     cachedSendMax = {};
+    $scope.showFeeFiat = false;
+    $scope.showAddress = false;
     $scope.useSendMax = data.stateParams.useSendMax == 'true' ? true : false;
     $scope.recipientType = data.stateParams.recipientType || null;
     $scope.toAddress = data.stateParams.toAddress;
@@ -124,6 +133,14 @@ angular.module('copayApp.controllers').controller('confirmController', function(
     });
   };
 
+  $scope.toggleFeeValue = function() {
+    $scope.showFeeFiat = !$scope.showFeeFiat;
+  };
+
+  $scope.toggleAddress = function() {
+    $scope.showAddress = !$scope.showAddress;
+  };
+
   var initConfirm = function() {
     if ($scope.paypro) _paymentTimeControl($scope.paypro.expires);
 
@@ -147,6 +164,7 @@ angular.module('copayApp.controllers').controller('confirmController', function(
 
   function resetValues() {
     $scope.displayAmount = $scope.displayUnit = $scope.fee = $scope.alternativeAmountStr = $scope.insufficientFunds = $scope.noMatchingWallet = null;
+    $scope.showFeeFiat = $scope.showAddress = false;
   };
 
   $scope.getSendMaxInfo = function() {
@@ -363,6 +381,9 @@ angular.module('copayApp.controllers').controller('confirmController', function(
 
   function apply(txp) {
     $scope.fee = txFormatService.formatAmountStr(txp.fee);
+    txFormatService.formatAlternativeStr(txp.fee, function(v) {
+      $scope.feeFiat = v;
+    });
     $scope.txp = txp;
     $timeout(function() {
       $scope.$apply();

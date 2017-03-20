@@ -1,14 +1,21 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('notificationsController', function($scope, $state, $timeout, $stateParams, $ionicConfig, profileService, configService, $interval) {
+angular.module('copayApp.controllers').controller('notificationsController', function($scope, $state, $timeout, $stateParams, $ionicConfig, profileService, configService, $interval, pushNotificationsService) {
 
-  $ionicConfig.views.swipeBackEnabled(false);
+  $scope.$on("$ionicView.enter", function() {
+    $ionicConfig.views.swipeBackEnabled(false);
+  });
+
+  $scope.$on("$ionicView.beforeLeave", function() {
+    $ionicConfig.views.swipeBackEnabled(true);
+  });
+
   $scope.walletId = $stateParams.walletId;
 
   $scope.allowNotif = function() {
     $scope.notificationDialogOpen = true;
     $timeout(function() {
-      profileService.pushNotificationsInit();
+      pushNotificationsService.init();
     });
     $scope.notificationPromise = $interval(function() {
       PushNotification.hasPermission(function(data) {

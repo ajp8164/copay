@@ -7,11 +7,8 @@
 var templates = {
   'package-template.json': '/',
   'index.html': 'www/',
-  'Makefile': 'cordova/',
-  'ProjectMakefile': 'cordova/',
   'config-template.xml': '/',
   'ionic.config.json': '/',
-  'Package.appxmanifest': 'cordova/wp/',
   '.desktop': 'webkitbuilds/',
   'setup-win.iss': 'webkitbuilds/',
   'build-macos.sh': 'webkitbuilds/',
@@ -117,12 +114,6 @@ function copyDir(from, to, cb) {
         var l = tmp.length - from.length;
         if (tmp.indexOf(from) == l) return; // #same dir
 
-        console.log('[apply.js.81]', l); //TODO
-
-        console.log('[apply.js.78]', from); //TODO
-        // console.log('[apply.js.78]', to); //TODO
-        console.log('[apply.js.78]', item.path); //TODO
-        console.log('[apply.js.78]', tmp.indexOf(from)); //TODO
       }
       if (item.path.indexOf('DS_Store') >= 0) return;
 
@@ -141,6 +132,9 @@ function copyDir(from, to, cb) {
 
 }
 
+// Push Notification
+fs.copySync(configDir + '/GoogleService-Info.plist', '../GoogleService-Info.plist');
+fs.copySync(configDir + '/google-services.json', '../google-services.json');
 
 copyDir(configDir + '/img/', '../www/img/app/', function() {
   copyDir(configDir + '/sass/', '../src/sass/app/', function() {
