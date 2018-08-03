@@ -6,7 +6,7 @@
   }
 
   &.card {
-    color: $mid-gray;
+    color: $v-mid-gray;
 
     .price {
       font-size: 38px;
@@ -23,7 +23,7 @@
     .infostamp {
       font-size: 10px;
       font-weight: normal;
-      color: $light-gray;
+      color: $v-light-gray;
 
       .source-name {
         float: right;
@@ -32,7 +32,7 @@
 
     .value {
       font-size: 14px;
-      color: $dark-gray;
+      color: $v-dark-gray;
 
       &.market-p-block {
         display: inline-block;
@@ -47,7 +47,7 @@
       }
 
       &.highlight-up {
-        color: $success-green;
+        color: $v-success-color;
 
         &.market-p-block {
 
@@ -58,7 +58,7 @@
       }
 
       &.highlight-down {
-        color: $warning-red;
+        color: $v-warning-color;
 
         &.market-p-block {
 
@@ -163,7 +163,7 @@
         .label {
           font-size: 12px;
           text-align: center;
-          color: $light-gray;
+          color: $v-light-gray;
         }
       }
 
@@ -177,7 +177,7 @@
         .title {
           font-size: 12px;
           text-align: center;
-          color: $light-gray;
+          color: $v-light-gray;
           margin-bottom: 0;
           text-transform: none;
           font-weight: normal;
@@ -202,16 +202,16 @@
               font-family: "Roboto-Light";
               
               path {
-                stroke: $light-gray;
+                stroke: $v-light-gray;
               }
 
               .tick {
                 line {
-                  stroke: $light-gray;
+                  stroke: $v-light-gray;
                 }
 
                 text {
-                  fill: $light-gray;
+                  fill: $v-light-gray;
                 }
               }
             }
